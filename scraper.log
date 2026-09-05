@@ -20,3 +20,5 @@
 2026-09-05 13:26:48,035 [INFO] Menambahkan 1 berita baru.
 2026-09-05 13:29:03,942 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
 2026-09-05 13:29:03,952 [INFO] Menambahkan 1 berita baru.
+2026-09-05 13:33:50,932 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-09-05 13:33:50,940 [INFO] Berhasil memperbarui 146 berita terbaru.
