@@ -25,11 +25,9 @@ def clean_text(text):
         return ""
     return " ".join(text.split())
 
-# 1. GOOGLE TRENDS KHUSUS INDONESIA (geo=ID)
-def fetch_google_trends_id(scraped_time):
-    url = "https://trends.google.com/trending/rss?geo=ID"
+def parse_google_trends_rss(url, wilayah, default_source, scraped_time):
+    """Fungsi fleksibel untuk menarik Google Trends berdasarkan kode negara."""
     articles = []
-
     try:
         resp = requests.get(url, headers=HEADERS, timeout=15)
         resp.raise_for_status()
@@ -49,68 +47,32 @@ def fetch_google_trends_id(scraped_time):
 
                 news_title = clean_text(title_el.text) if title_el is not None else "-"
                 news_url = url_el.text.strip() if url_el is not None else "-"
-                source_name = clean_text(source_el.text) if source_el is not None else "Google Trends ID"
+                source_name = clean_text(source_el.text) if source_el is not None else default_source
             else:
-                news_title, news_url, source_name = "-", "-", "Google Trends ID"
+                news_title, news_url, source_name = "-", "-", default_source
 
             articles.append({
                 "Waktu Tarik": scraped_time,
-                "Sumber": f"Google Trends Indonesia ({source_name})",
+                "Wilayah": wilayah,
+                "Sumber": f"Google Trends ({source_name})",
                 "Topik / Kata Kunci": keyword,
                 "Volume Pencarian": traffic,
                 "Judul Berita": news_title,
                 "URL": news_url
             })
     except Exception as e:
-        logging.error(f"Gagal mengambil Google Trends ID: {e}")
+        logging.error(f"Gagal mengambil Google Trends {wilayah}: {e}")
 
     return articles
 
-# 2. DETIK TERPOPULER (Umum & Celeb)
-def fetch_detik_populer(scraped_time):
-    urls = [
-        {"url": "https://hot.detik.com/terpopuler", "tag": "DetikHot Terpopuler"},
-        {"url": "https://www.detik.com/terpopuler", "tag": "Detik.com Terpopuler Nasional"}
-    ]
+def fetch_national_terpopuler(scraped_time):
+    """Menarik berita terpopuler nasional (Kompas & Detik)."""
     articles = []
-
-    for item in urls:
-        try:
-            resp = requests.get(item["url"], headers=HEADERS, timeout=15)
-            resp.raise_for_status()
-            soup = BeautifulSoup(resp.text, "html.parser")
-
-            for el in soup.find_all("a", attrs={"dtr-ttl": True}):
-                title = clean_text(el.get("dtr-ttl", ""))
-                link = el.get("href", "").strip()
-                section = clean_text(el.get("dtr-evt", "")).lower()
-
-                if any(x in section for x in ["header", "footer", "menu"]) or len(title) < 20:
-                    continue
-
-                articles.append({
-                    "Waktu Tarik": scraped_time,
-                    "Sumber": item["tag"],
-                    "Topik / Kata Kunci": "Trending Indonesia",
-                    "Volume Pencarian": "Top Traffic",
-                    "Judul Berita": title,
-                    "URL": link
-                })
-        except Exception as e:
-            logging.error(f"Gagal mengambil {item['tag']}: {e}")
-
-    return articles
-
-# 3. KOMPAS.COM TERPOPULER NASIONAL
-def fetch_kompas_populer(scraped_time):
-    url = "https://indeks.kompas.com/terpopuler"
-    articles = []
-
+    
+    # 1. Kompas Terpopuler
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=15)
-        resp.raise_for_status()
+        resp = requests.get("https://indeks.kompas.com/terpopuler", headers=HEADERS, timeout=15)
         soup = BeautifulSoup(resp.text, "html.parser")
-
         for a in soup.find_all("a", href=True):
             href = a["href"].split("?")[0].strip()
             if "kompas.com/read/" in href:
@@ -118,41 +80,65 @@ def fetch_kompas_populer(scraped_time):
                 if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel"]):
                     articles.append({
                         "Waktu Tarik": scraped_time,
-                        "Sumber": "Kompas.com Terpopuler Nasional",
-                        "Topik / Kata Kunci": "Trending Indonesia",
+                        "Wilayah": "Indonesia",
+                        "Sumber": "Kompas.com Terpopuler",
+                        "Topik / Kata Kunci": "Trending Nasional",
                         "Volume Pencarian": "Top Traffic",
                         "Judul Berita": title,
                         "URL": href
                     })
     except Exception as e:
-        logging.error(f"Gagal mengambil Kompas Terpopuler: {e}")
+        logging.error(f"Gagal Kompas: {e}")
+
+    # 2. DetikHot Terpopuler
+    try:
+        resp = requests.get("https://hot.detik.com/terpopuler", headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for el in soup.find_all("a", attrs={"dtr-ttl": True}):
+            title = clean_text(el.get("dtr-ttl", ""))
+            link = el.get("href", "").strip()
+            section = clean_text(el.get("dtr-evt", "")).lower()
+            if "header" in section or "footer" in section or len(title) < 20:
+                continue
+            articles.append({
+                "Waktu Tarik": scraped_time,
+                "Wilayah": "Indonesia",
+                "Sumber": "DetikHot Terpopuler",
+                "Topik / Kata Kunci": "Trending Seleb",
+                "Volume Pencarian": "Top Traffic",
+                "Judul Berita": title,
+                "URL": link
+            })
+    except Exception as e:
+        logging.error(f"Gagal DetikHot: {e}")
 
     return articles
 
 def run_trending():
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-    logging.info("Memulai penarikan berita trending Indonesia...")
+    logging.info("Memulai penarikan berita trending...")
     
-    data = []
-    # 1. Google Trends Indonesia
-    data.extend(fetch_google_trends_id(scraped_time))
-    # 2. Detik Terpopuler Indonesia
-    data.extend(fetch_detik_populer(scraped_time))
-    # 3. Kompas Terpopuler Indonesia
-    data.extend(fetch_kompas_populer(scraped_time))
+    all_data = []
 
-    if not data:
+    # 1. Tarik Data Indonesia (Google Trends ID + Portal Nasional)
+    all_data.extend(parse_google_trends_rss("https://trends.google.com/trending/rss?geo=ID", "Indonesia", "Trends ID", scraped_time))
+    all_data.extend(fetch_national_terpopuler(scraped_time))
+
+    # 2. Tarik Data Internasional (Google Trends Global/US)
+    all_data.extend(parse_google_trends_rss("https://trends.google.com/trending/rss?geo=US", "Internasional", "Trends Global", scraped_time))
+
+    if not all_data:
         logging.warning("Data trending kosong.")
         return
 
-    df_trending = pd.DataFrame(data).drop_duplicates(subset=["URL"])
+    df_trending = pd.DataFrame(all_data).drop_duplicates(subset=["URL"])
     
-    # Simpan hasil dalam urutan kolom yang rapi
-    kolom = ["Waktu Tarik", "Sumber", "Topik / Kata Kunci", "Volume Pencarian", "Judul Berita", "URL"]
+    # Susunan kolom rapi
+    kolom = ["Waktu Tarik", "Wilayah", "Sumber", "Topik / Kata Kunci", "Volume Pencarian", "Judul Berita", "URL"]
     df_trending = df_trending[kolom]
     
     df_trending.to_csv(CSV_TRENDING, index=False)
-    logging.info(f"Berhasil memperbarui {len(df_trending)} topik trending Indonesia ke {CSV_TRENDING}.")
+    logging.info(f"Berhasil memperbarui {len(df_trending)} data trending ke {CSV_TRENDING}.")
 
 if __name__ == "__main__":
     run_trending()
