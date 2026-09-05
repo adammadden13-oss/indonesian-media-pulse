@@ -52,3 +52,10 @@
 2026-09-05 19:31:54,879 [INFO] Berhasil memperbarui 147 berita terbaru.
 2026-09-05 19:31:55,415 [INFO] Memulai penarikan tren terpadu (General News & Sosmed)...
 2026-09-05 19:31:59,324 [INFO] Berhasil menyimpan 26 data tren ke berita_trending.csv.
+2026-09-05 19:45:10,688 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-09-05 19:45:10,696 [INFO] Berhasil memperbarui 147 berita terbaru.
+2026-09-05 19:45:12,984 [ERROR] Gagal mengambil CNN Indonesia: 403 Client Error: Forbidden for url: https://www.cnnindonesia.com/nasional
+2026-09-05 19:45:13,156 [ERROR] Gagal mengambil Tribunnews Nasional: 403 Client Error: Forbidden for url: https://www.tribunnews.com/nasional
+2026-09-05 19:45:15,256 [INFO] Membuat file CSV news baru dengan 242 berita.
+2026-09-05 19:45:15,709 [INFO] Memulai penarikan tren terpadu (General News & Sosmed)...
+2026-09-05 19:45:20,917 [INFO] Berhasil menyimpan 43 data tren ke berita_trending.csv.
