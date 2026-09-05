@@ -153,21 +153,13 @@ def run_job():
 
     df_new = pd.DataFrame(data).drop_duplicates(subset=["URL"])
 
-    # Mengatur urutan kolom: 'Waktu Tarik' diletakkan di paling kiri sebelum 'Sumber'
+    # 1. Pastikan urutan kolom: 'Waktu Tarik' paling kiri
     kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL"]
     df_new = df_new[kolom_urut]
 
-    if os.path.exists(CSV_FILE):
-        df_existing = pd.read_csv(CSV_FILE)
-        existing_urls = set(df_existing["URL"].dropna().astype(str))
-        df_to_save = df_new[~df_new["URL"].astype(str).isin(existing_urls)]
-
-        if not df_to_save.empty:
-            df_to_save.to_csv(CSV_FILE, mode="a", header=False, index=False)
-            logging.info(f"Menambahkan {len(df_to_save)} berita baru.")
-    else:
-        df_new.to_csv(CSV_FILE, index=False)
-        logging.info(f"Membuat file CSV dengan {len(df_new)} berita awal.")
+    # 2. Tulis ulang (overwrite) file CSV agar data lama langsung diganti dengan data baru yang bersih
+    df_new.to_csv(CSV_FILE, index=False)
+    logging.info(f"Berhasil memperbarui {len(df_new)} berita terbaru.")
 
 if __name__ == "__main__":
     run_job()
