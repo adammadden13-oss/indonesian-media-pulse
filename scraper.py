@@ -43,8 +43,17 @@ def fetch_latest_articles():
     for el in elements:
         title = el.get("dtr-ttl", "").strip()
         link = el.get("href", "").strip()
-        section = el.get("dtr-evt", "").strip()
+        section = el.get("dtr-evt", "").strip().lower()
         article_id = el.get("dtr-id", "").strip()
+
+        # FILTER PEMBERSIHAN:
+        # 1. Pastikan bukan dari header atau footer
+        if "header" in section or "footer" in section:
+            continue
+
+        # 2. Pastikan article_id adalah angka murni (ciri khas artikel asli detik)
+        if not article_id.isdigit():
+            continue
 
         img_tag = el.find("img")
         img_url = ""
