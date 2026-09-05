@@ -1,2 +1,14 @@
 2026-09-05 12:38:05,770 [INFO] Proses scraping dimulai...
 2026-09-05 12:38:07,721 [INFO] File CSV dibuat dengan 151 berita.
+2026-09-05 13:00:02,076 [INFO] === Memulai Siklus Penarikan Multi-Source ===
+2026-09-05 13:00:02,076 [INFO] Mengambil data dari: Wolipop (https://wolipop.detik.com)
+2026-09-05 13:00:03,683 [INFO] -> Ditemukan 78 artikel dari Wolipop
+2026-09-05 13:00:03,683 [INFO] Mengambil data dari: DetikHot Celebs (https://hot.detik.com/celebs)
+2026-09-05 13:00:05,075 [INFO] -> Ditemukan 122 artikel dari DetikHot Celebs
+2026-09-05 13:00:05,075 [INFO] Mengambil data dari: Grid.ID (https://www.grid.id)
+2026-09-05 13:00:05,181 [INFO] -> Ditemukan 0 artikel dari Grid.ID
+2026-09-05 13:00:05,181 [INFO] Mengambil data dari: Okezone Celebrity (https://celebrity.okezone.com)
+2026-09-05 13:00:05,507 [INFO] -> Ditemukan 81 artikel dari Okezone Celebrity
+2026-09-05 13:00:05,507 [INFO] Mengambil data dari: TribunTrends Infotainment (https://trends.tribunnews.com/infotainment)
+2026-09-05 13:00:05,603 [ERROR] Gagal memproses TribunTrends Infotainment: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-09-05 13:00:05,614 [INFO] Berhasil menyimpan 97 berita baru ke CSV.
