@@ -24,3 +24,8 @@
 2026-09-05 13:33:50,940 [INFO] Berhasil memperbarui 146 berita terbaru.
 2026-09-05 16:34:52,506 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
 2026-09-05 16:34:52,513 [INFO] Berhasil memperbarui 145 berita terbaru.
+2026-09-05 18:46:52,977 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-09-05 18:46:52,991 [INFO] Berhasil memperbarui 146 berita terbaru.
+2026-09-05 18:46:53,728 [INFO] Memulai penarikan berita trending...
+2026-09-05 18:46:55,275 [ERROR] Gagal mengambil Detik Terpopuler: 404 Client Error: Not Found for url: https://hot.detik.com/terpopuler
+2026-09-05 18:46:55,279 [INFO] Berhasil menyimpan 10 topik trending ke berita_trending.csv.
