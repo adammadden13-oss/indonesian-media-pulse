@@ -1,16 +1,16 @@
-name: Scheduled Scraper
+name: Scheduled Scraper & Trending Tracker
 
 on:
   schedule:
     # Berjalan otomatis setiap 2 jam
     - cron: '0 */2 * * *'
-  workflow_dispatch: # Tombol untuk menjalankan manual kapan saja
+  workflow_dispatch: # Tombol eksekusi manual
 
 jobs:
-  scrape:
+  scrape_and_trend:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Izin bot untuk menyimpan/commit data ke repo
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -24,14 +24,18 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Eksekusi Scraper
+      - name: Eksekusi Berita Terkini
         run: |
           python scraper.py
 
-      - name: Commit dan Simpan CSV Terbaru
+      - name: Eksekusi Trending Tracker
+        run: |
+          python trending_tracker.py
+
+      - name: Commit dan Simpan Semua Data Terbaru
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add berita_terkini.csv scraper.log
-          git commit -m "Auto-update data: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
+          git add berita_terkini.csv berita_trending.csv scraper.log
+          git commit -m "Update berita & trending: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
