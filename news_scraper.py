@@ -17,7 +17,6 @@ logging.basicConfig(
 CSV_FILE = "berita_news.csv"
 WIB = timezone(timedelta(hours=7))
 
-# 7 Portal Berita Terbesar di Indonesia
 TARGETS = [
     {"sumber": "detikNews", "url": "https://news.detik.com/berita", "tipe": "detik"},
     {"sumber": "Kompas.com Nasional", "url": "https://nasional.kompas.com", "tipe": "kompas"},
@@ -35,11 +34,20 @@ def get_session():
     return session
 
 def clean_text(text):
-    if not text:
+    """Membersihkan judul dari spasi ganda, tag waktu, dan tanggal rilis."""
+    if not isinstance(text, str) or not text:
         return ""
-    return " ".join(text.split())
+    cleaned = " ".join(text.split())
+    
+    # 1. Hapus pola tanggal & jam lengkap (contoh: "05 September 2026 - 23:23 WIB" atau "05 September 2026")
+    cleaned = re.sub(r'\s*\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s*[-–—]?\s*\d{1,2}:\d{2}(?:\s*(?:WIB|WITA|WIT))?)?\s*$', '', cleaned, flags=re.IGNORECASE)
+    
+    # 2. Hapus pola waktu relatif (contoh: "2 jam yang lalu", "15 menit lalu", "3 jam lalu")
+    cleaned = re.sub(r'\s*\d+\s*(?:menit|jam|hari|detik)\s*(?:yang)?\s*lalu\s*$', '', cleaned, flags=re.IGNORECASE)
+    
+    return cleaned.strip()
 
-# 1. PARSER DETIKNEWS
+# 1. DETIKNEWS
 def parse_detik(soup, sumber):
     articles = []
     for el in soup.find_all("a", attrs={"dtr-ttl": True}):
@@ -64,13 +72,14 @@ def parse_detik(soup, sumber):
             })
     return articles
 
-# 2. PARSER KOMPAS NASIONAL
+# 2. KOMPAS NASIONAL
 def parse_kompas(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "kompas.com/read/" in link:
-            title = clean_text(a.get("title") or a.get_text())
+            raw_title = a.get("title") or a.get_text()
+            title = clean_text(raw_title)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel kompas"]):
                 articles.append({
                     "Sumber": sumber,
@@ -80,13 +89,14 @@ def parse_kompas(soup, sumber):
                 })
     return articles
 
-# 3. PARSER CNN INDONESIA
+# 3. CNN INDONESIA
 def parse_cnn(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "cnnindonesia.com/nasional/" in link:
-            title = clean_text(a.get("title") or a.get_text())
+            raw_title = a.get("title") or a.get_text()
+            title = clean_text(raw_title)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "video", "baca juga", "fokus"]):
                 articles.append({
                     "Sumber": sumber,
@@ -96,13 +106,14 @@ def parse_cnn(soup, sumber):
                 })
     return articles
 
-# 4. PARSER TRIBUNNEWS NASIONAL
+# 4. TRIBUNNEWS NASIONAL
 def parse_tribun(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "tribunnews.com/nasional/" in link and re.search(r'/\d{4}/\d{2}/\d{2}/', link):
-            title = clean_text(a.get("title") or a.get_text())
+            raw_title = a.get("title") or a.get_text()
+            title = clean_text(raw_title)
             if len(title) >= 25 and not any(x in title.lower() for x in ["halaman selanjutnya", "lihat foto", "arsip"]):
                 articles.append({
                     "Sumber": sumber,
@@ -112,13 +123,15 @@ def parse_tribun(soup, sumber):
                 })
     return articles
 
-# 5. PARSER SINDONEWS NASIONAL (MNC Group)
+# 5. SINDONEWS NASIONAL (Dibersihkan dari tag waktu)
 def parse_sindo(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "sindonews.com/read/" in link:
-            title = clean_text(a.get("title") or a.get_text())
+            # Gunakan attribute title jika tersedia, atau get_text lalu bersihkan
+            raw_title = a.get("title") or a.get_text()
+            title = clean_text(raw_title)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "halaman", "baca juga"]):
                 articles.append({
                     "Sumber": sumber,
@@ -128,13 +141,14 @@ def parse_sindo(soup, sumber):
                 })
     return articles
 
-# 6. PARSER INEWS NASIONAL (MNC Group)
+# 6. INEWS NASIONAL
 def parse_inews(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "inews.id/news/" in link:
-            title = clean_text(a.get("title") or a.get_text())
+            raw_title = a.get("title") or a.get_text()
+            title = clean_text(raw_title)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "video", "baca juga"]):
                 articles.append({
                     "Sumber": sumber,
@@ -144,13 +158,14 @@ def parse_inews(soup, sumber):
                 })
     return articles
 
-# 7. PARSER LIPUTAN6 NEWS
+# 7. LIPUTAN6 NEWS
 def parse_liputan6(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "liputan6.com/news/read/" in link:
-            title = clean_text(a.get("title") or a.get_text())
+            raw_title = a.get("title") or a.get_text()
+            title = clean_text(raw_title)
             if len(title) >= 25:
                 articles.append({
                     "Sumber": sumber,
@@ -212,13 +227,21 @@ def run_job():
     df_new = df_new[kolom_urut]
 
     if os.path.exists(CSV_FILE):
-        df_existing = pd.read_csv(CSV_FILE)
-        existing_urls = set(df_existing["URL"].dropna().astype(str))
-        df_to_save = df_new[~df_new["URL"].astype(str).isin(existing_urls)]
-
-        if not df_to_save.empty:
-            df_to_save.to_csv(CSV_FILE, mode="a", header=False, index=False)
-            logging.info(f"Menambahkan {len(df_to_save)} berita news baru.")
+        try:
+            df_existing = pd.read_csv(CSV_FILE)
+            # Bersihkan judul-judul lama yang sudah tersimpan dari eksekusi sebelumnya
+            df_existing["Judul"] = df_existing["Judul"].apply(clean_text)
+            
+            # Gabungkan dengan data baru & eliminasi duplikasi berdasarkan URL
+            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
+            df_combined = df_combined.drop_duplicates(subset=["URL"], keep="first")
+            df_combined = df_combined[kolom_urut]
+            
+            df_combined.to_csv(CSV_FILE, index=False)
+            logging.info(f"Berhasil membersihkan dan memperbarui {len(df_combined)} berita.")
+        except Exception as e:
+            logging.error(f"Error memproses file lama: {e}")
+            df_new.to_csv(CSV_FILE, index=False)
     else:
         df_new.to_csv(CSV_FILE, index=False)
         logging.info(f"Membuat file CSV news baru dengan {len(df_new)} berita.")
