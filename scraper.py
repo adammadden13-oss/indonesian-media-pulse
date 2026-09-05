@@ -1,7 +1,7 @@
 import os
 import re
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -15,6 +15,9 @@ logging.basicConfig(
 )
 
 CSV_FILE = "berita_terkini.csv"
+
+# Zona waktu WIB (UTC+7)
+WIB = timezone(timedelta(hours=7))
 
 # Daftar target portal berita
 TARGETS = [
@@ -34,7 +37,6 @@ def get_session():
 def clean_text(text):
     if not text:
         return ""
-    # Hapus spasi ganda, enter, dan karakter whitespace berlebih
     return " ".join(text.split())
 
 def parse_detik(soup, sumber):
@@ -45,7 +47,6 @@ def parse_detik(soup, sumber):
         section = clean_text(el.get("dtr-evt", "")).title()
         article_id = el.get("dtr-id", "").strip()
 
-        # Filter ketat: buang header, footer, dan pastikan ID berupa angka artikel
         if any(x in section.lower() for x in ["header", "footer", "menu", "logo", "login", "register"]):
             continue
         if not article_id.isdigit():
@@ -113,7 +114,8 @@ def fetch_all():
     }
     session = get_session()
     all_data = []
-    scraped_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # Mengambil waktu dalam zona WIB (UTC+7)
+    scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
 
     for target in TARGETS:
         try:
@@ -133,6 +135,7 @@ def fetch_all():
                 items = []
 
             for item in items:
+                # Set 'Waktu Tarik' pada setiap item
                 item["Waktu Tarik"] = scraped_time
 
             all_data.extend(items)
@@ -145,10 +148,14 @@ def fetch_all():
 def run_job():
     data = fetch_all()
     if not data:
-        logging.warning("Tidak ada data ditemukan.")
+        logging.warning("Tidak ada data yang ditemukan.")
         return
 
     df_new = pd.DataFrame(data).drop_duplicates(subset=["URL"])
+
+    # Mengatur urutan kolom: 'Waktu Tarik' diletakkan di paling kiri sebelum 'Sumber'
+    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL"]
+    df_new = df_new[kolom_urut]
 
     if os.path.exists(CSV_FILE):
         df_existing = pd.read_csv(CSV_FILE)
@@ -160,7 +167,7 @@ def run_job():
             logging.info(f"Menambahkan {len(df_to_save)} berita baru.")
     else:
         df_new.to_csv(CSV_FILE, index=False)
-        logging.info(f"Membuat file CSV baru dengan {len(df_new)} berita.")
+        logging.info(f"Membuat file CSV dengan {len(df_new)} berita awal.")
 
 if __name__ == "__main__":
     run_job()
