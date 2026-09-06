@@ -42,3 +42,8 @@ jobs:
           git add berita_terkini.csv berita_news.csv berita_trending.csv scraper.log
           git commit -m "Auto-update data pipeline: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
+
+      - name: Run Python scripts
+        run: |
+          python scraper.py
+          python news_scraper.py
