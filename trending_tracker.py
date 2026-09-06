@@ -313,6 +313,9 @@ def run_trending():
     all_data.extend(fetch_kompas_terpopuler(scraped_time))
     all_data.extend(fetch_tribun_terpopuler(scraped_time))
 
+    # Tambahkan data tren TikTok
+    all_data.extend(fetch_tiktok_trends(scraped_time))
+
     if not all_data:
         logging.warning("Data trending kosong.")
         return
