@@ -23,10 +23,25 @@ HEADERS = {
     "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
 }
 
+# Daftar kategori kanal Kompas yang sering menempel sebelum tanggal
+KOMPAS_CATS = r"(?:Regional|Nasional|Megapolitan|Global|News|Bola|Tekno|Otomotif|Money|Food|Health|Tren|Edukasi|Sains|Hype|Lifestyle|Homey|Properti|Travel|UMKM|JEO)"
+
 def clean_text(text):
-    if not text:
+    """Membersihkan judul dari spasi ganda, nama kategori Kompas, dan tanggal rilis."""
+    if not isinstance(text, str) or not text:
         return ""
-    return " ".join(text.split())
+    cleaned = " ".join(text.split())
+
+    # 1. Hapus: [Kategori Kompas] [Tanggal] (contoh: "Bola 6 September 2026", "Otomotif 6 September 2026")
+    cleaned = re.sub(rf"\s+{KOMPAS_CATS}\s+\d{{1,2}}\s+[A-Za-z]+\s+\d{{4}}(?:\s*[-–—]?\s*\d{{1,2}}:\d{{2}}(?:\s*(?:WIB|WITA|WIT))?)?\s*$", "", cleaned, flags=re.IGNORECASE)
+
+    # 2. Hapus: Tanggal Indonesia di ujung judul (contoh: "6 September 2026" atau "06 September 2026 - 10:00 WIB")
+    cleaned = re.sub(r"\s+\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s*[-–—]?\s*\d{1,2}:\d{2}(?:\s*(?:WIB|WITA|WIT))?)?\s*$", "", cleaned, flags=re.IGNORECASE)
+
+    # 3. Hapus: Waktu relatif (contoh: "2 jam yang lalu", "15 menit lalu")
+    cleaned = re.sub(r"\s+\d+\s*(?:menit|jam|hari|detik)\s*(?:yang)?\s*lalu\s*$", "", cleaned, flags=re.IGNORECASE)
+
+    return cleaned.strip()
 
 # 1. MEDIA SOSIAL: X (TWITTER) INDONESIA
 def fetch_twitter_trends(scraped_time):
@@ -146,7 +161,7 @@ def fetch_google_trends(scraped_time):
         logging.error(f"Gagal Google Trends: {e}")
     return articles
 
-# 4. DETIKCOM: GENERAL & DETIKNEWS TERPOPULER (BUKAN SELEB)
+# 4. PORTAL BERITA: DETIK TERPOPULER
 def fetch_detik_terpopuler(scraped_time):
     articles = []
     targets = [
@@ -176,7 +191,7 @@ def fetch_detik_terpopuler(scraped_time):
             logging.error(f"Gagal {t['sumber']}: {e}")
     return articles
 
-# 5. KOMPAS.COM TERPOPULER NASIONAL
+# 5. PORTAL BERITA: KOMPAS.COM TERPOPULER (DIBERSIHKAN DARI KATEGORI & TANGGAL)
 def fetch_kompas_terpopuler(scraped_time):
     articles = []
     try:
@@ -185,8 +200,12 @@ def fetch_kompas_terpopuler(scraped_time):
         for a in soup.find_all("a", href=True):
             href = a["href"].split("?")[0].strip()
             if "kompas.com/read/" in href:
-                title = clean_text(a.get("title") or a.get_text())
-                if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel"]):
+                # Prioritaskan mengambil teks dari heading judul langsung
+                h_tag = a.find(["h1", "h2", "h3", "h4"]) or a.find(class_=lambda c: c and "title" in c.lower())
+                raw_title = h_tag.get_text() if h_tag else (a.get("title") or a.get_text())
+
+                title = clean_text(raw_title)
+                if len(title) >= 20 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel kompas"]):
                     articles.append({
                         "Waktu Tarik": scraped_time,
                         "Wilayah": "Indonesia",
@@ -200,7 +219,7 @@ def fetch_kompas_terpopuler(scraped_time):
         logging.error(f"Gagal Kompas: {e}")
     return articles
 
-# 6. TRIBUNNEWS TERPOPULER NASIONAL
+# 6. PORTAL BERITA: TRIBUNNEWS TERPOPULER
 def fetch_tribun_terpopuler(scraped_time):
     articles = []
     try:
@@ -209,7 +228,8 @@ def fetch_tribun_terpopuler(scraped_time):
         for a in soup.find_all("a", href=True):
             href = a["href"].split("?")[0].strip()
             if "tribunnews.com" in href and re.search(r'/\d{4}/\d{2}/\d{2}/', href):
-                title = clean_text(a.get("title") or a.get_text())
+                raw_title = a.get("title") or a.get_text()
+                title = clean_text(raw_title)
                 if len(title) >= 25 and not any(x in title.lower() for x in ["halaman selanjutnya", "lihat foto", "arsip"]):
                     articles.append({
                         "Waktu Tarik": scraped_time,
@@ -226,7 +246,7 @@ def fetch_tribun_terpopuler(scraped_time):
 
 def run_trending():
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-    logging.info("Memulai penarikan tren terpadu (General News & Sosmed)...")
+    logging.info("Memulai penarikan tren terpadu...")
     
     all_data = []
 
@@ -247,11 +267,15 @@ def run_trending():
         return
 
     df_trending = pd.DataFrame(all_data).drop_duplicates(subset=["URL"])
+    
+    # Pastikan seluruh kolom Judul Berita bersih dari kategori dan tanggal bocor
+    df_trending["Judul Berita"] = df_trending["Judul Berita"].apply(clean_text)
+    
     kolom = ["Waktu Tarik", "Wilayah", "Sumber", "Topik / Kata Kunci", "Volume Pencarian", "Judul Berita", "URL"]
     df_trending = df_trending[kolom]
     
     df_trending.to_csv(CSV_TRENDING, index=False)
-    logging.info(f"Berhasil menyimpan {len(df_trending)} data tren ke {CSV_TRENDING}.")
+    logging.info(f"Berhasil menyimpan {len(df_trending)} data tren bersih ke {CSV_TRENDING}.")
 
 if __name__ == "__main__":
     run_trending()
