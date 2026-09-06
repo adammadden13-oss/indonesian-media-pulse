@@ -1,49 +1,48 @@
 name: Scheduled Media & Trends Pipeline
 
 on:
-  schedule:
-    - cron: '0 */2 * * *'
-  workflow_dispatch:
+schedule:
+- cron: '0 */2 * * *'
+workflow_dispatch:
 
 jobs:
-  run_pipeline:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+run_pipeline:
+runs-on: ubuntu-latest
+permissions:
+contents: write
+steps:
+- name: Checkout Repository
+uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+  - name: Setup Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: '3.11'
 
-      - name: Install Libraries
-        run: |
-          pip install -r requirements.txt
+  - name: Install Libraries
+    run: |
+      pip install -r requirements.txt
 
-      - name: 1. Eksekusi Scraper Infotainment & Selebriti
-        run: |
-          python scraper.py
+  - name: 1. Eksekusi Scraper Infotainment & Selebriti
+    run: |
+      python scraper.py
 
-      - name: 2. Eksekusi Scraper Berita General News
-        run: |
-          python news_scraper.py
+  - name: 2. Eksekusi Scraper Berita General News
+    run: |
+      python news_scraper.py
 
-      - name: 3. Eksekusi Trending Tracker (Portal & Sosmed)
-        run: |
-          python trending_tracker.py
+  - name: 3. Eksekusi Trending Tracker (Portal & Sosmed)
+    run: |
+      python trending_tracker.py
 
-      - name: Commit dan Simpan Seluruh Dataset
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add berita_terkini.csv berita_news.csv berita_trending.csv scraper.log
-          git commit -m "Auto-update data pipeline: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
-          git push
+  - name: 4. Eksekusi Tracker Hiburan & Opini (TMDb & Trends)
+    run: |
+      python entertainment_tracker.py
 
-      - name: Run Python scripts
-        run: |
-          python scraper.py
-          python news_scraper.py
+  - name: Commit dan Simpan Seluruh Dataset
+    run: |
+      git config --global user.name "github-actions[bot]"
+      git config --global user.email "github-actions[bot]@users.noreply.github.com"
+      git add berita_terkini.csv berita_news.csv berita_trending.csv hiburan_dan_opini.csv scraper.log
+      git commit -m "Auto-update data pipeline: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
+      git push
