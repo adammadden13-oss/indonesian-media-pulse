@@ -23,11 +23,10 @@ HEADERS = {
     "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
 }
 
-# Daftar kategori kanal Kompas yang sering menempel sebelum tanggal
 KOMPAS_CATS = r"(?:Regional|Nasional|Megapolitan|Global|News|Bola|Tekno|Otomotif|Money|Food|Health|Tren|Edukasi|Sains|Hype|Lifestyle|Homey|Properti|Travel|UMKM|JEO)"
 
 def clean_text(text):
-    """Membersihkan judul dari spasi ganda, nama kategori Kompas, dan tanggal rilis."""
+    """Menghapus tanggal rilis, nama kategori Kompas, dan waktu relatif di ujung judul."""
     if not isinstance(text, str) or not text:
         return ""
     cleaned = " ".join(text.split())
@@ -35,7 +34,7 @@ def clean_text(text):
     # 1. Hapus: [Kategori Kompas] [Tanggal] (contoh: "Bola 6 September 2026", "Otomotif 6 September 2026")
     cleaned = re.sub(rf"\s+{KOMPAS_CATS}\s+\d{{1,2}}\s+[A-Za-z]+\s+\d{{4}}(?:\s*[-–—]?\s*\d{{1,2}}:\d{{2}}(?:\s*(?:WIB|WITA|WIT))?)?\s*$", "", cleaned, flags=re.IGNORECASE)
 
-    # 2. Hapus: Tanggal Indonesia di ujung judul (contoh: "6 September 2026" atau "06 September 2026 - 10:00 WIB")
+    # 2. Hapus: Tanggal di ujung judul (contoh: "6 September 2026" atau "06 September 2026 - 10:00 WIB")
     cleaned = re.sub(r"\s+\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s*[-–—]?\s*\d{1,2}:\d{2}(?:\s*(?:WIB|WITA|WIT))?)?\s*$", "", cleaned, flags=re.IGNORECASE)
 
     # 3. Hapus: Waktu relatif (contoh: "2 jam yang lalu", "15 menit lalu")
@@ -200,12 +199,11 @@ def fetch_kompas_terpopuler(scraped_time):
         for a in soup.find_all("a", href=True):
             href = a["href"].split("?")[0].strip()
             if "kompas.com/read/" in href:
-                # Prioritaskan mengambil teks dari heading judul langsung
                 h_tag = a.find(["h1", "h2", "h3", "h4"]) or a.find(class_=lambda c: c and "title" in c.lower())
                 raw_title = h_tag.get_text() if h_tag else (a.get("title") or a.get_text())
 
                 title = clean_text(raw_title)
-                if len(title) >= 20 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel kompas"]):
+                if len(title) >= 20 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel"]):
                     articles.append({
                         "Waktu Tarik": scraped_time,
                         "Wilayah": "Indonesia",
@@ -268,7 +266,7 @@ def run_trending():
 
     df_trending = pd.DataFrame(all_data).drop_duplicates(subset=["URL"])
     
-    # Pastikan seluruh kolom Judul Berita bersih dari kategori dan tanggal bocor
+    # Bersihkan kolom Judul Berita
     df_trending["Judul Berita"] = df_trending["Judul Berita"].apply(clean_text)
     
     kolom = ["Waktu Tarik", "Wilayah", "Sumber", "Topik / Kata Kunci", "Volume Pencarian", "Judul Berita", "URL"]
