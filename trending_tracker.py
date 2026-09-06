@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import requests
+import logging
 
 logging.basicConfig(
     filename="scraper.log",
@@ -241,6 +243,57 @@ def fetch_tribun_terpopuler(scraped_time):
     except Exception as e:
         logging.error(f"Gagal Tribunnews: {e}")
     return articles
+
+def fetch_tiktok_trends(scraped_time):
+    """
+    Menarik Top 15 Hashtag Trending TikTok di Indonesia
+    melalui endpoint resmi TikTok Creative Center.
+    """
+    url = "https://ads.tiktok.com/creative_radar_api/v1/popular_trend/hashtag/list"
+    params = {
+        "page": 1,
+        "limit": 15,
+        "period": 7,            # 7 hari terakhir (atau 1 untuk harian)
+        "country_code": "ID",   # Wilayah Indonesia
+        "sort_by": "popular"
+    }
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://ads.tiktok.com/business/creativecenter/inspiration/popular/hashtag/pc/en?countryCode=ID",
+        "Accept": "application/json, text/plain, */*"
+    }
+    
+    trends = []
+    try:
+        response = requests.get(url, params=params, headers=headers, timeout=15)
+        if response.status_code == 200:
+            data = response.json()
+            items = data.get("data", {}).get("list", [])
+            for item in items:
+                hashtag = item.get("hashtag_name", "")
+                if not hashtag:
+                    continue
+                
+                # Format jumlah video / penayangan
+                video_count = item.get("publish_cnt", 0)
+                video_views = item.get("video_views", 0)
+                volume_str = f"{video_count:,} video ({video_views:,} views)" if video_count else "Trending di TikTok"
+                
+                trends.append({
+                    "Waktu Tarik": scraped_time,
+                    "Wilayah": "Indonesia",
+                    "Sumber": "TikTok Trending (Creative Center)",
+                    "Topik / Kata Kunci": f"#{hashtag}",
+                    "Volume Pencarian": volume_str,
+                    "Judul Berita": f"Tren TikTok Indonesia: #{hashtag}",
+                    "URL": f"https://www.tiktok.com/tag/{hashtag}"
+                })
+        else:
+            logging.warning(f"TikTok API merespons status code: {response.status_code}")
+    except Exception as e:
+        logging.error(f"Gagal mengambil tren TikTok: {e}")
+        
+    return trends
 
 def run_trending():
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
