@@ -46,3 +46,7 @@ jobs:
           git add berita_terkini.csv berita_news.csv berita_trending.csv hiburan_dan_opini.csv scraper.log
           git commit -m "Auto-update data pipeline: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
+
+      - name: 5. Eksekusi Analisis Sentimen NLP
+        run: |
+          python sentiment_analyzer.py
