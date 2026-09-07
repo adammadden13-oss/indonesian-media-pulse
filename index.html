@@ -8,7 +8,7 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS (Styling Framework) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -16,8 +16,8 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        primary: '#1e3a8a', // Dark blue
-                        accent: '#3b82f6', // Light blue
+                        primary: '#1e3a8a',
+                        accent: '#3b82f6',
                         bgLight: '#f3f4f6',
                         card: '#ffffff'
                     }
@@ -26,10 +26,8 @@
         }
     </script>
 
-    <!-- PapaParse (Untuk membaca CSV) -->
+    <!-- PapaParse & Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
-    <!-- Chart.js (Untuk membuat grafik) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -59,10 +57,10 @@
         <!-- Loading State -->
         <div id="loadingState" class="flex flex-col items-center justify-center py-20">
             <div class="spinner mb-4"></div>
-            <p class="text-gray-500 font-medium">Menarik data analitik terbaru dari GitHub...</p>
+            <p class="text-gray-500 font-medium mt-4">Menarik analitik terbaru dari GitHub...</p>
         </div>
 
-        <!-- Dashboard Content (Hidden by default until data loads) -->
+        <!-- Dashboard Content -->
         <div id="dashboardContent" class="hidden space-y-6">
             
             <!-- Summary Stats Row -->
@@ -84,6 +82,19 @@
                     <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider">Film Terpopuler (TMDb)</h3>
                     <p class="text-xl font-bold text-blue-600 mt-2 truncate" id="statTopMovie">-</p>
                 </div>
+            </div>
+
+            <!-- Bagian Baru: Word Cloud -->
+            <div class="glass-card bg-gradient-to-r from-gray-900 to-gray-800 text-white border-0">
+                <h2 class="text-lg font-bold mb-4 text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                    Fokus Perhatian Publik (Word Cloud)
+                </h2>
+                <div class="w-full flex justify-center bg-white rounded-lg p-2">
+                    <!-- Tambahkan "?v=" dan angka random agar gambar selalu dimuat versi terbarunya (Bypass Cache) -->
+                    <img id="wordcloudImg" src="https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png" alt="Word Cloud Terkini" class="max-h-80 object-contain rounded w-full">
+                </div>
+                <p class="text-xs text-gray-400 mt-3 text-center">Ukuran kata merepresentasikan frekuensi kemunculannya di media massa dan tren sosial hari ini.</p>
             </div>
 
             <!-- Charts Row -->
@@ -150,47 +161,38 @@
 
     <footer class="bg-white border-t border-gray-200 mt-auto py-6">
         <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-            &copy; 2026 Indonesia Media Pulse. Data ditarik secara otomatis menggunakan GitHub Actions.
+            &copy; 2026 Indonesia Media Pulse. Data ditarik otomatis menggunakan GitHub Actions.
         </div>
     </footer>
 
     <script>
-        // Menggunakan library PapaParse untuk mengambil CSV langsung dari raw GitHub url
-        // Diperbarui: Menggunakan absolute URL dari repositori GitHub Anda agar bisa di-preview di sini
+        // Force refresh gambar Wordcloud agar tidak kena cache browser
+        document.getElementById('wordcloudImg').src = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png?v=' + new Date().getTime();
+
         const filesToLoad = {
             news: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_news.csv',
             trends: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_trending.csv',
             entertainment: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/hiburan_dan_opini.csv'
         };
 
-        let dashboardData = {
-            news: [],
-            trends: [],
-            entertainment: []
-        };
+        let dashboardData = { news: [], trends: [], entertainment: [] };
 
-        // Fungsi pembantu untuk parsing CSV ke JSON (Promise based)
         function parseCSV(url) {
+            // Tambahkan timestamp untuk memotong cache githubusercontent
+            const cacheBusterUrl = url + '?v=' + new Date().getTime();
             return new Promise((resolve, reject) => {
-                Papa.parse(url, {
+                Papa.parse(cacheBusterUrl, {
                     download: true,
                     header: true,
                     skipEmptyLines: true,
-                    complete: (results) => {
-                        resolve(results.data);
-                    },
-                    error: (error) => {
-                        console.warn(`Gagal menarik file ${url}`, error);
-                        resolve([]); // Return empty array if file not found to prevent full crash
-                    }
+                    complete: (results) => { resolve(results.data); },
+                    error: (error) => { resolve([]); }
                 });
             });
         }
 
-        // Fungsi utama inisialisasi Dashboard
         async function initDashboard() {
             try {
-                // 1. Tarik semua data secara paralel
                 const [newsData, trendsData, entertainmentData] = await Promise.all([
                     parseCSV(filesToLoad.news),
                     parseCSV(filesToLoad.trends),
@@ -201,59 +203,50 @@
                 dashboardData.trends = trendsData;
                 dashboardData.entertainment = entertainmentData;
 
-                // 2. Jika ada data berita, proses tampilannya
                 if (dashboardData.news.length > 0) {
                     processNewsStats();
                     renderSentimentChart();
                     renderSourceChart();
-                    
-                    // Update timestamp (Ambil dari baris pertama Waktu Tarik)
                     const lastUpdate = dashboardData.news[0]['Waktu Tarik'] || 'Hari ini';
                     document.getElementById('lastUpdated').innerText = `Update Terakhir: ${lastUpdate}`;
                 }
 
-                // 3. Proses data Tren
                 if (dashboardData.trends.length > 0) {
                     document.getElementById('statTotalTrends').innerText = dashboardData.trends.length;
                     renderTrendingTable();
                 }
 
-                // 4. Proses data Hiburan (Ambil film peringkat 1)
                 if (dashboardData.entertainment.length > 0) {
                     const topMovie = dashboardData.entertainment.find(row => row['Kategori'] === 'Film (TMDb)' && row['Peringkat'] === '1');
                     if (topMovie) {
                         document.getElementById('statTopMovie').innerText = topMovie['Judul'];
-                    } else {
-                        document.getElementById('statTopMovie').innerText = dashboardData.entertainment[0]['Judul'] || 'Tidak tersedia';
                     }
                 }
 
-                // 5. Sembunyikan loading, tampilkan dashboard
                 document.getElementById('loadingState').classList.add('hidden');
                 document.getElementById('dashboardContent').classList.remove('hidden');
 
             } catch (error) {
                 console.error("Dashboard Error:", error);
-                document.getElementById('loadingState').innerHTML = `<p class="text-red-500 font-bold">Terjadi kesalahan saat memuat data. Pastikan file CSV tersedia.</p>`;
+                document.getElementById('loadingState').innerHTML = `<p class="text-red-500 font-bold">Terjadi kesalahan saat memuat data.</p>`;
             }
         }
 
-        // Proses statistik umum berita
         function processNewsStats() {
             const data = dashboardData.news;
             document.getElementById('statTotalNews').innerText = data.length;
 
-            // Hitung sentimen dominan
             let sentiments = { Positif: 0, Negatif: 0, Netral: 0 };
             data.forEach(row => {
                 const s = row['Sentimen'];
-                if (s && sentiments[s] !== undefined) {
-                    sentiments[s]++;
-                }
+                if (s && sentiments[s] !== undefined) { sentiments[s]++; }
             });
 
-            // Cari yang terbanyak
-            let dominant = Object.keys(sentiments).reduce((a, b) => sentiments[a] > sentiments[b] ? a : b);
+            // Cari yang terbanyak, pastikan tidak crash kalau datanya kosong
+            let dominant = 'Netral';
+            if (Object.keys(sentiments).some(k => sentiments[k] > 0)) {
+                dominant = Object.keys(sentiments).reduce((a, b) => sentiments[a] > sentiments[b] ? a : b);
+            }
             
             const el = document.getElementById('statSentiment');
             el.innerText = dominant;
@@ -262,7 +255,6 @@
             else el.className = 'text-3xl font-bold text-gray-500 mt-2';
         }
 
-        // Gambar Grafik Sentimen (Pie)
         function renderSentimentChart() {
             let counts = { Positif: 0, Netral: 0, Negatif: 0 };
             dashboardData.news.forEach(row => {
@@ -276,22 +268,15 @@
                     labels: ['Positif', 'Netral', 'Negatif'],
                     datasets: [{
                         data: [counts.Positif, counts.Netral, counts.Negatif],
-                        backgroundColor: ['#10b981', '#9ca3af', '#ef4444'], // Green, Gray, Red
+                        backgroundColor: ['#10b981', '#9ca3af', '#ef4444'],
                         borderWidth: 0,
                         hoverOffset: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
         }
 
-        // Gambar Grafik Distribusi Sumber Berita (Bar)
         function renderSourceChart() {
             let sources = {};
             dashboardData.news.forEach(row => {
@@ -299,7 +284,6 @@
                 if(src) { sources[src] = (sources[src] || 0) + 1; }
             });
 
-            // Sort top 5 sources
             let sortedSources = Object.keys(sources).map(key => [key, sources[key]]).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
             const ctx = document.getElementById('sourceChart').getContext('2d');
@@ -310,23 +294,16 @@
                     datasets: [{
                         label: 'Jumlah Berita',
                         data: sortedSources.map(s => s[1]),
-                        backgroundColor: '#3b82f6', // Tailwind blue-500
+                        backgroundColor: '#3b82f6',
                         borderRadius: 4
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
 
-        // Render Tabel Topik Trending
         function renderTrendingTable() {
             const tbody = document.getElementById('trendingTableBody');
-            // Ambil 10 baris pertama untuk preview
             const topTrends = dashboardData.trends.slice(0, 10);
             
             tbody.innerHTML = '';
@@ -350,20 +327,12 @@
             });
         }
 
-        // ==========================================
-        // FUNGSI MODAL POP-UP BERITA
-        // ==========================================
-        
         function openNewsModal() {
             const listContainer = document.getElementById('newsModalList');
-            listContainer.innerHTML = ''; // Bersihkan list sebelumnya
-
-            // Looping data berita dan buat elemen list (HTML)
+            listContainer.innerHTML = ''; 
             dashboardData.news.forEach(news => {
                 const li = document.createElement('li');
                 li.className = "p-4 border border-gray-100 rounded-lg hover:bg-blue-50 transition-colors";
-                
-                // Tentukan warna label sentimen
                 let sentimentColor = "bg-gray-100 text-gray-800";
                 if(news['Sentimen'] === 'Positif') sentimentColor = "bg-green-100 text-green-800";
                 if(news['Sentimen'] === 'Negatif') sentimentColor = "bg-red-100 text-red-800";
@@ -384,24 +353,19 @@
                 `;
                 listContainer.appendChild(li);
             });
-
-            // Tampilkan modal (hapus class hidden)
-            document.body.style.overflow = 'hidden'; // Kunci scroll background
+            document.body.style.overflow = 'hidden'; 
             document.getElementById('newsModal').classList.remove('hidden');
         }
 
         function closeNewsModal() {
-            // Sembunyikan modal
-            document.body.style.overflow = 'auto'; // Buka kembali scroll background
+            document.body.style.overflow = 'auto'; 
             document.getElementById('newsModal').classList.add('hidden');
         }
         
-        // Tutup modal jika user mengklik area abu-abu di luar modal
         document.getElementById('newsModal').addEventListener('click', function(e) {
             if (e.target === this) closeNewsModal();
         });
 
-        // Jalankan saat halaman siap
         window.addEventListener('DOMContentLoaded', initDashboard);
     </script>
 </body>
