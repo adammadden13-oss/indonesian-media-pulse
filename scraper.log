@@ -184,3 +184,12 @@
 2026-09-07 04:53:27,383 [INFO] Berhasil menyimpan 42 data tren bersih ke berita_trending.csv.
 2026-09-07 04:53:27,664 [INFO] Memulai tracker Hiburan & Opini...
 2026-09-07 04:53:30,612 [INFO] Berhasil menyimpan 12 data ke hiburan_dan_opini.csv.
+2026-09-07 06:41:04,580 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-09-07 06:41:04,589 [INFO] Berhasil memperbarui 156 berita terbaru.
+2026-09-07 06:41:07,206 [ERROR] Gagal mengambil CNN Indonesia: 403 Client Error: Forbidden for url: https://www.cnnindonesia.com/nasional
+2026-09-07 06:41:07,400 [ERROR] Gagal mengambil Tribunnews Nasional: 403 Client Error: Forbidden for url: https://www.tribunnews.com/nasional
+2026-09-07 06:41:08,929 [INFO] Berhasil membersihkan dan memperbarui 758 berita.
+2026-09-07 06:41:09,449 [INFO] Memulai penarikan tren terpadu...
+2026-09-07 06:41:13,898 [INFO] Berhasil menyimpan 44 data tren bersih ke berita_trending.csv.
+2026-09-07 06:41:14,376 [INFO] Memulai tracker Hiburan & Opini...
+2026-09-07 06:41:17,922 [INFO] Berhasil menyimpan 12 data ke hiburan_dan_opini.csv.
