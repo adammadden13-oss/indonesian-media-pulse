@@ -43,10 +43,14 @@ jobs:
         run: |
           python sentiment_analyzer.py
 
+      - name: 6. Buat Word Cloud & Arsip Historis
+        run: |
+          python archive_wordcloud.py
+
       - name: Commit dan Simpan Seluruh Dataset
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add berita_terkini.csv berita_news.csv berita_trending.csv hiburan_dan_opini.csv scraper.log
+          git add berita_terkini.csv berita_news.csv berita_trending.csv hiburan_dan_opini.csv scraper.log wordcloud.png master_arsip.csv
           git commit -m "Auto-update data pipeline: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
