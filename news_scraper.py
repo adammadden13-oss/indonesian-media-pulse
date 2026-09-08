@@ -123,13 +123,12 @@ def parse_tribun(soup, sumber):
                 })
     return articles
 
-# 5. SINDONEWS NASIONAL (Dibersihkan dari tag waktu)
+# 5. SINDONEWS NASIONAL
 def parse_sindo(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
         if "sindonews.com/read/" in link:
-            # Gunakan attribute title jika tersedia, atau get_text lalu bersihkan
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "halaman", "baca juga"]):
@@ -229,20 +228,25 @@ def run_job():
     if os.path.exists(CSV_FILE):
         try:
             df_existing = pd.read_csv(CSV_FILE)
-            # Bersihkan judul-judul lama yang sudah tersimpan dari eksekusi sebelumnya
+            # Bersihkan judul-judul lama yang sudah tersimpan
             df_existing["Judul"] = df_existing["Judul"].apply(clean_text)
             
-            # Gabungkan dengan data baru & eliminasi duplikasi berdasarkan URL
-            df_combined = pd.concat([df_existing, df_new], ignore_index=True)
+            # 1. df_new ditaruh di depan agar berita yang ditarik jam 05:00 memperbarui timestamp
+            df_combined = pd.concat([df_new, df_existing], ignore_index=True)
             df_combined = df_combined.drop_duplicates(subset=["URL"], keep="first")
+            
+            # 2. Urutkan secara descending agar waktu tarik paling baru selalu di baris teratas
+            df_combined = df_combined.sort_values(by="Waktu Tarik", ascending=False)
             df_combined = df_combined[kolom_urut]
             
             df_combined.to_csv(CSV_FILE, index=False)
             logging.info(f"Berhasil membersihkan dan memperbarui {len(df_combined)} berita.")
         except Exception as e:
             logging.error(f"Error memproses file lama: {e}")
+            df_new = df_new.sort_values(by="Waktu Tarik", ascending=False)
             df_new.to_csv(CSV_FILE, index=False)
     else:
+        df_new = df_new.sort_values(by="Waktu Tarik", ascending=False)
         df_new.to_csv(CSV_FILE, index=False)
         logging.info(f"Membuat file CSV news baru dengan {len(df_new)} berita.")
 
