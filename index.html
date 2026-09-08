@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media Pulse | Executive Nexus</title>
     
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%231b2609%22/><path fill=%22%23c4f033%22 d=%22M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z%22/></svg>" type="image/svg+xml">
+
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -50,9 +53,11 @@
     <header id="header-wrapper" class="fixed top-0 left-0 w-full z-50 flex justify-center transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] px-0 pt-0">
         <nav id="navbar" class="w-full max-w-full bg-white/95 backdrop-blur-md border-b border-gray-100 flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] py-5 px-8 shadow-sm">
             <div class="flex items-center gap-3 shrink-0">
-                <div class="w-9 h-9 bg-brandDark rounded-full flex items-center justify-center text-brandLime font-bold shadow-md">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
-                </div>
+                <!-- Custom SVG Logo -->
+                <svg class="w-9 h-9 shrink-0 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="50" fill="#1b2609"/>
+                    <path d="M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z" fill="#c4f033"/>
+                </svg>
                 <span class="text-2xl font-black tracking-tight text-brandDark" data-i18n="brand">MediaPulse.</span>
             </div>
             
