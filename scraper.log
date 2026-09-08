@@ -308,3 +308,10 @@
 2026-09-08 01:35:02,453 [INFO] Berhasil membersihkan dan memperbarui 1080 berita.
 2026-09-08 01:35:05,045 [INFO] Memulai tracker Hiburan & Opini...
 2026-09-08 01:35:08,232 [INFO] Berhasil menyimpan 12 data ke hiburan_dan_opini.csv.
+2026-09-08 04:04:09,217 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-09-08 04:04:09,225 [INFO] Berhasil memperbarui 157 berita terbaru.
+2026-09-08 04:04:11,172 [ERROR] Gagal mengambil CNN Indonesia: 403 Client Error: Forbidden for url: https://www.cnnindonesia.com/nasional
+2026-09-08 04:04:11,320 [ERROR] Gagal mengambil Tribunnews Nasional: 403 Client Error: Forbidden for url: https://www.tribunnews.com/nasional
+2026-09-08 04:04:13,702 [INFO] Berhasil membersihkan dan memperbarui 1153 berita.
+2026-09-08 04:04:16,417 [INFO] Memulai tracker Hiburan & Opini...
+2026-09-08 04:04:20,237 [INFO] Berhasil menyimpan 12 data ke hiburan_dan_opini.csv.
