@@ -5,3 +5,6 @@ pytrends
 textblob
 wordcloud
 Pillow
+matplotlib
+urllib3
+openpyxl
