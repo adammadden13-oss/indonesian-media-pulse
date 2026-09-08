@@ -6,6 +6,10 @@ import xml.etree.ElementTree as ET
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import urllib3
+
+# Menonaktifkan peringatan SSL untuk web scraping
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logging.basicConfig(
     filename="scraper.log",
@@ -130,21 +134,89 @@ def fetch_editorial_opini(scraped_time):
         logging.error(f"Gagal Editorial: {e}")
     return articles
 
+# 4. BIOSKOP SEDANG TAYANG (XXI / CGV)
+def fetch_bioskop_xxi(scraped_time):
+    logging.info("Menarik data Film Sedang Tayang di Bioskop...")
+    url = "https://jadwalnonton.com/now-playing/"
+    data = []
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=15, verify=False)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        movies = soup.find_all('div', class_='item-poster')
+        count = 1
+        for m in movies:
+            if count > 10: break
+            title_tag = m.find('a', class_='title') or m.find('h2')
+            if title_tag:
+                title = clean_text(title_tag.text)
+                link = title_tag.get('href', url)
+                data.append({
+                    "Waktu Tarik": scraped_time,
+                    "Sumber": "Cinema XXI / Bioskop",
+                    "Kategori": "Sedang Tayang",
+                    "Judul": f"Now Playing: {title}",
+                    "URL": link
+                })
+                count += 1
+    except Exception as e:
+        logging.error(f"Gagal menarik data Bioskop XXI: {e}")
+    return data
+
+# 5. STREAMING TOP 10 (NETFLIX & VIU)
+def fetch_streaming_top10(platform_name, url_suffix, scraped_time):
+    logging.info(f"Menarik data Top 10 {platform_name} Indonesia...")
+    url = f"https://flixpatrol.com/top10/{url_suffix}/indonesia/today/"
+    data = []
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=20)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        table = soup.find('table')
+        if table:
+            rows = table.find_all('tr')[1:11]
+            for idx, row in enumerate(rows, 1):
+                cols = row.find_all('td')
+                if len(cols) >= 3:
+                    title_tag = cols[2].find('a') or cols[1].find('a')
+                    if title_tag:
+                        title = clean_text(title_tag.text)
+                        link = title_tag.get('href', '')
+                        full_url = f"https://flixpatrol.com{link}" if link.startswith("/") else link
+                        data.append({
+                            "Waktu Tarik": scraped_time,
+                            "Sumber": f"{platform_name} Indonesia",
+                            "Kategori": "Top 10 Streaming",
+                            "Judul": f"Peringkat #{idx}: {title}",
+                            "URL": full_url
+                        })
+    except Exception as e:
+        logging.error(f"Gagal menarik data {platform_name}: {e}")
+    return data
+
 def run_entertainment_tracker():
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-    logging.info("Memulai tracker Hiburan & Opini...")
+    logging.info("Memulai tracker Hiburan & Opini (TMDb, XXI, Netflix, Viu)...")
     
     all_data = []
     all_data.extend(fetch_tmdb_trending(scraped_time))
     all_data.extend(fetch_google_entertainment_trends(scraped_time))
     all_data.extend(fetch_editorial_opini(scraped_time))
+    all_data.extend(fetch_bioskop_xxi(scraped_time))
+    all_data.extend(fetch_streaming_top10('Netflix', 'netflix', scraped_time))
+    all_data.extend(fetch_streaming_top10('Viu', 'viu', scraped_time))
 
     if not all_data:
         logging.warning("Data hiburan & opini kosong.")
         return
 
+    # Hapus duplikat berdasarkan judul agar laporan tetap rapi
     df = pd.DataFrame(all_data).drop_duplicates(subset=["Judul"])
     kolom = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL"]
+    
+    # Validasi struktur kolom untuk mencegah error index
+    for col in kolom:
+        if col not in df.columns:
+            df[col] = "-"
+            
     df = df[kolom]
     
     df.to_csv(CSV_HIBURAN, index=False)
