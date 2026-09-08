@@ -433,7 +433,7 @@
                 }
 
                 if (dashboardData.entertainment.length > 0) {
-                    const topMovie = dashboardData.entertainment.find(row => row['Kategori'] === 'Film (TMDb)' && row['Peringkat'] === '1');
+                    const topMovie = dashboardData.entertainment.find(row => row['Sumber'] && row['Sumber'].includes('TMDb')) || dashboardData.entertainment[0];
                     if (topMovie) {
                         document.getElementById('statTopMovie').innerText = topMovie['Judul'] || 'Tidak tersedia';
                     }
@@ -658,21 +658,31 @@
                     </div>
                 `;
             } else if (type === 'entertainment') {
-                titleEl.innerText = "Daftar Film Terpopuler & Tren Hiburan (TMDb)";
-                const movies = dashboardData.entertainment.filter(r => r['Kategori'] === 'Film (TMDb)');
-                if (movies.length === 0) {
-                    listContainer.innerHTML = `<p class="text-gray-500 text-center py-8">Data film belum tersedia.</p>`;
+                titleEl.innerText = "Daftar Topik Hiburan (TMDb, Netflix, Viu, XXI)";
+                
+                // Ambil semua data karena dari Python sudah 100% murni data hiburan
+                const items = dashboardData.entertainment;
+
+                if (items.length === 0) {
+                    listContainer.innerHTML = `<p class="text-gray-500 text-center py-8">Data hiburan belum tersedia (Menunggu sinkronisasi Netflix/XXI).</p>`;
                 } else {
-                    movies.forEach(movie => {
+                    items.forEach(item => {
                         const card = document.createElement('div');
-                        card.className = "bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-2";
+                        card.className = "bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-orange-500 transition-all flex flex-col gap-3 group";
+                        
+                        let sourceColor = "bg-orange-100 text-orange-700";
+                        if (item['Sumber'] && item['Sumber'].includes('Netflix')) sourceColor = "bg-red-100 text-red-700";
+                        if (item['Sumber'] && item['Sumber'].includes('Viu')) sourceColor = "bg-yellow-100 text-yellow-700";
+                        if (item['Sumber'] && (item['Sumber'].includes('XXI') || item['Sumber'].includes('Bioskop'))) sourceColor = "bg-green-100 text-green-700";
+
                         card.innerHTML = `
-                            <div class="flex justify-between items-center">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-700">Peringkat #${movie['Peringkat']}</span>
-                                <span class="text-xs text-gray-400 font-medium">Rilis: ${movie['Tanggal Rilis'] || '-'}</span>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold ${sourceColor}">${item['Sumber'] || 'Hiburan'}</span>
+                                <span class="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-md">${item['Kategori'] || '-'}</span>
                             </div>
-                            <h4 class="text-lg font-black text-brandDark">${movie['Judul']}</h4>
-                            <p class="text-xs text-gray-600">${movie['Sinopsis Singkat'] || ''}</p>
+                            <a href="${item['URL']}" target="_blank" class="text-base font-bold text-brandDark group-hover:text-orange-500 transition-colors leading-snug">
+                                ${item['Judul']}
+                            </a>
                         `;
                         listContainer.appendChild(card);
                     });
