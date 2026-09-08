@@ -67,7 +67,7 @@
     <header id="header-wrapper" class="fixed top-0 left-0 w-full z-50 flex flex-col justify-center px-0 pt-0">
         <nav id="navbar" class="w-full max-w-full mx-auto bg-white/95 backdrop-blur-md border-b border-gray-100 flex justify-between items-center py-5 px-8 shadow-sm">
             <div class="flex items-center gap-3 shrink-0">
-                <!-- Vektor Logo Petir Kustom (Sesuai Referensi) -->
+                <!-- Vektor Logo Petir Kustom -->
                 <svg class="w-9 h-9 shrink-0 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="50" fill="#1b2609"/>
                     <path d="M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z" fill="#c4f033"/>
@@ -79,7 +79,6 @@
                 <a href="#overview" class="text-brandDark hover:text-brandLime transition-colors" data-i18n="nav_overview">Overview</a>
                 <a href="#nasional" class="hover:text-brandDark transition-colors" data-i18n="nav_nasional">Nasional</a>
                 <a href="#tren" class="hover:text-brandDark transition-colors" data-i18n="nav_tren">Tren Sosial</a>
-                <a href="#audio" class="hover:text-brandDark transition-colors" data-i18n="nav_audio">Audio & Opini</a>
             </div>
             
             <div class="flex items-center gap-4 shrink-0">
@@ -98,12 +97,11 @@
             </div>
         </nav>
         
-        <!-- Ticker Ekonomi (Baru) -->
+        <!-- Ticker Ekonomi -->
         <div id="economyTicker" class="w-full bg-brandLime text-brandDark font-bold py-1.5 px-4 overflow-hidden shadow-sm border-t border-brandLime/20 hidden flex items-center relative z-40 transition-all duration-300">
             <span class="shrink-0 text-xs tracking-widest uppercase bg-brandDark text-brandLime px-2 py-0.5 rounded mr-4 z-10 relative">MARKET PULSE</span>
             <div class="flex-grow overflow-hidden relative h-5">
                 <div class="absolute whitespace-nowrap animate-marquee flex gap-12 text-sm" id="tickerContent">
-                    <!-- Diisi oleh JS -->
                     <span>Menunggu Data Ekonomi...</span>
                 </div>
             </div>
@@ -120,7 +118,6 @@
         <!-- Overview Section: 4 Interactive Grid Cards -->
         <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
             
-            <!-- Stat 1: Total News - HITAM -->
             <div onclick="openModal('news')" class="bg-brandDark rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 group-hover:text-gray-300 transition-colors" data-i18n="stat_news_title">Total Berita Nasional</h3>
@@ -132,7 +129,6 @@
                 <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:bg-white/10 transition-colors"></div>
             </div>
             
-            <!-- Stat 2: Viral Topics - HIJAU LIMAU -->
             <div onclick="openModal('trends')" class="bg-brandLime rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-[11px] font-bold text-brandDark/60 uppercase tracking-wider mb-2 group-hover:text-brandDark transition-colors" data-i18n="stat_trends_title">Topik Viral Hari Ini</h3>
@@ -143,7 +139,6 @@
                 </p>
             </div>
 
-            <!-- Stat 3: Sentiment - ABU ABU MODERN -->
             <div onclick="openModal('sentiment')" class="bg-gray-200 rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2 group-hover:text-brandDark transition-colors" data-i18n="stat_sentiment_title">Sentimen Dominan</h3>
@@ -154,7 +149,6 @@
                 </p>
             </div>
 
-            <!-- Stat 4: Top Movie - ORANYE UI/UX -->
             <div onclick="openModal('entertainment')" class="bg-[#FF6B00] rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-[11px] font-bold text-orange-200 uppercase tracking-wider mb-2" data-i18n="stat_movie_title">Film Terpopuler (TMDb)</h3>
@@ -262,7 +256,7 @@
             </div>
 
             <!-- Podcast & Musik Audio (Baru) -->
-            <div id="audio" class="bg-brandDark rounded-[2.5rem] p-8 shadow-sm border border-gray-800 flex flex-col scroll-mt-28">
+            <div class="bg-brandDark rounded-[2.5rem] p-8 shadow-sm border border-gray-800 flex flex-col">
                 <h3 class="text-xl font-black text-white mb-6 tracking-tight flex items-center gap-2">
                     <svg class="w-6 h-6 text-brandLime" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                     Top Podcast & Musik Indonesia
@@ -301,7 +295,7 @@
     <script>
         const translations = {
             id: {
-                brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "Nasional", nav_tren: "Tren Sosial", nav_audio: "Audio & Opini",
+                brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "Nasional", nav_tren: "Tren Sosial",
                 loading: "Menyinkronkan Data Pipeline...", stat_news_title: "Total Berita Nasional", stat_trends_title: "Topik Viral Hari Ini",
                 stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Film Terpopuler (TMDb, Netflix)", click_details: "Klik untuk melihat rincian",
                 dist_data: "DISTRIBUSI DATA NASIONAL", portal_power_title: "Peta Kekuatan<br>Portal Berita",
@@ -311,7 +305,7 @@
                 trending_title: "Topik Terhangat (Media Sosial & Portal)"
             },
             en: {
-                brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "National", nav_tren: "Social Trends", nav_audio: "Audio & Opinion",
+                brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "National", nav_tren: "Social Trends",
                 loading: "Synchronizing Data Pipeline...", stat_news_title: "Total National News", stat_trends_title: "Today's Viral Topics",
                 stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Movies (TMDb, Netflix)", click_details: "Click for details",
                 dist_data: "NATIONAL DATA DISTRIBUTION", portal_power_title: "News Portal<br>Strength Map",
@@ -325,7 +319,7 @@
         function switchLanguage(lang) {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if(translations[lang][key]) el.innerHTML = translations[lang][key];
+                if(translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
             });
         }
 
@@ -517,19 +511,23 @@
 
         window.addEventListener('DOMContentLoaded', initDashboard);
 
-        // Rubber Navigation Effect
+        // Optimized Rubber Navigation Effect
+        let isNavScrolled = false;
         window.addEventListener('scroll', () => {
-            const wrap = document.getElementById('header-wrapper');
-            const nav = document.getElementById('navbar');
-            
-            if (window.scrollY > 20) {
+            if (window.scrollY > 20 && !isNavScrolled) {
+                const wrap = document.getElementById('header-wrapper');
+                const nav = document.getElementById('navbar');
                 wrap.classList.add('px-4', 'pt-4'); wrap.classList.remove('px-0', 'pt-0');
                 nav.classList.add('max-w-[1200px]', 'rounded-full', 'shadow-xl', 'py-3', 'border-transparent');
                 nav.classList.remove('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'border-b', 'border-gray-100');
-            } else {
+                isNavScrolled = true;
+            } else if (window.scrollY <= 20 && isNavScrolled) {
+                const wrap = document.getElementById('header-wrapper');
+                const nav = document.getElementById('navbar');
                 wrap.classList.remove('px-4', 'pt-4'); wrap.classList.add('px-0', 'pt-0');
                 nav.classList.remove('max-w-[1200px]', 'rounded-full', 'shadow-xl', 'py-3', 'border-transparent');
                 nav.classList.add('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'border-b', 'border-gray-100');
+                isNavScrolled = false;
             }
         });
     </script>
