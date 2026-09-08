@@ -45,35 +45,41 @@
     </style>
 </head>
 
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col pt-[100px]">
 
-    <nav class="w-full py-5 px-8 flex justify-between items-center max-w-[1400px] mx-auto bg-transparent sticky top-0 z-40 backdrop-blur-md bg-white/80">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-brandDark rounded-full flex items-center justify-center text-brandLime font-bold shadow-md">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
+    <header id="header-wrapper" class="fixed top-0 left-0 w-full z-50 flex justify-center transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] px-0 pt-0">
+        <nav id="navbar" class="w-full max-w-full bg-white/95 backdrop-blur-md border-b border-gray-100 flex justify-between items-center transition-all duration-500 ease-[cubic-bezier(0.175,0.885,0.32,1.275)] py-5 px-8 shadow-sm">
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="w-9 h-9 bg-brandDark rounded-full flex items-center justify-center text-brandLime font-bold shadow-md">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
+                </div>
+                <span class="text-2xl font-black tracking-tight text-brandDark" data-i18n="brand">MediaPulse.</span>
             </div>
-            <span class="text-xl font-bold tracking-tight text-brandDark" data-i18n="brand">MediaPulse.</span>
-        </div>
-        
-        <div class="hidden md:flex gap-8 text-sm font-semibold text-gray-500">
-            <a href="#overview" class="text-brandDark hover:text-brandLime transition-colors" data-i18n="nav_overview">Overview</a>
-            <a href="#nasional" class="hover:text-brandDark transition-colors" data-i18n="nav_nasional">Nasional</a>
-            <a href="#tren" class="hover:text-brandDark transition-colors" data-i18n="nav_tren">Tren Sosial</a>
-        </div>
-        
-        <div class="flex items-center gap-4">
-            <!-- Language Switcher -->
-            <select id="langSwitch" onchange="switchLanguage(this.value)" class="bg-gray-100 text-gray-700 text-xs font-bold px-3 py-2 rounded-full border border-gray-200 outline-none cursor-pointer">
-                <option value="id">ID</option>
-                <option value="en">EN</option>
-            </select>
+            
+            <!-- Menu Tengah (Absolute Center) -->
+            <div class="hidden md:flex gap-8 text-[15px] font-bold text-gray-500 absolute left-1/2 -translate-x-1/2">
+                <a href="#overview" class="text-brandDark hover:text-brandLime transition-colors" data-i18n="nav_overview">Overview</a>
+                <a href="#nasional" class="hover:text-brandDark transition-colors" data-i18n="nav_nasional">Nasional</a>
+                <a href="#tren" class="hover:text-brandDark transition-colors" data-i18n="nav_tren">Tren Sosial</a>
+            </div>
+            
+            <div class="flex items-center gap-5 shrink-0">
+                <!-- Dropdown Bahasa Modern -->
+                <div class="relative">
+                    <select id="langSwitch" onchange="switchLanguage(this.value)" class="appearance-none bg-gray-100 hover:bg-gray-200 text-brandDark text-sm font-bold pl-4 pr-9 py-2.5 rounded-full outline-none cursor-pointer transition-colors shadow-sm border border-transparent">
+                        <option value="id">ID</option>
+                        <option value="en">EN</option>
+                    </select>
+                    <svg class="w-3.5 h-3.5 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
 
-            <span id="lastUpdated" class="text-xs font-medium text-gray-400 hidden sm:block">Sync: Memuat...</span>
-            <button class="bg-brandDark text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-black transition-all shadow-md flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-brandLime animate-pulse"></span> Live
-            </button>
-        </div>
-    </nav>
+                <span id="lastUpdated" class="text-[13px] font-semibold text-gray-400 hidden sm:block">Sync: Memuat...</span>
+                <button class="bg-brandDark text-white px-5 py-2.5 rounded-full text-[15px] font-bold hover:bg-black hover:scale-105 active:scale-95 transition-all shadow-md flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-brandLime animate-pulse"></span> Live
+                </button>
+            </div>
+        </nav>
+    </header>
 
     <div id="loadingState" class="flex-grow flex flex-col items-center justify-center">
         <div class="spinner mb-4"></div>
@@ -682,6 +688,28 @@
         });
 
         window.addEventListener('DOMContentLoaded', initDashboard);
+
+        // Efek Scroll Navigasi Elastis (Rubber Effect)
+        window.addEventListener('scroll', () => {
+            const headerWrapper = document.getElementById('header-wrapper');
+            const navbar = document.getElementById('navbar');
+            
+            if (window.scrollY > 20) {
+                // Keadaan di-scroll: Menyusut menjadi pil melayang
+                headerWrapper.classList.add('px-4', 'pt-4');
+                headerWrapper.classList.remove('px-0', 'pt-0');
+                
+                navbar.classList.add('max-w-[1200px]', 'rounded-full', 'shadow-xl', 'py-3', 'bg-white/95', 'border-transparent');
+                navbar.classList.remove('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'bg-white/95', 'border-b', 'border-gray-100');
+            } else {
+                // Keadaan di atas: Membentang mentok layar
+                headerWrapper.classList.remove('px-4', 'pt-4');
+                headerWrapper.classList.add('px-0', 'pt-0');
+                
+                navbar.classList.remove('max-w-[1200px]', 'rounded-full', 'shadow-xl', 'py-3', 'bg-white/95', 'border-transparent');
+                navbar.classList.add('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'bg-white/95', 'border-b', 'border-gray-100');
+            }
+        });
     </script>
 </body>
 </html>
