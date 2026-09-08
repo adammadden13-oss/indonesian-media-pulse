@@ -82,58 +82,6 @@ def fetch_tmdb_trending(scraped_time):
 
     return movies
 
-# 2. TREN PENCARIAN GOOGLE (HIBURAN & POP CULTURE)
-def fetch_google_entertainment_trends(scraped_time):
-    url = "https://trends.google.com/trending/rss?geo=ID"
-    trends = []
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=15)
-        root = ET.fromstring(resp.content)
-        for item in root.findall('./channel/item')[:6]:
-            keyword = clean_text(item.find('title').text) if item.find('title') is not None else ""
-            news_item = item.find('{https://trends.google.com/trending/rss}news_item')
-            news_title = clean_text(news_item.find('{https://trends.google.com/trending/rss}news_item_title').text) if news_item is not None else f"Tren Pencarian: {keyword}"
-            news_url = news_item.find('{https://trends.google.com/trending/rss}news_item_url').text.strip() if news_item is not None else f"https://trends.google.com/trending?geo=ID&q={keyword}"
-
-            if keyword:
-                trends.append({
-                    "Waktu Tarik": scraped_time,
-                    "Sumber": "Google Trends ID",
-                    "Kategori": "Tren Pencarian Google",
-                    "Judul": f"[{keyword}] {news_title}",
-                    "URL": news_url
-                })
-    except Exception as e:
-        logging.error(f"Gagal Google Trends: {e}")
-    return trends
-
-# 3. OPINI & EDITORIAL PERS NASIONAL
-def fetch_editorial_opini(scraped_time):
-    url = "https://epaper.mediaindonesia.com/category/editorial"
-    articles = []
-    try:
-        resp = requests.get(url, headers=HEADERS, timeout=15)
-        soup = BeautifulSoup(resp.text, "html.parser")
-        count = 0
-        for a in soup.find_all("a", href=True):
-            if count >= 6:
-                break
-            title = clean_text(a.get_text())
-            link = a["href"].strip()
-            if len(title) >= 20 and not any(x in title.lower() for x in ["redaksi", "pedoman", "login", "kontak", "epaper"]):
-                full_url = link if link.startswith("http") else f"https://epaper.mediaindonesia.com{link}"
-                articles.append({
-                    "Waktu Tarik": scraped_time,
-                    "Sumber": "Media Indonesia",
-                    "Kategori": "Opini & Editorial",
-                    "Judul": f"Editorial: {title}",
-                    "URL": full_url
-                })
-                count += 1
-    except Exception as e:
-        logging.error(f"Gagal Editorial: {e}")
-    return articles
-
 # 4. BIOSKOP SEDANG TAYANG (XXI / CGV)
 def fetch_bioskop_xxi(scraped_time):
     logging.info("Menarik data Film Sedang Tayang di Bioskop...")
@@ -194,18 +142,17 @@ def fetch_streaming_top10(platform_name, url_suffix, scraped_time):
 
 def run_entertainment_tracker():
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-    logging.info("Memulai tracker Hiburan & Opini (TMDb, XXI, Netflix, Viu)...")
+    logging.info("Memulai tracker Hiburan Murni (TMDb, XXI, Netflix, Viu)...")
     
     all_data = []
+    # Hanya memanggil fungsi hiburan murni
     all_data.extend(fetch_tmdb_trending(scraped_time))
-    all_data.extend(fetch_google_entertainment_trends(scraped_time))
-    all_data.extend(fetch_editorial_opini(scraped_time))
     all_data.extend(fetch_bioskop_xxi(scraped_time))
     all_data.extend(fetch_streaming_top10('Netflix', 'netflix', scraped_time))
     all_data.extend(fetch_streaming_top10('Viu', 'viu', scraped_time))
 
     if not all_data:
-        logging.warning("Data hiburan & opini kosong.")
+        logging.warning("Data hiburan kosong.")
         return
 
     # Hapus duplikat berdasarkan judul agar laporan tetap rapi
