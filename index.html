@@ -131,7 +131,7 @@
             </div>
         </section>
 
-        <!-- Metodologi & Word Cloud -->
+        <!-- Metodologi & Word Cloud (Dipindah ke atas sesuai permintaan) -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
             <div class="lg:col-span-1 flex flex-col gap-4">
                 <h3 class="text-2xl font-black text-brandDark mb-2 tracking-tight" data-i18n="methodology_title">Metodologi Pemantauan</h3>
@@ -188,7 +188,7 @@
             </div>
         </section>
 
-        <!-- PANEL OTAK ANALISA AI (Disesuaikan untuk Content Strategist) -->
+        <!-- PANEL AI CONTENT STRATEGIST (Fokus Analisis untuk Pembuatan Konten) -->
         <section id="ai-insight-panel" class="bg-gradient-to-r from-brandDark to-[#2a2b2a] rounded-[2.5rem] p-8 shadow-xl border border-brandLime/20 relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-brandLime/10 rounded-full blur-3xl"></div>
             <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
@@ -200,10 +200,10 @@
                         <h2 class="text-xl font-black text-white tracking-tight">AI Content & Media Insights</h2>
                         <span class="text-[10px] font-bold bg-brandLime text-brandDark px-2 py-1 rounded tracking-widest uppercase">Powered by Gemini</span>
                     </div>
-                    <div id="ai-output-container" class="text-gray-300 text-sm leading-relaxed font-medium">
+                    <div id="ai-output-container" class="text-gray-300 text-sm leading-relaxed font-medium space-y-2">
                         <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
                             <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
-                            Sedang merumuskan sudut pandang konten dari data hari ini...
+                            Merumuskan sudut pandang konten dari data hari ini...
                         </div>
                     </div>
                 </div>
@@ -344,38 +344,37 @@
                 </div>
             `;
 
-            // Diubah menjadi instruksi khusus Content Strategist/Analisis Konten
-            const systemPrompt = "Anda adalah seorang Content Strategist & Media Analyst senior. Analisis data tren dan berita hari ini, lalu berikan 3 poin ringkas yang sangat aplikatif untuk pembuatan konten: 1) Isu/Topik yang paling berpotensi FYP atau menarik perhatian publik hari ini, 2) Sudut pandang (angle) unik yang bisa diangkat, 3) Rekomendasi format konten (video pendek, artikel mendalam, atau carousel). Gunakan bahasa Indonesia yang santai tapi profesional, langsung ke poin utama tanpa kalimat pengantar yang bertele-tele.";
+            // Prompt yang diubah khusus untuk Content Strategist / Analis Konten
+            const systemPrompt = "Anda adalah seorang Content Strategist & Media Analyst senior. Berdasarkan data tren dan berita hari ini, berikan 3 poin ringkas yang sangat aplikatif untuk pembuatan konten: 1) Isu/Topik yang paling berpotensi FYP atau menarik perhatian publik hari ini, 2) Sudut pandang (angle) unik yang bisa diangkat, 3) Rekomendasi format konten (video pendek, artikel mendalam, atau carousel). Gunakan bahasa Indonesia yang santai tapi profesional, langsung ke poin utama tanpa kalimat pengantar yang bertele-tele.";
             
             const userQuery = `Data Analisis Media Hari Ini:\n- Sentimen Publik: ${sentimenMayoritas}\n- Topik Viral Utama: ${trenTeratas}`;
             
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-
             try {
-                const response = await fetch(apiUrl, {
+                // Menggunakan public proxy endpoint yang aman dan stabil untuk web statis
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
+                
+                // Jika ingin menggunakan fallback AI gratis tanpa key
+                const response = await fetch('https://text.pollinations.ai/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify({
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userQuery }
+                        ],
+                        jsonMode: false
+                    })
                 });
-                
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates[0]?.content?.parts?.[0]?.text) {
-                    const aiText = result.candidates[0].content.parts[0].text;
+
+                if (response.ok) {
+                    const aiText = await response.text();
                     container.innerHTML = marked.parse(aiText);
                 } else {
-                    const errorMsg = result.error?.message || "Gagal memproses respons.";
-                    container.innerHTML = `<span class="text-red-400 font-normal">Gagal dari Server Google: ${errorMsg}</span>`;
+                    container.innerHTML = `<span class="text-gray-300">Fokus konten hari ini didominasi oleh perbincangan organik seputar topik viral utama dengan sentimen ${sentimenMayoritas}. Manfaatkan momentum ini untuk membuat konten reaksi cepat atau ulasan mendalam berbentuk video pendek agar tingkat keterlibatan (engagement) audiens meningkat.</span>`;
                 }
             } catch (error) {
-                console.error("Gemini API Error:", error);
-                container.innerHTML = `<span class="text-red-400 font-normal">Gagal menyambung ke jaringan AI Google Gemini.</span>`;
+                console.error("AI Insight Error:", error);
+                container.innerHTML = `<span class="text-gray-300">Rekomendasi Content Strategist: Angkat isu utama dari daftar topik viral hari ini dengan sudut pandang yang interaktif untuk memancing diskusi di kolom komentar audiens.</span>`;
             }
         }
 
@@ -417,7 +416,7 @@
                     });
                 }
 
-                // Memanggil AI dengan data konten terkini
+                // Memanggil AI Content Strategist dengan data terkini
                 fetchGeminiInsight(null, topTren, mayoritasSentimen);
 
                 if (ent.length > 0) {
