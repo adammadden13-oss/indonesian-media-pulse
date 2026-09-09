@@ -131,7 +131,7 @@
             </div>
         </section>
 
-        <!-- Metodologi & Word Cloud (Dipindah ke Atas AI Brief) -->
+        <!-- Metodologi & Word Cloud -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
             <div class="lg:col-span-1 flex flex-col gap-4">
                 <h3 class="text-2xl font-black text-brandDark mb-2 tracking-tight" data-i18n="methodology_title">Metodologi Pemantauan</h3>
@@ -188,7 +188,7 @@
             </div>
         </section>
 
-        <!-- PANEL OTAK ANALISA AI (Terintegrasi Kunci API Anda) -->
+        <!-- PANEL OTAK ANALISA AI (Disesuaikan untuk Content Strategist) -->
         <section id="ai-insight-panel" class="bg-gradient-to-r from-brandDark to-[#2a2b2a] rounded-[2.5rem] p-8 shadow-xl border border-brandLime/20 relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-brandLime/10 rounded-full blur-3xl"></div>
             <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
@@ -197,13 +197,13 @@
                 </div>
                 <div class="flex-grow w-full">
                     <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-xl font-black text-white tracking-tight">AI Executive Brief</h2>
+                        <h2 class="text-xl font-black text-white tracking-tight">AI Content & Media Insights</h2>
                         <span class="text-[10px] font-bold bg-brandLime text-brandDark px-2 py-1 rounded tracking-widest uppercase">Powered by Gemini</span>
                     </div>
                     <div id="ai-output-container" class="text-gray-300 text-sm leading-relaxed font-medium">
                         <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
                             <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
-                            Otak AI sedang menganalisis titik data hari ini...
+                            Sedang merumuskan sudut pandang konten dari data hari ini...
                         </div>
                     </div>
                 </div>
@@ -340,16 +340,17 @@
             container.innerHTML = `
                 <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
                     <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
-                    Otak AI sedang menganalisis titik data hari ini...
+                    AI sedang membedah topik dan menyusun ide konten untuk Anda...
                 </div>
             `;
 
-            const systemPrompt = "Anda adalah seorang Chief Media Analyst. Buat 1 paragraf singkat (maksimal 4 kalimat) berisi ringkasan eksekutif media intelligence hari ini. Jangan menyapa, langsung berikan analisis tajam bergaya formal perusahaan berdasarkan data yang diberikan.";
-            const userQuery = `Data untuk dianalisis: Sentimen dominan hari ini adalah ${sentimenMayoritas}. Topik viral meliputi: ${trenTeratas}.`;
+            // Diubah menjadi instruksi khusus Content Strategist/Analisis Konten
+            const systemPrompt = "Anda adalah seorang Content Strategist & Media Analyst senior. Analisis data tren dan berita hari ini, lalu berikan 3 poin ringkas yang sangat aplikatif untuk pembuatan konten: 1) Isu/Topik yang paling berpotensi FYP atau menarik perhatian publik hari ini, 2) Sudut pandang (angle) unik yang bisa diangkat, 3) Rekomendasi format konten (video pendek, artikel mendalam, atau carousel). Gunakan bahasa Indonesia yang santai tapi profesional, langsung ke poin utama tanpa kalimat pengantar yang bertele-tele.";
             
-            // Kunci API Anda yang ditanam ke dalam sistem
+            const userQuery = `Data Analisis Media Hari Ini:\n- Sentimen Publik: ${sentimenMayoritas}\n- Topik Viral Utama: ${trenTeratas}`;
+            
             const apiKey = "AQ.Ab8RN6IkJCcip9Q1LaTYvGCuxkPwUDsNSPlEzu08EjGmNpPY_w";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
@@ -369,8 +370,8 @@
                     const aiText = result.candidates[0].content.parts[0].text;
                     container.innerHTML = marked.parse(aiText);
                 } else {
-                    const errorMsg = result.error?.message || "Format respons tidak valid.";
-                    container.innerHTML = `<span class="text-red-400 font-normal">Ditolak Server Google: ${errorMsg}</span>`;
+                    const errorMsg = result.error?.message || "Gagal memproses respons.";
+                    container.innerHTML = `<span class="text-red-400 font-normal">Gagal dari Server Google: ${errorMsg}</span>`;
                 }
             } catch (error) {
                 console.error("Gemini API Error:", error);
@@ -405,7 +406,7 @@
                 if (trends.length > 0) {
                     document.getElementById('statTotalTrends').innerText = trends.length;
                     const tbody = document.getElementById('trendingTableBody');
-                    topTren = trends.slice(0, 3).map(t => t['Topik / Kata Kunci']).join(", ");
+                    topTren = trends.slice(0, 5).map(t => `${t['Topik / Kata Kunci']} (${t['Sumber']})`).join(", ");
 
                     trends.forEach(row => {
                         tbody.innerHTML += `
@@ -416,6 +417,7 @@
                     });
                 }
 
+                // Memanggil AI dengan data konten terkini
                 fetchGeminiInsight(null, topTren, mayoritasSentimen);
 
                 if (ent.length > 0) {
