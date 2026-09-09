@@ -131,7 +131,7 @@
             </div>
         </section>
 
-        <!-- Metodologi & Word Cloud (Dipindah ke atas sesuai permintaan) -->
+        <!-- Metodologi & Word Cloud -->
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
             <div class="lg:col-span-1 flex flex-col gap-4">
                 <h3 class="text-2xl font-black text-brandDark mb-2 tracking-tight" data-i18n="methodology_title">Metodologi Pemantauan</h3>
@@ -188,7 +188,7 @@
             </div>
         </section>
 
-        <!-- PANEL AI CONTENT STRATEGIST (Fokus Analisis untuk Pembuatan Konten) -->
+        <!-- PANEL AI CONTENT STRATEGIST -->
         <section id="ai-insight-panel" class="bg-gradient-to-r from-brandDark to-[#2a2b2a] rounded-[2.5rem] p-8 shadow-xl border border-brandLime/20 relative overflow-hidden">
             <div class="absolute -right-20 -top-20 w-64 h-64 bg-brandLime/10 rounded-full blur-3xl"></div>
             <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
@@ -203,7 +203,7 @@
                     <div id="ai-output-container" class="text-gray-300 text-sm leading-relaxed font-medium space-y-2">
                         <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
                             <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
-                            Merumuskan sudut pandang konten dari data hari ini...
+                            Membaca judul berita dan merumuskan sudut pandang konten...
                         </div>
                     </div>
                 </div>
@@ -335,25 +335,24 @@
             });
         }
 
-        async function fetchGeminiInsight(beritaTeratas, trenTeratas, sentimenMayoritas) {
+        async function fetchGeminiInsight(newsList, trendsList, sentimenMayoritas) {
             const container = document.getElementById('ai-output-container');
             container.innerHTML = `
                 <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
                     <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
-                    Sedang merumuskan sudut pandang konten dari data hari ini...
+                    Menganalisis judul berita dan topik viral spesifik hari ini...
                 </div>
             `;
 
-            // Prompt yang diubah khusus untuk Content Strategist / Analis Konten
-            const systemPrompt = "Anda adalah seorang Content Strategist & Media Analyst senior. Berdasarkan data tren dan berita hari ini, berikan 3 poin ringkas yang sangat aplikatif untuk pembuatan konten: 1) Isu/Topik yang paling berpotensi FYP atau menarik perhatian publik hari ini, 2) Sudut pandang (angle) unik yang bisa diangkat, 3) Rekomendasi format konten (video pendek, artikel mendalam, atau carousel). Gunakan bahasa Indonesia yang santai tapi profesional, langsung ke poin utama tanpa kalimat pengantar yang bertele-tele.";
+            // Ekstrak 5 judul berita dan 5 topik teratas agar AI tahu persis apa yang sedang dibahas
+            const sampleNews = newsList.slice(0, 5).map(n => n.Judul || '').filter(Boolean).join("; ");
+            const sampleTrends = trendsList.slice(0, 5).map(t => t['Topik / Kata Kunci'] || t['Judul Berita'] || '').filter(Boolean).join("; ");
+
+            const systemPrompt = "Anda adalah seorang Content Strategist & Media Analyst senior. Berdasarkan judul berita aktual dan topik viral yang diberikan di bawah ini, berikan analisis ringkas (dalam bentuk poin-poin atau paragraf tajam): 1) Sebutkan secara spesifik isu/topik utama yang sedang dibahas publik hari ini, 2) Sudut pandang (angle) konten unik apa yang bisa dieksploitasi untuk pembuatan konten, 3) Rekomendasi format (video pendek, artikel mendalam, dll). Gunakan bahasa Indonesia profesional dan langsung sebutkan topik spesifiknya.";
             
-            const userQuery = `Data Analisis Media Hari Ini:\n- Sentimen Publik: ${sentimenMayoritas}\n- Topik Viral Utama: ${trenTeratas}`;
+            const userQuery = `Data Aktual Hari Ini:\n- Sentimen Publik: ${sentimenMayoritas}\n- Judul Berita Utama: ${sampleNews}\n- Topik Tren/Sosmed: ${sampleTrends}`;
             
             try {
-                // Menggunakan public proxy endpoint yang aman dan stabil untuk web statis
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent`;
-                
-                // Jika ingin menggunakan fallback AI gratis tanpa key
                 const response = await fetch('https://text.pollinations.ai/', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -370,11 +369,11 @@
                     const aiText = await response.text();
                     container.innerHTML = marked.parse(aiText);
                 } else {
-                    container.innerHTML = `<span class="text-gray-300">Fokus konten hari ini didominasi oleh perbincangan organik seputar topik viral utama dengan sentimen ${sentimenMayoritas}. Manfaatkan momentum ini untuk membuat konten reaksi cepat atau ulasan mendalam berbentuk video pendek agar tingkat keterlibatan (engagement) audiens meningkat.</span>`;
+                    container.innerHTML = `<span class="text-gray-300">Berdasarkan data hari ini yang menyoroti topik-topik utama, fokuskan pembuatan konten pada pembahasan interaktif mengenai isu tersebut untuk mendongkrak engagement audiens.</span>`;
                 }
             } catch (error) {
                 console.error("AI Insight Error:", error);
-                container.innerHTML = `<span class="text-gray-300">Rekomendasi Content Strategist: Angkat isu utama dari daftar topik viral hari ini dengan sudut pandang yang interaktif untuk memancing diskusi di kolom komentar audiens.</span>`;
+                container.innerHTML = `<span class="text-gray-300">Content Strategist Insight: Angkat isu utama dari daftar tren di atas dengan sudut pandang pro-kontra atau ulasan mendalam untuk menarik perhatian audiens.</span>`;
             }
         }
 
@@ -389,7 +388,6 @@
                 dashboardData.entertainment = ent; dashboardData.economyAudio = eco;
 
                 let mayoritasSentimen = "Netral";
-                let topTren = "";
 
                 if (news.length > 0) {
                     document.getElementById('statTotalNews').innerText = news.length;
@@ -405,7 +403,6 @@
                 if (trends.length > 0) {
                     document.getElementById('statTotalTrends').innerText = trends.length;
                     const tbody = document.getElementById('trendingTableBody');
-                    topTren = trends.slice(0, 5).map(t => `${t['Topik / Kata Kunci']} (${t['Sumber']})`).join(", ");
 
                     trends.forEach(row => {
                         tbody.innerHTML += `
@@ -416,8 +413,8 @@
                     });
                 }
 
-                // Memanggil AI Content Strategist dengan data terkini
-                fetchGeminiInsight(null, topTren, mayoritasSentimen);
+                // Mengirimkan data array berita dan tren aktual ke AI
+                fetchGeminiInsight(news, trends, mayoritasSentimen);
 
                 if (ent.length > 0) {
                     const topMovie = ent.find(r => r['Sumber'] && r['Sumber'].includes('TMDb')) || ent[0];
