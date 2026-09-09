@@ -77,23 +77,34 @@ def fetch_macro_economy(scraped_time):
 def fetch_audio_trends(scraped_time):
     data = []
     
-    # A. Top 10 Podcasts Indonesia (Apple Podcasts API - Sangat stabil untuk robot)
+    # A. Top 5 Podcasts Indonesia (Gunakan Legacy iTunes API karena lebih stabil)
     try:
-        url_podcast = "https://rss.applemarketingtools.com/api/v2/id/podcasts/top/10/podcasts.json"
+        url_podcast = "https://itunes.apple.com/id/rss/toppodcasts/limit=5/json"
         resp = requests.get(url_podcast, headers=HEADERS, timeout=15)
         if resp.status_code == 200:
-            results = resp.json().get("feed", {}).get("results", [])
-            for idx, item in enumerate(results, 1):
+            entries = resp.json().get("feed", {}).get("entry", [])
+            for idx, item in enumerate(entries, 1):
+                title = item.get("im:name", {}).get("label", "Podcast")
+                artist = item.get("im:artist", {}).get("label", "Unknown")
+                
+                # Pengamanan struktur link JSON
+                link_data = item.get("link")
+                link = ""
+                if isinstance(link_data, list) and len(link_data) > 0:
+                    link = link_data[0].get("attributes", {}).get("href", "")
+                elif isinstance(link_data, dict):
+                    link = link_data.get("attributes", {}).get("href", "")
+
                 data.append({
                     "Waktu Tarik": scraped_time, "Sumber": "Apple Podcasts ID", "Kategori": "Top Podcast",
-                    "Indikator": f"#{idx} Podcast", "Nilai": f"{item.get('name')} (by {item.get('artistName')})", "URL": item.get("url")
+                    "Indikator": f"#{idx} Podcast", "Nilai": f"{title} (by {artist})", "URL": link
                 })
     except Exception as e:
         logging.error(f"Gagal menarik Top Podcast: {e}")
 
-    # B. Top 10 Lagu Indonesia
+    # B. Top 5 Lagu Indonesia
     try:
-        url_music = "https://rss.applemarketingtools.com/api/v2/id/music/most-played/10/songs.json"
+        url_music = "https://rss.applemarketingtools.com/api/v2/id/music/most-played/5/songs.json"
         resp = requests.get(url_music, headers=HEADERS, timeout=15)
         if resp.status_code == 200:
             results = resp.json().get("feed", {}).get("results", [])
