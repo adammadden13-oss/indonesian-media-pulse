@@ -340,7 +340,7 @@
             container.innerHTML = `
                 <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
                     <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
-                    AI sedang membedah topik dan menyusun ide konten untuk Anda...
+                    Sedang merumuskan sudut pandang konten dari data hari ini...
                 </div>
             `;
 
@@ -349,8 +349,8 @@
             
             const userQuery = `Data Analisis Media Hari Ini:\n- Sentimen Publik: ${sentimenMayoritas}\n- Topik Viral Utama: ${trenTeratas}`;
             
-            const apiKey = "AQ.Ab8RN6IkJCcip9Q1LaTYvGCuxkPwUDsNSPlEzu08EjGmNpPY_w";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
