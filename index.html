@@ -23,32 +23,20 @@
                         brandLime: '#c4f033',
                         brandLight: '#f5f5f5',
                         brandGray: '#2a2b2a',
-                    },
-                    borderRadius: {
-                        '4xl': '2rem',
-                        '5xl': '2.5rem',
-                    },
-                    animation: {
-                        'marquee': 'marquee 25s linear infinite',
-                    },
-                    keyframes: {
-                        marquee: {
-                            '0%': { transform: 'translateX(100%)' },
-                            '100%': { transform: 'translateX(-100%)' },
-                        }
                     }
                 }
             }
         }
     </script>
 
-    <!-- PapaParse & Chart.js -->
+    <!-- PapaParse, Chart.js, & Marked.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; scroll-behavior: smooth; }
-        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #1a1b1a; animation: spin 1s linear infinite; }
+        .spinner { border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #c4f033; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -61,13 +49,12 @@
     </style>
 </head>
 
-<body class="text-gray-800 antialiased min-h-screen flex flex-col pt-[120px]">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col pt-[100px]">
 
     <!-- Header & Navigation -->
     <header id="header-wrapper" class="fixed top-0 left-0 w-full z-50 flex flex-col justify-center px-0 pt-0">
         <nav id="navbar" class="w-full max-w-full mx-auto bg-white/95 backdrop-blur-md border-b border-gray-100 flex justify-between items-center py-5 px-8 shadow-sm">
             <div class="flex items-center gap-3 shrink-0">
-                <!-- Vektor Logo Petir Kustom -->
                 <svg class="w-9 h-9 shrink-0 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <circle cx="50" cy="50" r="50" fill="#1b2609"/>
                     <path d="M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z" fill="#c4f033"/>
@@ -82,49 +69,36 @@
             </div>
             
             <div class="flex items-center gap-4 shrink-0">
+                <!-- Dropdown Bahasa -->
                 <div class="relative flex items-center bg-gray-50 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
                     <select id="langSwitch" onchange="switchLanguage(this.value)" class="appearance-none bg-transparent text-brandDark text-sm font-bold pl-4 pr-8 py-2 outline-none cursor-pointer">
-                        <option value="id">EN</option>
-                        <option value="id">ID</option>
+                        <option value="en">EN</option>
+                        <option value="id" selected>ID</option>
                     </select>
                     <svg class="w-3.5 h-3.5 absolute right-3 pointer-events-none text-brandDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
-
+                
                 <span id="lastUpdated" class="text-[13px] font-semibold text-gray-400 hidden sm:block">Sync: Memuat...</span>
+                
                 <button class="bg-brandDark text-white px-5 py-2.5 rounded-full text-[15px] font-bold hover:bg-black transition-all shadow-md flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-brandLime animate-pulse"></span> Live
                 </button>
             </div>
         </nav>
-        
-        <!-- Ticker Ekonomi -->
-        <div id="economyTicker" class="w-full bg-brandLime text-brandDark font-bold py-1.5 px-4 overflow-hidden shadow-sm border-t border-brandLime/20 hidden flex items-center relative z-40 transition-all duration-300">
-            <span class="shrink-0 text-xs tracking-widest uppercase bg-brandDark text-brandLime px-2 py-0.5 rounded mr-4 z-10 relative">MARKET PULSE</span>
-            <div class="flex-grow overflow-hidden relative h-5">
-                <div class="absolute whitespace-nowrap animate-marquee flex gap-12 text-sm" id="tickerContent">
-                    <span>Menunggu Data Ekonomi...</span>
-                </div>
-            </div>
-        </div>
+        <!-- Running Text dihapus dari sini -->
     </header>
 
-    <div id="loadingState" class="flex-grow flex flex-col items-center justify-center">
-        <div class="spinner mb-4"></div>
-        <p class="text-gray-500 font-medium mt-4 tracking-tight" data-i18n="loading">Menyinkronkan Data Pipeline...</p>
-    </div>
-
-    <main id="dashboardContent" class="hidden flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-8 pb-16 space-y-10 mt-4">
+    <main id="dashboardContent" class="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-8 pb-16 space-y-10 mt-4">
         
-        <!-- Overview Section: 4 Interactive Grid Cards -->
+        <!-- Overview Section: 4 Cards -->
         <section id="overview" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
-            
             <div onclick="openModal('news')" class="bg-brandDark rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2 group-hover:text-gray-300 transition-colors" data-i18n="stat_news_title">Total Berita Nasional</h3>
                     <p id="statTotalNews" class="text-5xl font-black text-white tracking-tight">...</p>
                 </div>
                 <p class="text-[10px] text-brandLime/70 mt-4 font-bold flex items-center gap-1 group-hover:text-brandLime transition-colors relative z-10">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> <span data-i18n="click_details">Klik untuk melihat rincian</span>
+                    <span>💡</span> <span data-i18n="click_details">Klik untuk melihat rincian</span>
                 </p>
                 <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:bg-white/10 transition-colors"></div>
             </div>
@@ -135,7 +109,7 @@
                     <p id="statTotalTrends" class="text-5xl font-black text-brandDark tracking-tight">...</p>
                 </div>
                 <p class="text-[10px] text-brandDark/70 mt-4 font-bold flex items-center gap-1 group-hover:text-brandDark transition-colors relative z-10">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> <span data-i18n="click_details">Klik untuk melihat rincian</span>
+                    <span>💡</span> <span data-i18n="click_details">Klik untuk melihat rincian</span>
                 </p>
             </div>
 
@@ -145,7 +119,7 @@
                     <p id="statSentiment" class="text-4xl font-black text-brandDark tracking-tight mt-1">...</p>
                 </div>
                 <p class="text-[10px] text-gray-500 mt-4 font-bold flex items-center gap-1 group-hover:text-brandDark transition-colors relative z-10">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> <span data-i18n="click_details">Klik untuk melihat rincian</span>
+                    <span>💡</span> <span data-i18n="click_details">Klik untuk melihat rincian</span>
                 </p>
             </div>
 
@@ -155,13 +129,93 @@
                     <p id="statTopMovie" class="text-xl font-bold text-white line-clamp-2 leading-snug drop-shadow-sm">...</p>
                 </div>
                 <p class="text-[10px] text-orange-100/80 mt-4 font-bold flex items-center gap-1 group-hover:text-white transition-colors relative z-10">
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg> <span data-i18n="click_details">Klik untuk rincian film</span>
+                    <span>💡</span> <span data-i18n="click_details">Klik untuk rincian film</span>
                 </p>
             </div>
         </section>
 
-        <!-- Panel Analitik Gelap -->
-        <section id="nasional" class="bg-brandDark rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-gray-800 pt-10 scroll-mt-28">
+        <!-- Metodologi & Word Cloud -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
+            <div class="lg:col-span-1 flex flex-col gap-4">
+                <h3 class="text-2xl font-black text-brandDark mb-2 tracking-tight" data-i18n="methodology_title">Metodologi Pemantauan</h3>
+                <div class="max-h-[380px] overflow-y-auto pr-2 space-y-4">
+                    
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-brandDark text-sm">1. Web Scraping & RSS</h4>
+                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded font-bold text-gray-500">Nasional</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 font-medium mb-3 leading-relaxed">
+                            <strong>Teori:</strong> Menggunakan teknik <em>Automated DOM Parsing</em> untuk mengekstrak metadata terstruktur dari portal berita tier-1.
+                        </p>
+                        <div class="text-[11px] font-bold text-blue-700 bg-blue-50 p-2.5 rounded-xl flex items-start gap-2">
+                            <span class="shrink-0">💡</span><span><strong>Hasil:</strong> Memetakan dominasi agenda-setting dan kecepatan publikasi media.</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-brandDark text-sm">2. Analisis Sentimen (NLP)</h4>
+                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded font-bold text-gray-500">Sentimen</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 font-medium mb-3 leading-relaxed">
+                            <strong>Teori:</strong> Menerapkan <em>Lexicon-based approach</em> spesifik bahasa Indonesia dengan <em>Polarity Scoring</em>.
+                        </p>
+                        <div class="text-[11px] font-bold text-green-700 bg-green-50 p-2.5 rounded-xl flex items-start gap-2">
+                            <span class="shrink-0">💡</span><span><strong>Hasil:</strong> Mengukur indeks kecemasan atau tingkat optimisme publik.</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-bold text-brandDark text-sm">3. Agregasi Tren Platform</h4>
+                            <span class="text-[10px] bg-gray-100 px-2 py-1 rounded font-bold text-gray-500">Tren</span>
+                        </div>
+                        <p class="text-[11px] text-gray-500 font-medium mb-3 leading-relaxed">
+                            <strong>Teori:</strong> Melakukan integrasi <em>API tracking</em> publik untuk merekam lonjakan kueri penelusuran harian.
+                        </p>
+                        <div class="text-[11px] font-bold text-orange-700 bg-orange-50 p-2.5 rounded-xl flex items-start gap-2">
+                            <span class="shrink-0">💡</span><span><strong>Hasil:</strong> Menangkap <em>echo chamber</em> perbincangan akar rumput.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 bg-brandLime rounded-[2.5rem] p-8 md:p-10 shadow-lg relative overflow-hidden flex flex-col justify-between">
+                <div class="relative z-10 mb-6">
+                    <h2 class="text-3xl font-black text-brandDark mb-2 tracking-tight" data-i18n="wordcloud_title">Awan Kata (Word Cloud)</h2>
+                    <p class="text-brandDark/70 font-semibold text-sm" data-i18n="wordcloud_desc">Fokus perhatian publik berdasarkan agregasi ribuan judul berita hari ini.</p>
+                </div>
+                <div class="w-full bg-white rounded-3xl p-2 overflow-hidden shadow-2xl relative z-10">
+                    <img id="wordcloudImg" src="https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png" alt="Word Cloud Terkini" class="w-full h-auto max-h-[280px] object-cover rounded-2xl mix-blend-multiply" onerror="this.src='https://placehold.co/800x400/f5f5f5/1a1b1a?text=Menunggu+Wordcloud...'">
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL OTAK ANALISA AI -->
+        <section id="ai-insight-panel" class="bg-gradient-to-r from-brandDark to-[#2a2b2a] rounded-[2.5rem] p-8 shadow-xl border border-brandLime/20 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-brandLime/10 rounded-full blur-3xl"></div>
+            <div class="relative z-10 flex flex-col md:flex-row gap-6 items-start">
+                <div class="shrink-0 bg-brandLime/10 p-4 rounded-2xl border border-brandLime/20">
+                    <svg class="w-8 h-8 text-brandLime" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <div class="flex-grow w-full">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-xl font-black text-white tracking-tight">AI Executive Brief</h2>
+                        <span class="text-[10px] font-bold bg-brandLime text-brandDark px-2 py-1 rounded tracking-widest uppercase">Powered by Gemini</span>
+                    </div>
+                    <div id="ai-output-container" class="text-gray-300 text-sm leading-relaxed font-medium">
+                        <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
+                            <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
+                            Otak AI sedang menganalisis titik data hari ini...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analitik Gelap -->
+        <section id="nasional" class="bg-brandDark rounded-[2.5rem] p-8 md:p-12 shadow-xl border border-gray-800 scroll-mt-28">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div class="lg:col-span-1 flex flex-col justify-center">
                     <span class="inline-block bg-[#2a2b2a] text-brandLime px-4 py-1.5 rounded-full text-[10px] font-bold tracking-widest mb-6 w-max border border-gray-700" data-i18n="dist_data">DISTRIBUSI DATA NASIONAL</span>
@@ -173,7 +227,6 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg> <span data-i18n="download_report">Unduh Laporan Lengkap (.XLSX)</span>
                     </a>
                 </div>
-
                 <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-[#212221] rounded-3xl p-6 border border-gray-800/60 shadow-inner flex flex-col">
                         <h3 class="text-sm font-bold text-gray-300 mb-6 tracking-wide" data-i18n="sentiment_ratio">Rasio Sentimen Nasional</h3>
@@ -191,53 +244,8 @@
             </div>
         </section>
 
-        <!-- Metodologi & Word Cloud -->
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-6">
-            <div class="lg:col-span-1 flex flex-col gap-4">
-                <h3 class="text-2xl font-black text-brandDark mb-2 tracking-tight" data-i18n="methodology_title">Metodologi Pemantauan</h3>
-                <div class="max-h-[380px] overflow-y-auto pr-2 space-y-4">
-                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-brandDark text-sm">1. Web Scraping & RSS</h4>
-                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded font-bold text-gray-500">Nasional</span>
-                        </div>
-                        <p class="text-xs text-gray-500 font-medium mb-2">Menggunakan Automated Web Scraping untuk ekstraksi metadata portal berita arus utama.</p>
-                        <p class="text-[11px] font-bold text-blue-600 bg-blue-50 p-2 rounded-xl">💡 Memetakan kecepatan dan volume publikasi media.</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-brandDark text-sm">2. Analisis Sentimen (NLP)</h4>
-                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded font-bold text-gray-500">Sentimen</span>
-                        </div>
-                        <p class="text-xs text-gray-500 font-medium mb-2">Menerapkan Lexicon-based approach & Polarity Scoring untuk sentimen teks harian.</p>
-                        <p class="text-[11px] font-bold text-green-600 bg-green-50 p-2 rounded-xl">💡 Mengukur kecemasan atau optimisme publik.</p>
-                    </div>
-                    <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-brandDark text-sm">3. Agregasi Tren Platform</h4>
-                            <span class="text-xs bg-gray-100 px-2 py-0.5 rounded font-bold text-gray-500">Tren</span>
-                        </div>
-                        <p class="text-xs text-gray-500 font-medium mb-2">Mengambil rekam jejak kueri penelusuran harian dari X, Google, dan YouTube.</p>
-                        <p class="text-[11px] font-bold text-orange-600 bg-orange-50 p-2 rounded-xl">💡 Menangkap topik perbincangan akar rumput.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-2 bg-brandLime rounded-[2.5rem] p-8 md:p-10 shadow-lg relative overflow-hidden flex flex-col justify-between">
-                <div class="relative z-10 mb-6">
-                    <h2 class="text-3xl font-black text-brandDark mb-2 tracking-tight" data-i18n="wordcloud_title">Awan Kata (Word Cloud)</h2>
-                    <p class="text-brandDark/70 font-semibold text-sm" data-i18n="wordcloud_desc">Fokus perhatian publik berdasarkan agregasi ribuan judul berita hari ini.</p>
-                </div>
-                <div class="w-full bg-white rounded-3xl p-2 overflow-hidden shadow-2xl relative z-10">
-                    <img id="wordcloudImg" src="https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png" alt="Word Cloud Terkini" class="w-full h-auto max-h-[280px] object-cover rounded-2xl mix-blend-multiply" onerror="this.src='https://placehold.co/800x400/f5f5f5/1a1b1a?text=Menunggu+Wordcloud...'">
-                </div>
-            </div>
-        </section>
-
         <!-- Topik Terhangat & Audio -->
         <section id="tren" class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 scroll-mt-28">
-            
-            <!-- Tren Portal & Sosmed -->
             <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-gray-100 flex flex-col">
                 <h3 class="text-xl font-black text-brandDark mb-6 tracking-tight" data-i18n="trending_title">Topik Terhangat (Media Sosial & Portal)</h3>
                 <div class="flex-grow overflow-y-auto max-h-[420px] pr-2">
@@ -248,31 +256,26 @@
                                 <th class="pb-4">Topik / Judul</th>
                             </tr>
                         </thead>
-                        <tbody id="trendingTableBody" class="divide-y divide-gray-100">
-                            <!-- JS fills -->
-                        </tbody>
+                        <tbody id="trendingTableBody" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Podcast & Musik Audio (Baru) -->
-            <div class="bg-brandDark rounded-[2.5rem] p-8 shadow-sm border border-gray-800 flex flex-col">
+            <div id="audio" class="bg-brandDark rounded-[2.5rem] p-8 shadow-sm border border-gray-800 flex flex-col scroll-mt-28">
                 <h3 class="text-xl font-black text-white mb-6 tracking-tight flex items-center gap-2">
                     <svg class="w-6 h-6 text-brandLime" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
                     Top Podcast & Musik Indonesia
                 </h3>
                 <div class="flex-grow overflow-y-auto max-h-[420px] pr-2" id="audioListContainer">
                     <p class="text-gray-500 text-sm italic">Menunggu data audio...</p>
-                    <!-- JS fills this with Podcast/Music cards -->
                 </div>
             </div>
-
         </section>
 
     </main>
 
     <!-- Modal Pop-ups -->
-    <div id="universalModal" class="hidden fixed inset-0 bg-brandDark/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+    <div id="universalModal" class="hidden fixed inset-0 bg-brandDark/90 z-[999] flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-[2rem] w-full max-w-4xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl">
             <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                 <h2 id="modalTitle" class="text-2xl font-black text-brandDark tracking-tight">Detail Informasi</h2>
@@ -293,11 +296,12 @@
     </footer>
 
     <script>
+        // Kumpulan terjemahan teks (Dictionary)
         const translations = {
             id: {
                 brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "Nasional", nav_tren: "Tren Sosial",
                 loading: "Menyinkronkan Data Pipeline...", stat_news_title: "Total Berita Nasional", stat_trends_title: "Topik Viral Hari Ini",
-                stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Film Terpopuler (TMDb, Netflix)", click_details: "Klik untuk melihat rincian",
+                stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Film Terpopuler (TMDb)", click_details: "Klik untuk melihat rincian",
                 dist_data: "DISTRIBUSI DATA NASIONAL", portal_power_title: "Peta Kekuatan<br>Portal Berita",
                 portal_power_desc: "Visualisasi proporsi penerbitan artikel oleh berbagai media arus utama di Indonesia. Data ditarik secara real-time dari pipeline analitik harian via GitHub Actions.",
                 download_report: "Unduh Laporan Lengkap (.XLSX)", sentiment_ratio: "Rasio Sentimen Nasional", volume_source: "Volume per Sumber",
@@ -307,7 +311,7 @@
             en: {
                 brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "National", nav_tren: "Social Trends",
                 loading: "Synchronizing Data Pipeline...", stat_news_title: "Total National News", stat_trends_title: "Today's Viral Topics",
-                stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Movies (TMDb, Netflix)", click_details: "Click for details",
+                stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Movies (TMDb)", click_details: "Click for details",
                 dist_data: "NATIONAL DATA DISTRIBUTION", portal_power_title: "News Portal<br>Strength Map",
                 portal_power_desc: "Visualization of article publication proportions by mainstream media in Indonesia. Data pulled in real-time via GitHub Actions.",
                 download_report: "Download Full Report (.XLSX)", sentiment_ratio: "National Sentiment Ratio", volume_source: "Volume per Source",
@@ -319,158 +323,156 @@
         function switchLanguage(lang) {
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if(translations[lang] && translations[lang][key]) el.innerHTML = translations[lang][key];
+                if(translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
             });
         }
 
-        const filesToLoad = {
-            news: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_news.csv',
-            trends: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_trending.csv',
-            entertainment: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/hiburan_dan_opini.csv',
-            economy: 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/ekonomi_audio.csv'
-        };
-
+        const baseUrl = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/';
         let dashboardData = { news: [], trends: [], entertainment: [], economyAudio: [] };
         let sentimentChartInstance = null; let sourceChartInstance = null;
 
-        function parseCSV(url) {
+        function parseCSV(filename) {
             return new Promise((resolve) => {
-                Papa.parse(url + '?v=' + new Date().getTime(), {
+                Papa.parse(baseUrl + filename + '?v=' + new Date().getTime(), {
                     download: true, header: true, skipEmptyLines: true,
                     complete: (res) => resolve(res.data), error: () => resolve([])
                 });
             });
         }
 
+        async function fetchGeminiInsight(beritaTeratas, trenTeratas, sentimenMayoritas) {
+            const container = document.getElementById('ai-output-container');
+            
+            // Menampilkan animasi loading saat memanggil API
+            container.innerHTML = `
+                <div class="flex items-center gap-3 animate-pulse text-brandLime/70">
+                    <div class="spinner w-4 h-4 border-2 border-brandLime border-t-transparent rounded-full animate-spin"></div>
+                    Menganalisis titik data dengan server resmi Gemini...
+                </div>
+            `;
+
+            const systemPrompt = "Anda adalah seorang Chief Media Analyst. Buat 1 paragraf singkat (maksimal 4 kalimat) berisi ringkasan eksekutif media intelligence hari ini. Jangan menyapa, langsung berikan analisis tajam bergaya formal perusahaan berdasarkan data yang diberikan.";
+            const userQuery = `Data untuk dianalisis: Sentimen dominan hari ini adalah ${sentimenMayoritas}. Topik viral meliputi: ${trenTeratas}.`;
+            
+            // API Key Anda yang ditanam ke dalam sistem
+            const apiKey = "AQ.Ab8RN6JJDfqGb-XEXaWYjPpfnronhc-fwKl5pcn9ea5JKczWDQ";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+                
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const aiText = candidate.content.parts[0].text;
+                    // Menerjemahkan Markdown dari AI ke dalam elemen HTML
+                    container.innerHTML = marked.parse(aiText);
+                } else {
+                    container.innerHTML = `<span class="text-red-400">Respons AI gagal diproses. Endpoint atau API Key salah.</span>`;
+                }
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                container.innerHTML = `<span class="text-red-400 font-normal">Gagal menyambung ke jaringan AI Google Gemini. Periksa koneksi internet Anda.</span>`;
+            }
+        }
+
         async function initDashboard() {
             try {
                 const [news, trends, ent, eco] = await Promise.all([
-                    parseCSV(filesToLoad.news), parseCSV(filesToLoad.trends), 
-                    parseCSV(filesToLoad.entertainment), parseCSV(filesToLoad.economy)
+                    parseCSV('berita_news.csv'), parseCSV('berita_trending.csv'), 
+                    parseCSV('hiburan_dan_opini.csv'), parseCSV('ekonomi_audio.csv')
                 ]);
 
                 dashboardData.news = news; dashboardData.trends = trends; 
                 dashboardData.entertainment = ent; dashboardData.economyAudio = eco;
 
+                let mayoritasSentimen = "Netral";
+                let topTren = "";
+
                 if (news.length > 0) {
-                    processNewsStats(); renderSentimentChart(); renderSourceChart();
-                    document.getElementById('lastUpdated').innerText = `Sync: ${news[0]['Waktu Tarik'] || 'Baru saja'}`;
+                    document.getElementById('statTotalNews').innerText = news.length;
+                    document.getElementById('lastUpdated').innerText = `Sync: ${news[0]['Waktu Tarik'] || 'Selesai'}`;
+                    
+                    let s = { Positif: 0, Negatif: 0, Netral: 0 };
+                    news.forEach(r => { if(r.Sentimen) s[r.Sentimen] = (s[r.Sentimen]||0)+1; });
+                    mayoritasSentimen = Object.keys(s).reduce((a,b) => s[a] > s[b] ? a : b);
+                    document.getElementById('statSentiment').innerText = mayoritasSentimen;
+                    renderCharts();
                 }
                 
                 if (trends.length > 0) {
                     document.getElementById('statTotalTrends').innerText = trends.length;
-                    renderTrendingTable();
+                    const tbody = document.getElementById('trendingTableBody');
+                    topTren = trends.slice(0, 3).map(t => t['Topik / Kata Kunci']).join(", ");
+
+                    trends.forEach(row => {
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="py-4 pr-4 whitespace-nowrap"><span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">${row['Sumber'] || 'Trending'}</span></td>
+                                <td class="py-4 pr-4"><p class="font-bold text-sm text-brandDark">${row['Topik / Kata Kunci'] || '-'}</p><p class="text-xs text-gray-400 font-medium line-clamp-1 mt-0.5">${row['Judul Berita'] || ''}</p></td>
+                            </tr>`;
+                    });
                 }
+
+                fetchGeminiInsight(null, topTren, mayoritasSentimen);
 
                 if (ent.length > 0) {
                     const topMovie = ent.find(r => r['Sumber'] && r['Sumber'].includes('TMDb')) || ent[0];
                     if (topMovie) document.getElementById('statTopMovie').innerText = topMovie['Judul'] || 'Tidak tersedia';
                 }
 
-                // Process Economy & Audio Data
                 if (eco.length > 0) {
-                    processEconomyTicker();
-                    processAudioList();
+                    const audioData = eco.filter(r => r.Kategori === 'Top Podcast' || r.Kategori === 'Top Musik');
+                    const container = document.getElementById('audioListContainer');
+                    if(audioData.length > 0) {
+                        container.innerHTML = '';
+                        audioData.forEach(item => {
+                            const isPodcast = item.Kategori === 'Top Podcast';
+                            const iconColor = isPodcast ? 'text-purple-400 bg-purple-500/10 border-purple-500/20' : 'text-blue-400 bg-blue-500/10 border-blue-500/20';
+                            container.innerHTML += `
+                                <a href="${item.URL}" target="_blank" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors group mb-2 border border-transparent hover:border-gray-700">
+                                    <div class="w-10 h-10 rounded-full border flex items-center justify-center shrink-0 ${iconColor}">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">${item.Sumber} • ${item.Indikator}</span>
+                                        <p class="text-sm font-bold text-gray-200 group-hover:text-brandLime transition-colors mt-0.5 line-clamp-1">${item.Nilai}</p>
+                                    </div>
+                                </a>`;
+                        });
+                    }
                 }
-
-                document.getElementById('loadingState').classList.add('hidden');
-                document.getElementById('dashboardContent').classList.remove('hidden');
-
-            } catch (error) {
-                console.error("Dashboard Error:", error);
-                document.getElementById('loadingState').innerHTML = `<p class="text-red-500 font-bold bg-red-50 p-4 rounded-xl">Menunggu sinkronisasi repositori GitHub.</p>`;
-            }
+            } catch (error) { console.error("Error:", error); }
         }
 
-        function processEconomyTicker() {
-            const ecoData = dashboardData.economyAudio.filter(r => r.Kategori === 'Makro Ekonomi');
-            if(ecoData.length > 0) {
-                const tickerEl = document.getElementById('economyTicker');
-                const contentEl = document.getElementById('tickerContent');
-                tickerEl.classList.remove('hidden');
-                
-                let htmlStr = '';
-                ecoData.forEach(item => {
-                    htmlStr += `<span class="flex items-center gap-2"><strong class="text-brandDark">${item.Indikator}:</strong> <span class="text-green-800">${item.Nilai}</span></span>`;
-                });
-                // Duplicate for smooth infinite marquee
-                contentEl.innerHTML = htmlStr + htmlStr + htmlStr;
-            }
-        }
-
-        function processAudioList() {
-            const audioData = dashboardData.economyAudio.filter(r => r.Kategori === 'Top Podcast' || r.Kategori === 'Top Musik');
-            const container = document.getElementById('audioListContainer');
-            
-            if(audioData.length > 0) {
-                container.innerHTML = '';
-                audioData.forEach(item => {
-                    const isPodcast = item.Kategori === 'Top Podcast';
-                    const iconColor = isPodcast ? 'text-purple-400 bg-purple-500/10 border-purple-500/20' : 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-                    const iconSvg = isPodcast 
-                        ? `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>`
-                        : `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2zm12-3c-1.105 0-2-.895-2-2s.895-2 2-2 2 .895 2 2-.895 2-2 2z"></path></svg>`;
-
-                    container.innerHTML += `
-                        <a href="${item.URL}" target="_blank" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/5 transition-colors group mb-2 border border-transparent hover:border-gray-700">
-                            <div class="w-10 h-10 rounded-full border flex items-center justify-center shrink-0 ${iconColor}">
-                                ${iconSvg}
-                            </div>
-                            <div class="flex-grow">
-                                <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">${item.Sumber} • ${item.Indikator}</span>
-                                <p class="text-sm font-bold text-gray-200 group-hover:text-brandLime transition-colors mt-0.5 line-clamp-1">${item.Nilai}</p>
-                            </div>
-                        </a>
-                    `;
-                });
-            }
-        }
-
-        function processNewsStats() {
-            document.getElementById('statTotalNews').innerText = dashboardData.news.length;
-            let s = { Positif: 0, Negatif: 0, Netral: 0 };
-            dashboardData.news.forEach(r => { if(r.Sentimen) s[r.Sentimen] = (s[r.Sentimen]||0)+1; });
-            document.getElementById('statSentiment').innerText = Object.keys(s).reduce((a,b) => s[a] > s[b] ? a : b);
-        }
-
-        function renderTrendingTable() {
-            const tbody = document.getElementById('trendingTableBody');
-            tbody.innerHTML = '';
-            dashboardData.trends.forEach(row => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="py-4 pr-4 whitespace-nowrap">
-                            <span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">${row['Sumber'] || 'Trending'}</span>
-                        </td>
-                        <td class="py-4 pr-4">
-                            <p class="font-bold text-sm text-brandDark">${row['Topik / Kata Kunci'] || '-'}</p>
-                            <p class="text-xs text-gray-400 font-medium line-clamp-1 mt-0.5">${row['Judul Berita'] || ''}</p>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        Chart.defaults.color = '#9ca3af'; Chart.defaults.font.family = 'Inter';
-        
-        function renderSentimentChart() {
+        function renderCharts() {
+            Chart.defaults.color = '#9ca3af'; Chart.defaults.font.family = 'Inter';
             let counts = { Positif: 0, Netral: 0, Negatif: 0 };
-            dashboardData.news.forEach(r => { if(r['Sentimen']) counts[r['Sentimen']]++; });
-            const ctx = document.getElementById('sentimentChart').getContext('2d');
+            let sources = {};
+            dashboardData.news.forEach(r => { if(r['Sentimen']) counts[r['Sentimen']]++; if(r['Sumber']) sources[r['Sumber']] = (sources[r['Sumber']]||0)+1; });
+
             if(sentimentChartInstance) sentimentChartInstance.destroy();
-            sentimentChartInstance = new Chart(ctx, {
+            sentimentChartInstance = new Chart(document.getElementById('sentimentChart').getContext('2d'), {
                 type: 'doughnut',
                 data: { labels: ['Positif', 'Netral', 'Negatif'], datasets: [{ data: [counts.Positif, counts.Netral, counts.Negatif], backgroundColor: ['#c4f033', '#4b5563', '#ef4444'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, color: '#d1d5db' } } } }
             });
-        }
 
-        function renderSourceChart() {
-            let sources = {};
-            dashboardData.news.forEach(r => { if(r['Sumber']) sources[r['Sumber']] = (sources[r['Sumber']]||0)+1; });
             let sorted = Object.keys(sources).map(k => [k, sources[k]]).sort((a,b) => b[1]-a[1]).slice(0,5);
-            const ctx = document.getElementById('sourceChart').getContext('2d');
             if(sourceChartInstance) sourceChartInstance.destroy();
-            sourceChartInstance = new Chart(ctx, {
+            sourceChartInstance = new Chart(document.getElementById('sourceChart').getContext('2d'), {
                 type: 'bar',
                 data: { labels: sorted.map(s=>s[0]), datasets: [{ data: sorted.map(s=>s[1]), backgroundColor: '#c4f033', borderRadius: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, border: {display: false} }, x: { grid: { display: false }, border: {display: false} } } }
@@ -482,23 +484,13 @@
             const list = document.getElementById('modalListContent');
             list.innerHTML = '';
 
-            if(type === 'news' || type === 'trends' || type === 'entertainment') {
-                const data = type === 'news' ? dashboardData.news : (type === 'trends' ? dashboardData.trends : dashboardData.entertainment);
-                titleEl.innerText = type === 'news' ? 'Arsip Berita Nasional' : (type === 'trends' ? 'Daftar Topik Viral' : 'Film & Series Terpopuler');
-                
-                data.forEach(item => {
-                    list.innerHTML += `
-                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-brandLime transition-all group">
-                            <div class="flex gap-2 mb-2">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500">${item['Sumber'] || 'Data'}</span>
-                            </div>
-                            <a href="${item['URL']}" target="_blank" class="text-sm font-bold text-brandDark group-hover:text-blue-600 block">${item['Judul'] || item['Topik / Kata Kunci']}</a>
-                        </div>`;
-                });
-            } else if (type === 'sentiment') {
-                titleEl.innerText = "Breakdown Sentimen";
-                list.innerHTML = `<p class="text-gray-500 p-8 text-center">Menampilkan breakdown rasio positif/negatif pada berita hari ini...</p>`;
-            }
+            const data = type === 'news' ? dashboardData.news : (type === 'trends' ? dashboardData.trends : dashboardData.entertainment);
+            titleEl.innerText = type === 'news' ? 'Arsip Berita Nasional' : (type === 'trends' ? 'Daftar Topik Viral' : 'Film & Series Terpopuler');
+            
+            // Limit to 30 items for smooth performance
+            data.slice(0, 30).forEach(item => {
+                list.innerHTML += `<div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-brandLime transition-all group mb-4"><div class="flex gap-2 mb-2"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500">${item['Sumber'] || 'Data'}</span></div><a href="${item['URL']}" target="_blank" class="text-sm font-bold text-brandDark group-hover:text-blue-600 block">${item['Judul'] || item['Topik / Kata Kunci']}</a></div>`;
+            });
 
             document.body.style.overflow = 'hidden';
             document.getElementById('universalModal').classList.remove('hidden');
@@ -511,22 +503,20 @@
 
         window.addEventListener('DOMContentLoaded', initDashboard);
 
-        // Optimized Rubber Navigation Effect
         let isNavScrolled = false;
         window.addEventListener('scroll', () => {
+            const wrap = document.getElementById('header-wrapper');
+            const nav = document.getElementById('navbar');
+            
             if (window.scrollY > 20 && !isNavScrolled) {
-                const wrap = document.getElementById('header-wrapper');
-                const nav = document.getElementById('navbar');
                 wrap.classList.add('px-4', 'pt-4'); wrap.classList.remove('px-0', 'pt-0');
-                nav.classList.add('max-w-[1200px]', 'rounded-full', 'shadow-xl', 'py-3', 'border-transparent');
-                nav.classList.remove('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'border-b', 'border-gray-100');
+                nav.classList.add('max-w-[1200px]', 'rounded-full', 'shadow-2xl', 'py-3', 'border-transparent', 'bg-white');
+                nav.classList.remove('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'border-b', 'border-gray-100', 'bg-white/95');
                 isNavScrolled = true;
             } else if (window.scrollY <= 20 && isNavScrolled) {
-                const wrap = document.getElementById('header-wrapper');
-                const nav = document.getElementById('navbar');
                 wrap.classList.remove('px-4', 'pt-4'); wrap.classList.add('px-0', 'pt-0');
-                nav.classList.remove('max-w-[1200px]', 'rounded-full', 'shadow-xl', 'py-3', 'border-transparent');
-                nav.classList.add('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'border-b', 'border-gray-100');
+                nav.classList.remove('max-w-[1200px]', 'rounded-full', 'shadow-2xl', 'py-3', 'border-transparent', 'bg-white');
+                nav.classList.add('max-w-full', 'rounded-none', 'shadow-sm', 'py-5', 'border-b', 'border-gray-100', 'bg-white/95');
                 isNavScrolled = false;
             }
         });
