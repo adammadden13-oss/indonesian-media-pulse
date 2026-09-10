@@ -226,12 +226,20 @@ def run_job():
         return
 
     df_new = pd.DataFrame(data).drop_duplicates(subset=["URL"])
-    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL"]
+    # 1. ADD SENTIMENT PLACEHOLDERS SO COLUMNS MATCH
+    df_new["Sentimen"] = ""
+    df_new["Skor Sentimen"] = ""
+    
+    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL", "Sentimen", "Skor Sentimen"]
     df_new = df_new[kolom_urut]
 
     if os.path.exists(CSV_FILE):
         try:
             df_existing = pd.read_csv(CSV_FILE)
+            # Ensure existing file has the columns too, to prevent mismatch
+            if "Sentimen" not in df_existing.columns: df_existing["Sentimen"] = ""
+            if "Skor Sentimen" not in df_existing.columns: df_existing["Skor Sentimen"] = ""
+            
             # Bersihkan judul-judul lama yang sudah tersimpan agar seragam
             df_existing["Judul"] = df_existing["Judul"].apply(clean_text)
             
