@@ -36,6 +36,8 @@ jobs:
           python trending_tracker.py || true
 
       - name: 4. Eksekusi Tracker Hiburan & Opini
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: |
           python entertainment_tracker.py || true
 
