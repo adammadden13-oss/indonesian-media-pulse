@@ -431,8 +431,10 @@
 
         async function initDashboard() {
             try {
+                // Eksekusi paralel yang kebal error berkat perlindungan di fungsi parseCSV
+                // PERBAIKAN: Dikembalikan ke berita_news.csv (Berita Nasional Asli)
                 const [news, trends, ent, eco] = await Promise.all([
-                    parseCSV('berita_terkini.csv'), parseCSV('berita_trending.csv'), 
+                    parseCSV('berita_news.csv'), parseCSV('berita_trending.csv'), 
                     parseCSV('film_dan_hiburan.csv'), parseCSV('ekonomi_audio.csv')
                 ]);
 
