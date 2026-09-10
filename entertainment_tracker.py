@@ -166,8 +166,22 @@ def run_entertainment_tracker():
             
     df = df[kolom]
     
-    df.to_csv(CSV_HIBURAN, index=False)
-    logging.info(f"Berhasil menyimpan {len(df)} data ke {CSV_HIBURAN}.")
+    # PERBAIKAN: Jangan overwrite (timpa) file jika sudah ada data Opini/Google Trends
+    if os.path.exists(CSV_HIBURAN):
+        try:
+            df_lama = pd.read_csv(CSV_HIBURAN)
+            # Gabungkan data lama (Opini/Tren) dengan data baru (Film/Series)
+            df_final = pd.concat([df_lama, df], ignore_index=True)
+            # Hapus duplikat secara global berdasarkan Judul agar bersih
+            df_final = df_final.drop_duplicates(subset=["Judul"], keep="last")
+            df_final.to_csv(CSV_HIBURAN, index=False)
+            logging.info(f"Berhasil menggabungkan {len(df)} data hiburan ke {CSV_HIBURAN}.")
+        except Exception as e:
+            logging.error(f"Gagal menggabungkan CSV: {e}")
+            df.to_csv(CSV_HIBURAN, index=False) # Fallback jika file lama rusak
+    else:
+        df.to_csv(CSV_HIBURAN, index=False)
+        logging.info(f"Berhasil membuat file baru dan menyimpan {len(df)} data ke {CSV_HIBURAN}.")
 
 if __name__ == "__main__":
     run_entertainment_tracker()
