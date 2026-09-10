@@ -34,16 +34,20 @@ def get_session():
     return session
 
 def clean_text(text):
-    """Membersihkan judul dari spasi ganda, tag waktu, dan tanggal rilis."""
+    """Membersihkan judul dari spasi ganda, tag waktu, tanggal rilis, dan karakter pemecah CSV."""
     if not isinstance(text, str) or not text:
         return ""
     cleaned = " ".join(text.split())
     
-    # 1. Hapus pola tanggal & jam lengkap (contoh: "05 September 2026 - 23:23 WIB" atau "05 September 2026")
+    # 1. Hapus pola tanggal & jam lengkap
     cleaned = re.sub(r'\s*\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s*[-–—]?\s*\d{1,2}:\d{2}(?:\s*(?:WIB|WITA|WIT))?)?\s*$', '', cleaned, flags=re.IGNORECASE)
     
-    # 2. Hapus pola waktu relatif (contoh: "2 jam yang lalu", "15 menit lalu", "3 jam lalu")
+    # 2. Hapus pola waktu relatif 
     cleaned = re.sub(r'\s*\d+\s*(?:menit|jam|hari|detik)\s*(?:yang)?\s*lalu\s*$', '', cleaned, flags=re.IGNORECASE)
+    
+    # 3. MENGHINDARI BUG CSV GITHUB: Ganti koma dengan spasi/hubung agar kolom tidak pecah
+    cleaned = cleaned.replace(',', ' -')
+    cleaned = cleaned.replace('"', "'") # Ganti kutip ganda jadi tunggal agar lebih aman
     
     return cleaned.strip()
 
@@ -228,10 +232,10 @@ def run_job():
     if os.path.exists(CSV_FILE):
         try:
             df_existing = pd.read_csv(CSV_FILE)
-            # Bersihkan judul-judul lama yang sudah tersimpan
+            # Bersihkan judul-judul lama yang sudah tersimpan agar seragam
             df_existing["Judul"] = df_existing["Judul"].apply(clean_text)
             
-            # 1. df_new ditaruh di depan agar berita yang ditarik jam 05:00 memperbarui timestamp
+            # 1. df_new ditaruh di depan agar berita yang ditarik memperbarui timestamp
             df_combined = pd.concat([df_new, df_existing], ignore_index=True)
             df_combined = df_combined.drop_duplicates(subset=["URL"], keep="first")
             
