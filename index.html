@@ -417,7 +417,8 @@
 
         async function initDashboard() {
             try {
-                // Membaca file baru yang terpisah untuk film: film_dan_hiburan.csv
+                // Eksekusi paralel yang kebal error berkat perlindungan di fungsi parseCSV
+                // PERBAIKAN: Mengganti 'berita_news.csv' dengan 'berita_terkini.csv'
                 const [news, trends, ent, eco] = await Promise.all([
                     parseCSV('berita_terkini.csv'), parseCSV('berita_trending.csv'), 
                     parseCSV('film_dan_hiburan.csv'), parseCSV('ekonomi_audio.csv')
