@@ -124,7 +124,7 @@
             <div onclick="openModal('entertainment')" class="bg-[#FF6B00] rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
                     <h3 class="text-[11px] font-bold text-orange-200 uppercase tracking-wider mb-2" data-i18n="stat_movie_title">Film Terpopuler (TMDb)</h3>
-                    <p id="statTopMovie" class="text-xl font-bold text-white line-clamp-2 leading-snug drop-shadow-sm">...</p>
+                    <p id="statTopMovie" class="text-xl font-bold text-white line-clamp-2 leading-snug drop-shadow-sm transition-all duration-300">...</p>
                 </div>
                 <p class="text-[10px] text-orange-100/80 mt-4 font-bold flex items-center gap-1 group-hover:text-white transition-colors relative z-10">
                     <span>💡</span> <span data-i18n="click_details">Klik untuk rincian film</span>
@@ -355,7 +355,7 @@
                 Papa.parse(baseUrl + filename + '?v=' + new Date().getTime(), {
                     download: true, header: true, skipEmptyLines: true,
                     complete: (res) => resolve(res.data),
-                    error: () => resolve([]) // Jangan melempar error, kembalikan array kosong agar dasbor tidak mati
+                    error: () => resolve([]) 
                 });
             });
         }
@@ -417,7 +417,7 @@
 
         async function initDashboard() {
             try {
-                // MENGUBAH NAMA FILE: Sekarang membaca dari file khusus film_dan_hiburan.csv
+                // Membaca file baru yang terpisah untuk film: film_dan_hiburan.csv
                 const [news, trends, ent, eco] = await Promise.all([
                     parseCSV('berita_terkini.csv'), parseCSV('berita_trending.csv'), 
                     parseCSV('film_dan_hiburan.csv'), parseCSV('ekonomi_audio.csv')
@@ -435,7 +435,6 @@
                     
                     let s = { Positif: 0, Negatif: 0, Netral: 0 };
                     news.forEach(r => { if(r.Sentimen) s[r.Sentimen] = (s[r.Sentimen]||0)+1; });
-                    // Handle case where sentiment columns might not exist yet
                     if(s.Positif > 0 || s.Negatif > 0 || s.Netral > 0) {
                         mayoritasSentimen = Object.keys(s).reduce((a,b) => s[a] > s[b] ? a : b);
                     }
@@ -466,17 +465,17 @@
 
                 fetchGeminiInsight(news, trends, mayoritasSentimen);
 
-                // Memuat Film dari file khusus
+                // Memuat Film (Mendukung Error Handling System Debug)
                 if (ent.length > 0) {
-                    // Karena filenya sekarang eksklusif untuk film, kita ambil baris pertama yang ada judulnya
                     const topMovie = ent.find(r => r['Judul'] && r['Judul'] !== '-');
                     
                     if (topMovie) {
-                        // Jika isi judulnya adalah pesan error dari script Python
                         if (topMovie['Judul'].includes('Gagal') || topMovie['Judul'].includes('Peringatan')) {
+                            // Tampilan jika kena blokir Cloudflare / API Key kosong
                             document.getElementById('statTopMovie').innerText = 'Scraping diblokir server tujuan hari ini';
                             document.getElementById('statTopMovie').classList.add('text-sm', 'font-normal');
                         } else {
+                            // Tampilan normal
                             document.getElementById('statTopMovie').innerText = topMovie['Judul'];
                             document.getElementById('statTopMovie').classList.remove('text-sm', 'font-normal');
                         }
@@ -553,17 +552,18 @@
                 data = dashboardData.trends;
                 titleEl.innerText = 'Daftar Topik Viral';
             } else if (type === 'sentiment') {
+                // Smart Filter: Hanya tampilkan berita dengan sentimen yang dominan saat ini
                 data = dashboardData.news.filter(r => r.Sentimen === globalDominantSentiment);
                 titleEl.innerText = `Berita Bersentimen ${globalDominantSentiment}`;
-                maxItems = 15;
+                maxItems = 15; // Dibatasi agar tidak terlalu banyak
             } else if (type === 'entertainment') {
-                // Menggunakan data utuh dari film_dan_hiburan.csv tanpa perlu di filter ketat lagi
+                // Menarik data murni dari film_dan_hiburan.csv
                 data = dashboardData.entertainment.filter(r => r.Judul && r.Judul !== '-'); 
                 titleEl.innerText = 'Film & Series Terpopuler';
             }
             
             if (data.length === 0) {
-                const emptyMsg = type === 'entertainment' ? 'Belum ada data film/series yang berhasil ditarik hari ini.' : 'Belum ada data yang ditarik hari ini.';
+                const emptyMsg = type === 'entertainment' ? 'Belum ada data film/series yang berhasil ditarik hari ini (kemungkinan diblokir server tujuan).' : 'Belum ada data yang ditarik hari ini.';
                 list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium">${emptyMsg}</div>`;
             } else {
                 data.slice(0, maxItems).forEach(item => {
@@ -573,6 +573,7 @@
                         sentimentBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${color}">${item['Sentimen']}</span>`;
                     }
 
+                    // Tentukan judul utama yang akan ditampilkan
                     const mainTitle = item['Judul Berita'] || item['Judul'] || item['Topik / Kata Kunci'] || 'Tanpa Judul';
                     
                     let catSub = '';
@@ -580,6 +581,7 @@
                         catSub = `<p class="text-[11px] font-bold text-orange-500 mb-1.5 uppercase tracking-wider">${item['Kategori']}</p>`;
                     }
 
+                    // Tampilkan topik di atas judul berita jika ada
                     const topicSub = (item['Topik / Kata Kunci'] && type === 'trends') ? 
                         `<p class="text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">${item['Topik / Kata Kunci']}</p>` : catSub;
 
