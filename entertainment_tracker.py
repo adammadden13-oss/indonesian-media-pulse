@@ -152,8 +152,15 @@ def run_entertainment_tracker():
     all_data.extend(fetch_streaming_top10('Viu', 'viu', scraped_time))
 
     if not all_data:
-        logging.warning("Data hiburan kosong.")
-        return
+        logging.warning("Semua scraper hiburan gagal menarik data (mungkin diblokir atau API Key kosong).")
+        # Mengganti 'return' dengan memasukkan data dummy agar CSV tetap terupdate dan kita tahu script berjalan.
+        all_data.append({
+            "Waktu Tarik": scraped_time,
+            "Sumber": "System Debug",
+            "Kategori": "Peringatan Sistem",
+            "Judul": "Peringatan: Gagal menarik data Film/Series. Periksa API Key TMDb atau hadangan Cloudflare.",
+            "URL": "-"
+        })
 
     # Hapus duplikat berdasarkan judul agar laporan tetap rapi
     df = pd.DataFrame(all_data).drop_duplicates(subset=["Judul"])
