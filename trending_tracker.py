@@ -21,6 +21,8 @@ def clean_text_trending(text):
     cleaned = re.sub(rf'\s+{KOMPAS_CATS}\s+\d{{1,2}}\s+[A-Za-z]+\s+\d{{4}}(?:\s*[-–—]?\s*\d{{1,2}}:\d{{2}}(?:\s*(?:WIB|WITA|WIT))?)?\s*$', '', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s+\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s*[-–—]?\s*\d{1,2}:\d{2}(?:\s*(?:WIB|WITA|WIT))?)?\s*$', '', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s+\d+\s*(?:menit|jam|hari|detik)\s*(?:yang)?\s*lalu\s*$', '', cleaned, flags=re.IGNORECASE)
+    # Bersihkan koma agar format CSV GitHub aman
+    cleaned = cleaned.replace(',', ' -').replace('"', "'")
     return cleaned.strip()
 
 def fetch_twitter_trends(scraped_time):
@@ -67,13 +69,16 @@ def fetch_tiktok_trends(scraped_time):
             title = re.sub(r'\s*-\s*[^-]+$', '', raw_title)
             link = item.find('link').text if item.find('link') is not None else '-'
             
+            cleaned_title = clean_text_trending(title)
+            
+            # PERBAIKAN: Menggunakan judul asli sebagai Topik, BUKAN teks "Viral TikTok" yang statis
             articles.append({
                 'Waktu Tarik': scraped_time,
                 'Wilayah': 'Indonesia',
                 'Sumber': 'TikTok Trending (News)',
-                'Topik / Kata Kunci': 'Viral TikTok',
+                'Topik / Kata Kunci': cleaned_title, # <- Info konten spesifik untuk AI
                 'Volume Pencarian': 'Trending Sosmed',
-                'Judul Berita': clean_text_trending(title),
+                'Judul Berita': cleaned_title,
                 'URL': link
             })
             count += 1
@@ -149,7 +154,7 @@ def run_trending():
     print('=== Memulai penarikan tren sosial media terpadu ===')
     all_data = []
     
-    all_data.extend(fetch_tiktok_trends(scraped_time)) # Fitur Baru
+    all_data.extend(fetch_tiktok_trends(scraped_time))
     all_data.extend(fetch_twitter_trends(scraped_time))
     all_data.extend(fetch_youtube_trends(scraped_time))
     all_data.extend(fetch_google_trends(scraped_time))
