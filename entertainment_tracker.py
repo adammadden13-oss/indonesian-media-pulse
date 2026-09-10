@@ -17,7 +17,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-CSV_HIBURAN = "hiburan_dan_opini.csv"
+CSV_HIBURAN = "film_dan_hiburan.csv"
 WIB = timezone(timedelta(hours=7))
 
 HEADERS = {
