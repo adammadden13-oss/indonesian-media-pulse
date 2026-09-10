@@ -2,7 +2,7 @@ name: Scheduled Media & Trends Pipeline
 
 on:
   schedule:
-    - cron: '0 */2 * * *'
+    - cron: '0 0 * * *'  # Diubah dari setiap 2 jam ('0 */2 * * *') menjadi 1 kali sehari (pukul 00:00 UTC / 07:00 WIB)
   workflow_dispatch:
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
         run: |
           python trending_tracker.py || true
 
-      - name: 4. Eksekusi Tracker Hiburan & Opini
+      - name: 4. Eksekusi Tracker Film & Hiburan
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
         run: |
@@ -60,3 +60,4 @@ jobs:
           git add -A
           git commit -m "Auto-update data pipeline: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
+
