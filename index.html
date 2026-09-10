@@ -123,11 +123,11 @@
 
             <div onclick="openModal('entertainment')" class="bg-[#FF6B00] rounded-[2rem] p-6 shadow-md hover:-translate-y-1.5 hover:shadow-xl cursor-pointer transition-all duration-300 group flex flex-col justify-between h-[160px] relative overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-[11px] font-bold text-orange-200 uppercase tracking-wider mb-2" data-i18n="stat_movie_title">Film Terpopuler (TMDb)</h3>
+                    <h3 class="text-[11px] font-bold text-orange-200 uppercase tracking-wider mb-2" data-i18n="stat_movie_title">Opini & Tren Terkini</h3>
                     <p id="statTopMovie" class="text-xl font-bold text-white line-clamp-2 leading-snug drop-shadow-sm">...</p>
                 </div>
                 <p class="text-[10px] text-orange-100/80 mt-4 font-bold flex items-center gap-1 group-hover:text-white transition-colors relative z-10">
-                    <span>💡</span> <span data-i18n="click_details">Klik untuk rincian film</span>
+                    <span>💡</span> <span data-i18n="click_details">Klik untuk baca selengkapnya</span>
                 </p>
             </div>
         </section>
@@ -297,7 +297,7 @@
             id: {
                 brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "Nasional", nav_tren: "Tren Sosial",
                 loading: "Menyinkronkan Data Pipeline...", stat_news_title: "Total Berita Nasional", stat_trends_title: "Topik Viral Hari Ini",
-                stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Film Terpopuler (TMDb)", click_details: "Klik untuk melihat rincian",
+                stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Opini & Tren Terkini", click_details: "Klik untuk melihat rincian",
                 dist_data: "DISTRIBUSI DATA NASIONAL", portal_power_title: "Peta Kekuatan<br>Portal Berita",
                 portal_power_desc: "Visualisasi proporsi penerbitan artikel oleh berbagai media arus utama di Indonesia. Data ditarik secara real-time dari pipeline analitik harian via GitHub Actions.",
                 download_report: "Unduh Laporan Lengkap (.XLSX)", sentiment_ratio: "Rasio Sentimen Nasional", volume_source: "Volume per Sumber",
@@ -315,7 +315,7 @@
             en: {
                 brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "National", nav_tren: "Social Trends",
                 loading: "Synchronizing Data Pipeline...", stat_news_title: "Total National News", stat_trends_title: "Today's Viral Topics",
-                stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Movies (TMDb)", click_details: "Click for details",
+                stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Opinions & Trends", click_details: "Click for details",
                 dist_data: "NATIONAL DATA DISTRIBUTION", portal_power_title: "News Portal<br>Strength Map",
                 portal_power_desc: "Visualization of article publication proportions by mainstream media in Indonesia. Data pulled in real-time via GitHub Actions.",
                 download_report: "Download Full Report (.XLSX)", sentiment_ratio: "National Sentiment Ratio", volume_source: "Volume per Source",
@@ -471,16 +471,15 @@
                 // Kirimkan array asli ke fungsi AI agar dia bisa menyebutkan nama berita/trending
                 fetchGeminiInsight(news, trends, mayoritasSentimen);
 
-                // Memuat Film (TMDb)
+                // Memuat Sorotan Opini & Hiburan
                 if (ent.length > 0) {
-                    // Filter HANYA data yang benar-benar berasal dari TMDb
-                    const tmdbMovies = ent.filter(r => r['Sumber'] && r['Sumber'].toLowerCase().includes('tmdb'));
-                    
-                    if (tmdbMovies.length > 0) {
-                        document.getElementById('statTopMovie').innerText = tmdbMovies[0]['Judul'] || 'Tidak tersedia';
+                    // Karena data asli berisi Opini/Google Trends, kita ambil item pertama yang memiliki judul
+                    const topHighlight = ent.find(r => r['Judul']) || ent[0];
+                    if (topHighlight) {
+                        document.getElementById('statTopMovie').innerText = topHighlight['Judul'] || 'Tidak tersedia';
+                        document.getElementById('statTopMovie').classList.remove('text-sm', 'font-normal');
                     } else {
-                        document.getElementById('statTopMovie').innerText = 'Data film belum tersedia hari ini';
-                        document.getElementById('statTopMovie').classList.add('text-sm', 'font-normal');
+                        document.getElementById('statTopMovie').innerText = 'Data belum tersedia';
                     }
                 } else {
                     document.getElementById('statTopMovie').innerText = 'Menunggu data...';
@@ -555,14 +554,14 @@
                 titleEl.innerText = `Berita Bersentimen ${globalDominantSentiment}`;
                 maxItems = 15; // Dibatasi lebih sedikit sesuai permintaan
             } else if (type === 'entertainment') {
-                // Filter HANYA data TMDb agar berita opini/keuangan tidak masuk
-                data = dashboardData.entertainment.filter(r => r['Sumber'] && r['Sumber'].toLowerCase().includes('tmdb'));
-                titleEl.innerText = 'Film & Series Terpopuler (TMDb)';
+                // Tampilkan semua data dari file opini & hiburan sesuai isi aslinya
+                data = dashboardData.entertainment;
+                titleEl.innerText = 'Sorotan Opini & Tren';
             }
             
             // Render list dengan batasan maxItems agar browser tidak lag
-            if (data.length === 0 && type === 'entertainment') {
-                list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium">Belum ada data film/series dari TMDb yang ditarik hari ini.</div>`;
+            if (data.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium">Belum ada data yang ditarik hari ini.</div>`;
             } else {
                 data.slice(0, maxItems).forEach(item => {
                     // Tambahkan badge sentimen jika datanya ada
@@ -575,9 +574,15 @@
                     // Menarik data "Judul Berita" untuk Trends, "Judul" untuk News/Entertainment
                     const mainTitle = item['Judul'] || item['Judul Berita'] || item['Topik / Kata Kunci'] || 'Tanpa Judul';
                     
-                    // Menampilkan label Topik khusus untuk pop-up Trends agar lebih kaya konteks
+                    // Menampilkan label kategori khusus (Opini / Tren Pencarian)
+                    let catSub = '';
+                    if (type === 'entertainment' && item['Kategori']) {
+                        catSub = `<p class="text-[11px] font-bold text-orange-500 mb-1.5 uppercase tracking-wider">${item['Kategori']}</p>`;
+                    }
+
+                    // Menampilkan label Topik khusus untuk pop-up Trends
                     const topicSub = (item['Topik / Kata Kunci'] && type === 'trends') ? 
-                        `<p class="text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">${item['Topik / Kata Kunci']}</p>` : '';
+                        `<p class="text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">${item['Topik / Kata Kunci']}</p>` : catSub;
 
                     list.innerHTML += `
                         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-brandLime transition-all group mb-4">
