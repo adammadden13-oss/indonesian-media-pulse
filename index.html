@@ -297,7 +297,7 @@
             id: {
                 brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "Nasional", nav_tren: "Tren Sosial",
                 loading: "Menyinkronkan Data Pipeline...", stat_news_title: "Total Berita Nasional", stat_trends_title: "Topik Viral Hari Ini",
-                stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Top Film / Hiburan", click_details: "Klik untuk melihat rincian",
+                stat_sentiment_title: "Sentimen Dominan", stat_movie_title: "Film Terpopuler (TMDb)", click_details: "Klik untuk melihat rincian",
                 dist_data: "DISTRIBUSI DATA NASIONAL", portal_power_title: "Peta Kekuatan<br>Portal Berita",
                 portal_power_desc: "Visualisasi proporsi penerbitan artikel oleh berbagai media arus utama di Indonesia. Data ditarik secara real-time dari pipeline analitik harian via GitHub Actions.",
                 download_report: "Unduh Laporan Lengkap (.XLSX)", sentiment_ratio: "Rasio Sentimen Nasional", volume_source: "Volume per Sumber",
@@ -315,7 +315,7 @@
             en: {
                 brand: "MediaPulse.", nav_overview: "Overview", nav_nasional: "National", nav_tren: "Social Trends",
                 loading: "Synchronizing Data Pipeline...", stat_news_title: "Total National News", stat_trends_title: "Today's Viral Topics",
-                stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Movies / Ent.", click_details: "Click for details",
+                stat_sentiment_title: "Dominant Sentiment", stat_movie_title: "Top Movies (TMDb)", click_details: "Click for details",
                 dist_data: "NATIONAL DATA DISTRIBUTION", portal_power_title: "News Portal<br>Strength Map",
                 portal_power_desc: "Visualization of article publication proportions by mainstream media in Indonesia. Data pulled in real-time via GitHub Actions.",
                 download_report: "Download Full Report (.XLSX)", sentiment_ratio: "National Sentiment Ratio", volume_source: "Volume per Source",
@@ -339,11 +339,8 @@
                     el.innerHTML = translations[lang][key];
                 }
             });
-            // Re-render AI Insight fallback text if it's currently showing fallback
             const aiContainer = document.getElementById('ai-output-container');
             if (aiContainer.innerHTML.includes('Berdasarkan pantauan algoritma') || aiContainer.innerHTML.includes('Based on today')) {
-                // If it's a fallback, we need to refresh it by calling the fallback logic again, but we don't have the original data here easily.
-                // For simplicity, we just trigger a full re-init. It's fast enough.
                 initDashboard();
             }
         }
@@ -351,9 +348,8 @@
         const baseUrl = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/';
         let dashboardData = { news: [], trends: [], entertainment: [], economyAudio: [] };
         let sentimentChartInstance = null; let sourceChartInstance = null;
-        let globalDominantSentiment = "Netral"; // Menambahkan variabel global untuk sentimen
+        let globalDominantSentiment = "Netral"; 
 
-        // Pemuat CSV Anti-Error: Mengembalikan array kosong jika file gagal ditarik (404)
         function parseCSV(filename) {
             return new Promise((resolve) => {
                 Papa.parse(baseUrl + filename + '?v=' + new Date().getTime(), {
@@ -381,7 +377,6 @@
             const fallbackTopic = topTrends[0] || 'Isu Nasional Terkini';
             const fallbackNews = topNews[0] || 'Berita Politik & Ekonomi';
             
-            // Smart Fallback Content based on language
             let fallbackHTML = "";
             if (currentLang === 'en') {
                 fallbackHTML = `
@@ -402,8 +397,6 @@
             }
 
             try {
-                // Trik aman: Menggunakan API gratisan yang menunggangi sistem polling
-                // AI diminta berfokus sebagai Content Strategist
                 const prompt = currentLang === 'en' ? 
                     `Act as a Content Strategist. Based on this data: Sentiment: ${sentimenMayoritas}. Viral Topics: ${topTrends.join(", ")}. Top News: ${topNews.join(", ")}. Write 1 short paragraph recommending a specific content idea (e.g., TikTok/Reels angle) mentioning the exact topic or figure name. Be direct and professional.` :
                     `Kamu adalah Content Strategist. Berdasarkan data ini: Sentimen: ${sentimenMayoritas}. Topik Viral: ${topTrends.join(", ")}. Berita Teratas: ${topNews.join(", ")}. Tulis 1 paragraf singkat berisi rekomendasi ide konten (misal angle TikTok/Reels) yang secara spesifik menyebutkan NAMA TOKOH atau NAMA KEJADIAN yang sedang viral. Jangan bertele-tele.`;
@@ -418,17 +411,16 @@
                 }
             } catch (error) {
                 console.warn("Menggunakan Smart Fallback AI:", error);
-                // Menampilkan fallback jika API gagal
                 container.innerHTML = fallbackHTML;
             }
         }
 
         async function initDashboard() {
             try {
-                // Eksekusi paralel yang kebal error berkat perlindungan di fungsi parseCSV
+                // MENGUBAH NAMA FILE: Sekarang membaca dari file khusus film_dan_hiburan.csv
                 const [news, trends, ent, eco] = await Promise.all([
-                    parseCSV('berita_news.csv'), parseCSV('berita_trending.csv'), 
-                    parseCSV('hiburan_dan_opini.csv'), parseCSV('ekonomi_audio.csv')
+                    parseCSV('berita_terkini.csv'), parseCSV('berita_trending.csv'), 
+                    parseCSV('film_dan_hiburan.csv'), parseCSV('ekonomi_audio.csv')
                 ]);
 
                 dashboardData.news = news; dashboardData.trends = trends; 
@@ -443,8 +435,11 @@
                     
                     let s = { Positif: 0, Negatif: 0, Netral: 0 };
                     news.forEach(r => { if(r.Sentimen) s[r.Sentimen] = (s[r.Sentimen]||0)+1; });
-                    mayoritasSentimen = Object.keys(s).reduce((a,b) => s[a] > s[b] ? a : b);
-                    globalDominantSentiment = mayoritasSentimen; // Simpan ke global
+                    // Handle case where sentiment columns might not exist yet
+                    if(s.Positif > 0 || s.Negatif > 0 || s.Netral > 0) {
+                        mayoritasSentimen = Object.keys(s).reduce((a,b) => s[a] > s[b] ? a : b);
+                    }
+                    globalDominantSentiment = mayoritasSentimen;
                     document.getElementById('statSentiment').innerText = mayoritasSentimen;
                     renderCharts();
                 } else {
@@ -456,6 +451,7 @@
                 if (trends.length > 0) {
                     document.getElementById('statTotalTrends').innerText = trends.length;
                     const tbody = document.getElementById('trendingTableBody');
+                    tbody.innerHTML = '';
 
                     trends.forEach(row => {
                         tbody.innerHTML += `
@@ -468,22 +464,29 @@
                     document.getElementById('statTotalTrends').innerText = '0';
                 }
 
-                // Kirimkan array asli ke fungsi AI agar dia bisa menyebutkan nama berita/trending
                 fetchGeminiInsight(news, trends, mayoritasSentimen);
 
-                // Memuat Film (TMDb / Bioskop / Netflix / Viu)
+                // Memuat Film dari file khusus
                 if (ent.length > 0) {
-                    const topMovie = ent.find(r => r['Sumber'] && (r['Sumber'].toLowerCase().includes('tmdb') || r['Sumber'].toLowerCase().includes('bioskop') || r['Sumber'].toLowerCase().includes('netflix') || r['Sumber'].toLowerCase().includes('viu')));
+                    // Karena filenya sekarang eksklusif untuk film, kita ambil baris pertama yang ada judulnya
+                    const topMovie = ent.find(r => r['Judul'] && r['Judul'] !== '-');
                     
                     if (topMovie) {
-                        document.getElementById('statTopMovie').innerText = topMovie['Judul'] || 'Tidak tersedia';
-                        document.getElementById('statTopMovie').classList.remove('text-sm', 'font-normal');
+                        // Jika isi judulnya adalah pesan error dari script Python
+                        if (topMovie['Judul'].includes('Gagal') || topMovie['Judul'].includes('Peringatan')) {
+                            document.getElementById('statTopMovie').innerText = 'Scraping diblokir server tujuan hari ini';
+                            document.getElementById('statTopMovie').classList.add('text-sm', 'font-normal');
+                        } else {
+                            document.getElementById('statTopMovie').innerText = topMovie['Judul'];
+                            document.getElementById('statTopMovie').classList.remove('text-sm', 'font-normal');
+                        }
                     } else {
-                        document.getElementById('statTopMovie').innerText = 'Data film belum tersedia hari ini';
+                        document.getElementById('statTopMovie').innerText = 'Data film kosong hari ini';
                         document.getElementById('statTopMovie').classList.add('text-sm', 'font-normal');
                     }
                 } else {
-                    document.getElementById('statTopMovie').innerText = 'Menunggu data...';
+                    document.getElementById('statTopMovie').innerText = 'Menunggu data film...';
+                    document.getElementById('statTopMovie').classList.add('text-sm', 'font-normal');
                 }
 
                 // Memuat Audio Podcast
@@ -541,7 +544,7 @@
             list.innerHTML = '';
 
             let data = [];
-            let maxItems = 30; // Batas standar
+            let maxItems = 30; 
 
             if (type === 'news') {
                 data = dashboardData.news;
@@ -550,42 +553,33 @@
                 data = dashboardData.trends;
                 titleEl.innerText = 'Daftar Topik Viral';
             } else if (type === 'sentiment') {
-                // Filter hanya berita dengan sentimen yang paling dominan saat ini
                 data = dashboardData.news.filter(r => r.Sentimen === globalDominantSentiment);
                 titleEl.innerText = `Berita Bersentimen ${globalDominantSentiment}`;
                 maxItems = 15;
             } else if (type === 'entertainment') {
-                // Menyaring KHUSUS film/series, membuang data opini/trends dari daftar
-                data = dashboardData.entertainment.filter(r => r['Sumber'] && (r['Sumber'].toLowerCase().includes('tmdb') || r['Sumber'].toLowerCase().includes('bioskop') || r['Sumber'].toLowerCase().includes('netflix') || r['Sumber'].toLowerCase().includes('viu')));
+                // Menggunakan data utuh dari film_dan_hiburan.csv tanpa perlu di filter ketat lagi
+                data = dashboardData.entertainment.filter(r => r.Judul && r.Judul !== '-'); 
                 titleEl.innerText = 'Film & Series Terpopuler';
             }
             
-            // Render list dengan batasan maxItems agar browser tidak lag
             if (data.length === 0) {
-                if (type === 'entertainment') {
-                    list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium">Belum ada data film/series yang ditarik hari ini.</div>`;
-                } else {
-                    list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium">Belum ada data yang ditarik hari ini.</div>`;
-                }
+                const emptyMsg = type === 'entertainment' ? 'Belum ada data film/series yang berhasil ditarik hari ini.' : 'Belum ada data yang ditarik hari ini.';
+                list.innerHTML = `<div class="p-8 text-center text-gray-500 font-medium">${emptyMsg}</div>`;
             } else {
                 data.slice(0, maxItems).forEach(item => {
-                    // Tambahkan badge sentimen jika datanya ada
                     let sentimentBadge = '';
                     if (item['Sentimen']) {
                         const color = item['Sentimen'] === 'Positif' ? 'bg-green-100 text-green-700' : (item['Sentimen'] === 'Negatif' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600');
                         sentimentBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${color}">${item['Sentimen']}</span>`;
                     }
 
-                    // Menarik data "Judul Berita" untuk Trends, "Judul" untuk News/Entertainment
-                    const mainTitle = item['Judul'] || item['Judul Berita'] || item['Topik / Kata Kunci'] || 'Tanpa Judul';
+                    const mainTitle = item['Judul Berita'] || item['Judul'] || item['Topik / Kata Kunci'] || 'Tanpa Judul';
                     
-                    // Menampilkan label kategori khusus (Opini / Tren Pencarian)
                     let catSub = '';
                     if (type === 'entertainment' && item['Kategori']) {
                         catSub = `<p class="text-[11px] font-bold text-orange-500 mb-1.5 uppercase tracking-wider">${item['Kategori']}</p>`;
                     }
 
-                    // Menampilkan label Topik khusus untuk pop-up Trends
                     const topicSub = (item['Topik / Kata Kunci'] && type === 'trends') ? 
                         `<p class="text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">${item['Topik / Kata Kunci']}</p>` : catSub;
 
@@ -614,7 +608,6 @@
 
         window.addEventListener('DOMContentLoaded', initDashboard);
 
-        // Skrip Navigasi Elastis (Rubber Effect) yang sudah diperbaiki
         let isNavScrolled = false;
         window.addEventListener('scroll', () => {
             const wrap = document.getElementById('header-wrapper');
