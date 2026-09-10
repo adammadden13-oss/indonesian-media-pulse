@@ -372,7 +372,21 @@
             `;
 
             const topNews = (newsList || []).slice(0, 3).map(n => n.Judul).filter(Boolean);
-            const topTrends = (trendsList || []).slice(0, 3).map(t => t['Topik / Kata Kunci'] || t['Judul Berita']).filter(Boolean);
+            
+            // PERBAIKAN AI: Menyaring agar tidak tertipu oleh tulisan "Viral TikTok" di kolom Topik
+            const validTrends = (trendsList || [])
+                .map(t => {
+                    let topic = t['Topik / Kata Kunci'] || '';
+                    let title = t['Judul Berita'] || '';
+                    // Jika topiknya cuma teks statis "Viral TikTok", maka ambil judul aslinya
+                    if (topic.toLowerCase().includes('viral tiktok')) {
+                        return title;
+                    }
+                    return topic;
+                })
+                .filter(t => t && !t.toLowerCase().includes('viral tiktok') && t.length > 5);
+
+            const topTrends = validTrends.slice(0, 3);
             
             const fallbackTopic = topTrends[0] || 'Isu Nasional Terkini';
             const fallbackNews = topNews[0] || 'Berita Politik & Ekonomi';
@@ -417,8 +431,6 @@
 
         async function initDashboard() {
             try {
-                // Eksekusi paralel yang kebal error berkat perlindungan di fungsi parseCSV
-                // PERBAIKAN: Mengganti 'berita_news.csv' dengan 'berita_terkini.csv'
                 const [news, trends, ent, eco] = await Promise.all([
                     parseCSV('berita_terkini.csv'), parseCSV('berita_trending.csv'), 
                     parseCSV('film_dan_hiburan.csv'), parseCSV('ekonomi_audio.csv')
@@ -472,11 +484,9 @@
                     
                     if (topMovie) {
                         if (topMovie['Judul'].includes('Gagal') || topMovie['Judul'].includes('Peringatan')) {
-                            // Tampilan jika kena blokir Cloudflare / API Key kosong
                             document.getElementById('statTopMovie').innerText = 'Scraping diblokir server tujuan hari ini';
                             document.getElementById('statTopMovie').classList.add('text-sm', 'font-normal');
                         } else {
-                            // Tampilan normal
                             document.getElementById('statTopMovie').innerText = topMovie['Judul'];
                             document.getElementById('statTopMovie').classList.remove('text-sm', 'font-normal');
                         }
@@ -553,12 +563,10 @@
                 data = dashboardData.trends;
                 titleEl.innerText = 'Daftar Topik Viral';
             } else if (type === 'sentiment') {
-                // Smart Filter: Hanya tampilkan berita dengan sentimen yang dominan saat ini
                 data = dashboardData.news.filter(r => r.Sentimen === globalDominantSentiment);
                 titleEl.innerText = `Berita Bersentimen ${globalDominantSentiment}`;
-                maxItems = 15; // Dibatasi agar tidak terlalu banyak
+                maxItems = 15; 
             } else if (type === 'entertainment') {
-                // Menarik data murni dari film_dan_hiburan.csv
                 data = dashboardData.entertainment.filter(r => r.Judul && r.Judul !== '-'); 
                 titleEl.innerText = 'Film & Series Terpopuler';
             }
@@ -574,7 +582,6 @@
                         sentimentBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold ${color}">${item['Sentimen']}</span>`;
                     }
 
-                    // Tentukan judul utama yang akan ditampilkan
                     const mainTitle = item['Judul Berita'] || item['Judul'] || item['Topik / Kata Kunci'] || 'Tanpa Judul';
                     
                     let catSub = '';
@@ -582,7 +589,6 @@
                         catSub = `<p class="text-[11px] font-bold text-orange-500 mb-1.5 uppercase tracking-wider">${item['Kategori']}</p>`;
                     }
 
-                    // Tampilkan topik di atas judul berita jika ada
                     const topicSub = (item['Topik / Kata Kunci'] && type === 'trends') ? 
                         `<p class="text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider">${item['Topik / Kata Kunci']}</p>` : catSub;
 
