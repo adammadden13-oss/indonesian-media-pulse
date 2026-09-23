@@ -183,8 +183,8 @@
                     <h2 class="text-3xl font-black text-brandDark mb-2 tracking-tight" data-i18n="wordcloud_title">Awan Kata (Word Cloud)</h2>
                     <p class="text-brandDark/70 font-semibold text-sm" data-i18n="wordcloud_desc">Fokus perhatian publik berdasarkan agregasi ribuan judul berita hari ini.</p>
                 </div>
-                <div class="w-full bg-white rounded-3xl p-2 overflow-hidden shadow-2xl relative z-10">
-                    <img id="wordcloudImg" src="https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png" alt="Word Cloud Terkini" class="w-full h-auto max-h-[280px] object-cover rounded-2xl mix-blend-multiply" onerror="this.src='https://placehold.co/800x400/f5f5f5/1a1b1a?text=Menunggu+Wordcloud...'">
+                <div class="w-full bg-white rounded-3xl p-2 overflow-hidden shadow-2xl relative z-10 flex justify-center items-center">
+                    <img id="wordcloudImg" src="https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png" alt="Word Cloud Terkini" class="w-full h-auto max-h-[350px] object-contain rounded-2xl mix-blend-multiply transition-opacity duration-500 opacity-0" onload="this.classList.remove('opacity-0')" onerror="this.src='https://placehold.co/1200x600/f5f5f5/1a1b1a?text=Memproses+Wordcloud+Terbaru...'; this.classList.remove('opacity-0')">
                 </div>
             </div>
         </section>
@@ -617,7 +617,19 @@
             document.getElementById('universalModal').classList.add('hidden');
         }
 
-        window.addEventListener('DOMContentLoaded', initDashboard);
+        // PERBAIKAN CACHE IMAGE: Paksa browser memuat ulang gambar Wordcloud agar tidak nyangkut di memori lama
+        function forceImageReload() {
+            const img = document.getElementById('wordcloudImg');
+            if (img && img.src.includes('raw.githubusercontent')) {
+                const timestamp = new Date().getTime();
+                img.src = `https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/wordcloud.png?t=${timestamp}`;
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+            forceImageReload();
+        });
 
         let isNavScrolled = false;
         window.addEventListener('scroll', () => {
