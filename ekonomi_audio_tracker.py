@@ -21,9 +21,9 @@ def fetch_financial_data(scraped_time):
         resp = requests.get(url_ihsg, headers=HEADERS, timeout=15)
         soup = BeautifulSoup(resp.text, 'html.parser')
         
-        # Mengambil harga dan persentase perubahan
+        # Mengambil harga dan persentase perubahan dari Google Finance
         price_el = soup.find('div', class_='YMlKec fxKbKc')
-        change_el = soup.find('div', class_='JwB6zf') # elemen persentase perubahan
+        change_el = soup.find('div', class_='JwB6zf') 
         
         if price_el:
             perubahan = change_el.text.strip() if change_el else "Naik/Turun"
@@ -34,7 +34,7 @@ def fetch_financial_data(scraped_time):
                 "Nilai / Artis": price_el.text.strip(),
                 "Satuan / Platform": "Poin / BEI",
                 "Perubahan / Status Tren": perubahan,
-                "Insight & Dampak": "Data harian dari Google Finance",
+                "Insight & Dampak": "Data pergerakan harian indeks saham utama Indonesia.",
                 "URL": url_ihsg
             })
     except Exception as e:
@@ -58,7 +58,7 @@ def fetch_financial_data(scraped_time):
                 "Nilai / Artis": f"Rp {price_el.text.strip()}",
                 "Satuan / Platform": "IDR per USD",
                 "Perubahan / Status Tren": perubahan,
-                "Insight & Dampak": "Data harian dari Google Finance",
+                "Insight & Dampak": "Pantauan nilai tukar mata uang Rupiah terhadap Dolar AS.",
                 "URL": url_usd
             })
     except Exception as e:
@@ -81,7 +81,6 @@ def fetch_audio_podcast_data(scraped_time):
         for idx, entry in enumerate(entries):
             # Mendapatkan Judul Lagu
             title = entry.get('title', {}).get('label', 'Tanpa Judul')
-            # Memisahkan Judul dan Artis (format API Apple: "Judul - Artis")
             if " - " in title:
                 judul_lagu, artis = title.split(" - ", 1)
             else:
@@ -97,7 +96,7 @@ def fetch_audio_podcast_data(scraped_time):
                 "Nilai / Artis": artis.strip(),
                 "Satuan / Platform": "Apple Music ID",
                 "Perubahan / Status Tren": f"Peringkat #{idx+1}",
-                "Insight & Dampak": "Lagu terpopuler hari ini di Indonesia",
+                "Insight & Dampak": "Lagu terpopuler hari ini di tangga lagu Indonesia.",
                 "URL": link
             })
     except Exception as e:
@@ -127,7 +126,7 @@ def fetch_audio_podcast_data(scraped_time):
                 "Nilai / Artis": podcaster.strip(),
                 "Satuan / Platform": "Apple Podcasts ID",
                 "Perubahan / Status Tren": f"Peringkat #{idx+1}",
-                "Insight & Dampak": "Podcast terpopuler hari ini di Indonesia",
+                "Insight & Dampak": "Podcast terpopuler hari ini di Indonesia.",
                 "URL": link
             })
     except Exception as e:
@@ -151,24 +150,29 @@ def run_job():
         
     df = pd.DataFrame(all_data)
     
-    # Pastikan urutan dan nama kolom persis seperti di Google Sheets pengguna
+    # PASTIKAN URUTAN KOLOM SAMA PERSIS DENGAN GOOGLE SHEETS
     kolom_urut = [
-        "Waktu Tarik", "Kategori", "Indikator / Judul Trek", 
-        "Nilai / Artis", "Satuan / Platform", "Perubahan / Status Tren", 
-        "Insight & Dampak", "URL"
+        "Waktu Tarik", 
+        "Kategori", 
+        "Indikator / Judul Trek", 
+        "Nilai / Artis", 
+        "Satuan / Platform", 
+        "Perubahan / Status Tren", 
+        "Insight & Dampak", 
+        "URL"
     ]
+    
+    # Tambahkan kolom yang mungkin kosong agar tidak error
     for col in kolom_urut:
         if col not in df.columns:
             df[col] = "-"
             
+    # Terapkan urutan mutlak
     df = df[kolom_urut]
     
-    # Simpan ke CSV (Menimpa data lama agar AI dan GSheets selalu mendapat data fresh hari ini)
+    # Simpan ke CSV (Menimpa data lama)
     df.to_csv(CSV_FILE, index=False)
     print(f"[SUCCESS] Tersimpan {len(df)} baris data Ekonomi & Audio ke {CSV_FILE}.")
 
 if __name__ == "__main__":
     run_job()
-```
-
-*(Jangan lupa, agar Dashboard HTML Anda tidak berantakan setelah penyesuaian kolom ini, terapkan juga modifikasi `index.html` dari respons saya yang sebelumnya. Serta pastikan Anda melakukan **Run workflow** di tab Actions GitHub setelah semuanya tersimpan!)*
