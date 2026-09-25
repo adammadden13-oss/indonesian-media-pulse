@@ -1,146 +1,174 @@
 import os
-import logging
-from datetime import datetime, timezone, timedelta
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import urllib3
+from datetime import datetime, timezone, timedelta
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-logging.basicConfig(
-    filename="scraper.log",
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
-
-CSV_EKONOMI_AUDIO = "ekonomi_audio.csv"
 WIB = timezone(timedelta(hours=7))
-
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
 }
+CSV_FILE = "ekonomi_audio.csv"
 
-# 1. MAKRO EKONOMI (IHSG, Kurs USD, Emas)
-def fetch_macro_economy(scraped_time):
-    data = []
+def fetch_financial_data(scraped_time):
+    """Menarik data IHSG dan Kurs Rupiah dari Google Finance"""
+    results = []
+    print("Menarik data Ekonomi (IHSG & Kurs)...")
     
-    # A. Kurs USD ke IDR (Google Finance)
+    # 1. IHSG (Indeks Harga Saham Gabungan)
     try:
-        resp = requests.get("https://www.google.com/finance/quote/USD-IDR", headers=HEADERS, timeout=15)
-        soup = BeautifulSoup(resp.text, "html.parser")
-        price_div = soup.find("div", class_="YMlKec fxKbKc")
-        if price_div:
-            price = price_div.text.strip()
-            data.append({
-                "Waktu Tarik": scraped_time, "Sumber": "Google Finance", "Kategori": "Makro Ekonomi",
-                "Indikator": "USD/IDR", "Nilai": price, "URL": "https://www.google.com/finance/quote/USD-IDR"
-            })
-    except Exception as e:
-        logging.error(f"Gagal menarik Kurs USD: {e}")
-
-    # B. IHSG / Jakarta Composite Index (Google Finance)
-    try:
-        resp = requests.get("https://www.google.com/finance/quote/COMPOSITE:IDX", headers=HEADERS, timeout=15)
-        soup = BeautifulSoup(resp.text, "html.parser")
-        price_div = soup.find("div", class_="YMlKec fxKbKc")
-        if price_div:
-            price = price_div.text.strip()
-            data.append({
-                "Waktu Tarik": scraped_time, "Sumber": "Google Finance", "Kategori": "Makro Ekonomi",
-                "Indikator": "IHSG (Saham)", "Nilai": price, "URL": "https://www.google.com/finance/quote/COMPOSITE:IDX"
-            })
-    except Exception as e:
-        logging.error(f"Gagal menarik IHSG: {e}")
-
-    # C. Harga Emas Antam (Scraping Logam Mulia / Portal Emas)
-    try:
-        resp = requests.get("https://harga-emas.org/", headers=HEADERS, timeout=15)
-        soup = BeautifulSoup(resp.text, "html.parser")
-        # Mencari tabel harga 1 gram
-        tds = soup.find_all("td")
-        for i, td in enumerate(tds):
-            if "1 gram" in td.text.lower() and i + 1 < len(tds):
-                price = tds[i+1].text.strip()
-                data.append({
-                    "Waktu Tarik": scraped_time, "Sumber": "Harga-Emas.org", "Kategori": "Makro Ekonomi",
-                    "Indikator": "Emas Antam (1g)", "Nilai": price, "URL": "https://harga-emas.org/"
-                })
-                break
-    except Exception as e:
-        logging.error(f"Gagal menarik Harga Emas: {e}")
+        url_ihsg = "https://www.google.com/finance/quote/COMPOSITE:IDX"
+        resp = requests.get(url_ihsg, headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(resp.text, 'html.parser')
         
-    return data
+        # Mengambil harga dan persentase perubahan
+        price_el = soup.find('div', class_='YMlKec fxKbKc')
+        change_el = soup.find('div', class_='JwB6zf') # elemen persentase perubahan
+        
+        if price_el:
+            perubahan = change_el.text.strip() if change_el else "Naik/Turun"
+            results.append({
+                "Waktu Tarik": scraped_time,
+                "Kategori": "Pasar Modal",
+                "Indikator / Judul Trek": "IHSG (Indeks Harga Saham Gabungan)",
+                "Nilai / Artis": price_el.text.strip(),
+                "Satuan / Platform": "Poin / BEI",
+                "Perubahan / Status Tren": perubahan,
+                "Insight & Dampak": "Data harian dari Google Finance",
+                "URL": url_ihsg
+            })
+    except Exception as e:
+        print(f"Gagal menarik IHSG: {e}")
 
-# 2. AUDIO (Podcast & Musik Top Indonesia via API Terbuka)
-def fetch_audio_trends(scraped_time):
-    data = []
-    
-    # A. Top 5 Podcasts Indonesia (Gunakan Legacy iTunes API karena lebih stabil)
+    # 2. Kurs USD ke IDR
     try:
-        url_podcast = "https://itunes.apple.com/id/rss/toppodcasts/limit=5/json"
-        resp = requests.get(url_podcast, headers=HEADERS, timeout=15)
-        if resp.status_code == 200:
-            entries = resp.json().get("feed", {}).get("entry", [])
-            for idx, item in enumerate(entries, 1):
-                title = item.get("im:name", {}).get("label", "Podcast")
-                artist = item.get("im:artist", {}).get("label", "Unknown")
+        url_usd = "https://www.google.com/finance/quote/USD-IDR"
+        resp = requests.get(url_usd, headers=HEADERS, timeout=15)
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        
+        price_el = soup.find('div', class_='YMlKec fxKbKc')
+        change_el = soup.find('div', class_='JwB6zf')
+        
+        if price_el:
+            perubahan = change_el.text.strip() if change_el else "Fluktuatif"
+            results.append({
+                "Waktu Tarik": scraped_time,
+                "Kategori": "Mata Uang & Valas",
+                "Indikator / Judul Trek": "Kurs USD / IDR",
+                "Nilai / Artis": f"Rp {price_el.text.strip()}",
+                "Satuan / Platform": "IDR per USD",
+                "Perubahan / Status Tren": perubahan,
+                "Insight & Dampak": "Data harian dari Google Finance",
+                "URL": url_usd
+            })
+    except Exception as e:
+        print(f"Gagal menarik Kurs USD: {e}")
+        
+    return results
+
+def fetch_audio_podcast_data(scraped_time):
+    """Menarik Top 5 Lagu dan Podcast di Indonesia via Apple API"""
+    results = []
+    print("Menarik data Top Audio & Podcast via API Resmi...")
+    
+    # 1. Top Songs (Apple Music Indonesia)
+    try:
+        url_songs = "https://itunes.apple.com/id/rss/topsongs/limit=5/json"
+        resp = requests.get(url_songs, timeout=15)
+        data = resp.json()
+        
+        entries = data.get('feed', {}).get('entry', [])
+        for idx, entry in enumerate(entries):
+            # Mendapatkan Judul Lagu
+            title = entry.get('title', {}).get('label', 'Tanpa Judul')
+            # Memisahkan Judul dan Artis (format API Apple: "Judul - Artis")
+            if " - " in title:
+                judul_lagu, artis = title.split(" - ", 1)
+            else:
+                judul_lagu = title
+                artis = "Artis Tidak Diketahui"
                 
-                # Pengamanan struktur link JSON
-                link_data = item.get("link")
-                link = ""
-                if isinstance(link_data, list) and len(link_data) > 0:
-                    link = link_data[0].get("attributes", {}).get("href", "")
-                elif isinstance(link_data, dict):
-                    link = link_data.get("attributes", {}).get("href", "")
-
-                data.append({
-                    "Waktu Tarik": scraped_time, "Sumber": "Apple Podcasts ID", "Kategori": "Top Podcast",
-                    "Indikator": f"#{idx} Podcast", "Nilai": f"{title} (by {artist})", "URL": link
-                })
+            link = entry.get('link', [{}])[0].get('attributes', {}).get('href', '-')
+            
+            results.append({
+                "Waktu Tarik": scraped_time,
+                "Kategori": "Streaming Musik Populer",
+                "Indikator / Judul Trek": judul_lagu.strip(),
+                "Nilai / Artis": artis.strip(),
+                "Satuan / Platform": "Apple Music ID",
+                "Perubahan / Status Tren": f"Peringkat #{idx+1}",
+                "Insight & Dampak": "Lagu terpopuler hari ini di Indonesia",
+                "URL": link
+            })
     except Exception as e:
-        logging.error(f"Gagal menarik Top Podcast: {e}")
+        print(f"Gagal menarik Top Songs: {e}")
 
-    # B. Top 5 Lagu Indonesia
+    # 2. Top Podcasts (Apple Podcasts Indonesia)
     try:
-        url_music = "https://rss.applemarketingtools.com/api/v2/id/music/most-played/5/songs.json"
-        resp = requests.get(url_music, headers=HEADERS, timeout=15)
-        if resp.status_code == 200:
-            results = resp.json().get("feed", {}).get("results", [])
-            for idx, item in enumerate(results, 1):
-                data.append({
-                    "Waktu Tarik": scraped_time, "Sumber": "Apple Music ID", "Kategori": "Top Musik",
-                    "Indikator": f"#{idx} Song", "Nilai": f"{item.get('name')} - {item.get('artistName')}", "URL": item.get("url")
-                })
+        url_podcasts = "https://itunes.apple.com/id/rss/toppodcasts/limit=5/json"
+        resp = requests.get(url_podcasts, timeout=15)
+        data = resp.json()
+        
+        entries = data.get('feed', {}).get('entry', [])
+        for idx, entry in enumerate(entries):
+            title = entry.get('title', {}).get('label', 'Tanpa Judul')
+            if " - " in title:
+                judul_podcast, podcaster = title.split(" - ", 1)
+            else:
+                judul_podcast = title
+                podcaster = "Podcaster Tidak Diketahui"
+                
+            link = entry.get('link', [{}])[0].get('attributes', {}).get('href', '-')
+            
+            results.append({
+                "Waktu Tarik": scraped_time,
+                "Kategori": "Top Podcast",
+                "Indikator / Judul Trek": judul_podcast.strip(),
+                "Nilai / Artis": podcaster.strip(),
+                "Satuan / Platform": "Apple Podcasts ID",
+                "Perubahan / Status Tren": f"Peringkat #{idx+1}",
+                "Insight & Dampak": "Podcast terpopuler hari ini di Indonesia",
+                "URL": link
+            })
     except Exception as e:
-        logging.error(f"Gagal menarik Top Musik: {e}")
+        print(f"Gagal menarik Top Podcasts: {e}")
 
-    return data
+    return results
 
-def run_economy_audio_tracker():
+def run_job():
+    print("=== Memulai penarikan Ekonomi & Audio ===")
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-    logging.info("Memulai tracker Ekonomi & Audio...")
     
-    all_data = []
-    all_data.extend(fetch_macro_economy(scraped_time))
-    all_data.extend(fetch_audio_trends(scraped_time))
-
+    # Kumpulkan Data
+    data_finance = fetch_financial_data(scraped_time)
+    data_audio = fetch_audio_podcast_data(scraped_time)
+    
+    all_data = data_finance + data_audio
+    
     if not all_data:
-        logging.warning("Data Ekonomi & Audio kosong.")
+        print("Gagal menarik seluruh data Ekonomi & Audio hari ini.")
         return
-
+        
     df = pd.DataFrame(all_data)
-    kolom = ["Waktu Tarik", "Sumber", "Kategori", "Indikator", "Nilai", "URL"]
     
-    # Validasi struktur kolom
-    for col in kolom:
+    # Pastikan urutan dan nama kolom persis seperti di Google Sheets pengguna
+    kolom_urut = [
+        "Waktu Tarik", "Kategori", "Indikator / Judul Trek", 
+        "Nilai / Artis", "Satuan / Platform", "Perubahan / Status Tren", 
+        "Insight & Dampak", "URL"
+    ]
+    for col in kolom_urut:
         if col not in df.columns:
             df[col] = "-"
             
-    df = df[kolom]
-    df.to_csv(CSV_EKONOMI_AUDIO, index=False)
-    logging.info(f"Berhasil menyimpan {len(df)} data ke {CSV_EKONOMI_AUDIO}.")
+    df = df[kolom_urut]
+    
+    # Simpan ke CSV (Menimpa data lama agar AI dan GSheets selalu mendapat data fresh hari ini)
+    df.to_csv(CSV_FILE, index=False)
+    print(f"[SUCCESS] Tersimpan {len(df)} baris data Ekonomi & Audio ke {CSV_FILE}.")
 
 if __name__ == "__main__":
-    run_economy_audio_tracker()
+    run_job()
+```
+
+*(Jangan lupa, agar Dashboard HTML Anda tidak berantakan setelah penyesuaian kolom ini, terapkan juga modifikasi `index.html` dari respons saya yang sebelumnya. Serta pastikan Anda melakukan **Run workflow** di tab Actions GitHub setelah semuanya tersimpan!)*
