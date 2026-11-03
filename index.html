@@ -30,7 +30,7 @@
             theme: {
                 extend: {
                     colors: {
-                        brandLime: '#c4f033', // Disesuaikan dengan warna logo baru
+                        brandLime: '#c4f033',
                         brandDark: '#111827',
                     }
                 }
@@ -242,7 +242,7 @@
         let activePortal = 'Semua';
         let activeCategory = 'Semua';
         let searchQuery = '';
-        let displayLimit = 20; // Default batasan tampilan awal
+        let displayLimit = 20;
         
         let analyticsScope = 'all';
         let currentView = 'feed'; 
@@ -336,11 +336,6 @@
             }
         }
 
-        window.changeLimit = function(val) {
-            displayLimit = parseInt(val);
-            renderTimeline();
-        };
-
         window.resetFilters = function() {
             document.getElementById('searchInput').value = '';
             document.getElementById('periodFilter').value = 'today';
@@ -430,7 +425,6 @@
             emptyState.classList.remove('flex');
 
             let html = '';
-            // Batasi tampilan sesuai pilihan dropdown (20, 50, 100, 150)
             const displayData = filteredNews.slice(0, displayLimit);
 
             displayData.forEach(item => {
@@ -445,7 +439,7 @@
                 html += `
                     <div class="relative flex gap-4 ml-6 mb-8 group fade-in">
                         <div class="absolute -left-[35px] w-4 h-4 bg-gray-300 rounded-full border-4 border-gray-50 group-hover:bg-brandLime group-hover:border-brandLime/30 transition-colors z-10 mt-2"></div>
-                        <a href="${item['URL'] || '#'}" target="_blank" class="block w-4/5 md:w-full max-w-4xl bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brandLime/50 transition-all">
+                        <a href="${item['URL'] || '#'}" target="_blank" class="block w-full max-w-4xl bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brandLime/50 transition-all">
                             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                                 <div class="flex items-center gap-2">
                                     <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${colorClass}">${sumber}</span>
@@ -484,7 +478,7 @@
 
             const text = dataToAnalyze.slice(0, 100).map(d => d['Judul'] || '').join(' ').toLowerCase();
             const words = text.replace(/[^a-z0-9\s]/g, '').split(/\s+/);
-            const stopwords = new Set(["di","ke","dari","dan","atau","untuk","dengan","yang","ini","itu","pada","dalam","sebagai","oleh","karena","sehingga","bahwa","jika","ada","adalah","saja","juga","sudah","belum","bisa","akan","telah","saat","setelah","lalu","kemudian","namun","tetapi","tapi","sedang","lagi","baru","satu","dua","hari","tahun","bulan","berita","indonesia","video","foto","nasional","baca","lihat","viral","tiktok","trending"]);
+            const stopwords = new Set(["di","ke","dari","dan","atau","untuk","dengan","yang","ini","itu","pada","dalam","sebagai","oleh","karena","sehingga","bahwa","jika","ada","adalah","saja","juga","sudah","belum","bisa","akan","telah","saat","setelah","lalu","kemudian","namun","tetapi","tapi","sedang","lagi","baru","satu","dua","hari","tahun","bulan","berita","indonesia","video","foto","nasional","baca","juga","lihat","viral","tiktok","trending"]);
 
             const wordCounts = {};
             words.forEach(word => { if (word.length > 3 && !stopwords.has(word)) wordCounts[word] = (wordCounts[word] || 0) + 1; });
