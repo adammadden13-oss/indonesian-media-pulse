@@ -51,16 +51,23 @@ def clean_text(text):
     return cleaned.strip()
 
 def extract_image(element):
-    """Fungsi ajaib menembus lazy-loading untuk mencari URL thumbnail gambar."""
+    """Fungsi super ekstraktor: Mencari gambar hingga ke kontainer terluar artikel."""
+    # 1. Cari di dalam elemen itu sendiri
     img = element.find('img')
-    # Jika gambar tidak ada langsung di dalam tag <a>, cari di elemen bungkusnya (parent)
-    if not img and element.parent:
-        img = element.parent.find('img')
-    if not img and element.parent and element.parent.parent:
-        img = element.parent.parent.find('img')
-        
+    
+    # 2. Jika tidak ada, cari di kontainer induk artikel (naik ke atas)
+    if not img:
+        container = element.find_parent(['article', 'li'])
+        if not container:
+            container = element.parent
+            if container and container.parent:
+                container = container.parent # Naik 2 level
+                
+        if container:
+            img = container.find('img')
+            
+    # 3. Ekstrak URL (Tembus Lazy-Loading)
     if img:
-        # KUNCI: Prioritaskan atribut lazy-loading sebelum atribut 'src' standar
         url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
         if url.startswith('//'):
             url = 'https:' + url
