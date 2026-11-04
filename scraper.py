@@ -4,21 +4,36 @@ def clean_text(text):
         return ""
     return " ".join(text.split())
 
+def get_img_url(img):
+    """Mengekstrak URL gambar dari atribut lazy-load maupun standar."""
+    if not img: return ""
+    url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
+    if url.startswith('//'): return 'https:' + url
+    return url
+
 def extract_image(element):
-    """Fungsi ajaib menembus lazy-loading untuk mencari URL thumbnail gambar."""
+    """Fungsi Super Ekstraktor untuk infotaiment"""
     img = element.find('img')
-    if not img and element.parent:
-        img = element.parent.find('img')
-    if not img and element.parent and element.parent.parent:
-        img = element.parent.parent.find('img')
+    if img: return get_img_url(img)
+    
+    prev = element.find_previous_sibling('a')
+    if prev:
+        img = prev.find('img')
+        if img: return get_img_url(img)
         
-    if img:
-        # KUNCI: Prioritaskan atribut lazy-loading sebelum atribut 'src' standar
-        url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
-        # Bersihkan URL jika formatnya //domain.com
-        if url.startswith('//'):
-            url = 'https:' + url
-        return url
+    parent = element.parent
+    if parent:
+        links = parent.find_all('a')
+        if len(links) <= 3:
+            img = parent.find('img')
+            if img: return get_img_url(img)
+            
+    if parent and parent.parent:
+        links = parent.parent.find_all('a')
+        if len(links) <= 3:
+            img = parent.parent.find('img')
+            if img: return get_img_url(img)
+            
     return ""
 
 def parse_detik(soup, sumber):
