@@ -23,6 +23,24 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Sidebar Collapse Transitions */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .collapsed-sidebar { width: 5rem !important; }
+        .collapsed-sidebar .sidebar-text { display: none !important; }
+        .collapsed-sidebar .lg\:justify-start { justify-content: center !important; }
+        .collapsed-sidebar .collapsed-sidebar-center { justify-content: center !important; }
+
+        /* Scroll Shrink Transitions */
+        #mainHeader, #feedFiltersView, #portalContainer, #categoryContainer {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .is-scrolled #mainHeader { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+        .is-scrolled #searchInput { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; font-size: 0.75rem !important; }
+        .is-scrolled #portalContainer { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+        .is-scrolled #portalContainer button { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; font-size: 0.75rem !important; }
+        .is-scrolled #categoryContainer { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; min-height: 36px !important; }
+        .is-scrolled #categoryContainer button { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; font-size: 0.65rem !important; }
     </style>
     
     <script>
@@ -41,55 +59,61 @@
 <body class="text-gray-800 h-screen flex overflow-hidden">
 
     <!-- Sidebar Navigation -->
-    <aside class="w-20 lg:w-64 bg-brandDark text-white flex flex-col h-full shrink-0 shadow-xl z-20 transition-all duration-300">
+    <aside id="sidebar" class="w-20 lg:w-64 bg-brandDark text-white flex flex-col h-full shrink-0 shadow-xl z-20 transition-all duration-300">
         <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-gray-800">
             <!-- Logo SVG Media Pulse -->
             <svg class="w-8 h-8 shrink-0 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="50" fill="#1b2609"/>
                 <path d="M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z" fill="#c4f033"/>
             </svg>
-            <span class="ml-3 font-bold text-lg hidden lg:block tracking-wide">MediaPulse</span>
+            <span class="ml-3 font-bold text-lg hidden lg:block tracking-wide sidebar-text">MediaPulse</span>
         </div>
-        <nav class="flex-1 py-6 flex flex-col gap-2 px-3">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block" data-i18n="cat_main">Kategori Utama</p>
+        <nav class="flex-1 py-6 flex flex-col gap-2 px-3 overflow-y-auto scrollbar-hide">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block sidebar-text" data-i18n="cat_main">Kategori Utama</p>
             
             <a href="#" onclick="switchCategory('nasional')" id="navNasional" class="flex items-center gap-3 px-3 py-3 bg-gray-800/50 rounded-xl text-brandLime transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-                <span class="hidden lg:block font-medium" data-i18n="nav_nasional">Berita Nasional</span>
+                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_nasional">Berita Nasional</span>
             </a>
             
             <a href="#" onclick="switchCategory('infotainment')" id="navInfo" class="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 rounded-xl text-gray-400 transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                <span class="hidden lg:block font-medium" data-i18n="nav_info">Infotainment</span>
+                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_info">Infotainment</span>
             </a>
             
             <a href="#" onclick="switchCategory('hiburan')" id="navHiburan" class="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 rounded-xl text-gray-400 transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
-                <span class="hidden lg:block font-medium" data-i18n="nav_hiburan">Film & Hiburan</span>
+                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_hiburan">Film & Hiburan</span>
             </a>
 
             <hr class="border-gray-800 my-2 mx-2">
             
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block" data-i18n="cat_command">Pusat Komando</p>
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block sidebar-text" data-i18n="cat_command">Pusat Komando</p>
             <a href="#" onclick="switchView('analytics')" id="navAnalytics" class="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 rounded-xl text-gray-400 transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                <span class="hidden lg:block font-medium" data-i18n="nav_analytics">Analisis Sentimen</span>
+                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_analytics">Analisis Sentimen</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-gray-800 text-center lg:text-left">
-            <p class="text-xs text-gray-500 hidden lg:block" data-i18n="sys_status">System Status</p>
+        <div class="p-4 border-t border-gray-800 text-center lg:text-left flex flex-col justify-center">
+            <p class="text-xs text-gray-500 hidden lg:block sidebar-text" data-i18n="sys_status">System Status</p>
             <div class="flex items-center justify-center lg:justify-start gap-2 mt-1">
-                <div class="w-2 h-2 rounded-full bg-brandLime animate-pulse"></div>
-                <span class="text-sm font-medium text-gray-300 hidden lg:block" id="syncStatus">Sinkronisasi...</span>
+                <div class="w-2 h-2 rounded-full bg-brandLime animate-pulse shrink-0"></div>
+                <span class="text-sm font-medium text-gray-300 hidden lg:block sidebar-text" id="syncStatus" data-i18n="status_sync">Sinkronisasi...</span>
             </div>
+        </div>
+        <!-- Tombol Pelipat Sidebar -->
+        <div class="p-3 border-t border-gray-800 hidden lg:flex justify-end collapsed-sidebar-center">
+            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-white p-1 rounded-md hover:bg-gray-800 transition-all">
+                 <svg id="collapseIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
         </div>
     </aside>
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-full bg-gray-50 relative">
         
-        <!-- Header: Search, Period Filter & Language Switcher -->
-        <header class="w-full bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex flex-col sm:flex-row items-center gap-4 justify-between shrink-0 shadow-sm z-10">
+        <!-- Header: Search & Period Filter -->
+        <header id="mainHeader" class="w-full bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex flex-col sm:flex-row items-center gap-4 justify-between shrink-0 shadow-sm z-10 transition-all duration-300">
             <div class="flex-1 w-full max-w-2xl relative">
                 <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Lacak isu, tokoh, atau kata kunci berita..." class="w-full bg-gray-100 border-transparent rounded-full pl-12 pr-4 py-2.5 text-sm font-medium focus:bg-white focus:border-brandLime focus:ring-2 focus:ring-brandLime/50 transition-all shadow-inner">
@@ -118,13 +142,13 @@
         </header>
 
         <!-- Filters & Topics Header -->
-        <div class="w-full bg-white border-b border-gray-200 shrink-0 shadow-sm z-0" id="feedFiltersView">
+        <div class="w-full bg-white border-b border-gray-200 shrink-0 shadow-sm z-0 transition-all duration-300" id="feedFiltersView">
             <!-- Portals Filter -->
-            <div class="px-4 lg:px-8 py-3 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide" id="portalContainer">
+            <div class="px-4 lg:px-8 py-3 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide transition-all duration-300" id="portalContainer">
                 <!-- Diisi oleh JS -->
             </div>
             <!-- Categories Filter -->
-            <div class="px-4 lg:px-8 py-2 bg-gray-50 flex items-center gap-2 overflow-x-auto scrollbar-hide min-h-[48px]" id="categoryContainer">
+            <div class="px-4 lg:px-8 py-2 bg-gray-50 flex items-center gap-2 overflow-x-auto scrollbar-hide min-h-[48px] transition-all duration-300" id="categoryContainer">
                 <!-- Diisi oleh JS -->
             </div>
         </div>
@@ -236,8 +260,7 @@
     </main>
 
     <script>
-        // Dictionary Bahasa (ID & EN)
-        const translations = {
+        var translations = {
             id: {
                 cat_main: "Kategori Utama",
                 nav_nasional: "Berita Nasional",
@@ -247,7 +270,7 @@
                 nav_analytics: "Analisis Sentimen",
                 sys_status: "System Status",
                 status_sync: "Sinkronisasi...",
-                status_updated: "Data up-to-date",
+                status_updated: "Data Mutakhir",
                 search_placeholder: "Lacak isu, tokoh, atau kata kunci berita...",
                 period_label: "Periode:",
                 opt_today: "Hari Ini (24 Jam Terakhir)",
@@ -316,18 +339,18 @@
             }
         };
 
-        let currentLang = 'id';
+        var currentLang = 'id';
 
         function switchLanguage(lang) {
             currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
+            document.querySelectorAll('[data-i18n]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n');
                 if (translations[lang][key]) {
                     el.innerText = translations[lang][key];
                 }
             });
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+                var key = el.getAttribute('data-i18n-placeholder');
                 if (translations[lang][key]) {
                     el.placeholder = translations[lang][key];
                 }
@@ -336,28 +359,28 @@
             if (currentView === 'analytics') renderAnalytics();
         }
 
-        const URL_NEWS = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_news.csv';
-        const URL_INFOTAINMENT = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_terkini.csv';
-        const URL_HIBURAN = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/film_dan_hiburan.csv';
+        var URL_NEWS = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_news.csv';
+        var URL_INFOTAINMENT = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_terkini.csv';
+        var URL_HIBURAN = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/film_dan_hiburan.csv';
         
-        let dataNasional = [];
-        let dataInfotainment = [];
-        let dataHiburan = [];
-        let activePage = 'nasional';
+        var dataNasional = [];
+        var dataInfotainment = [];
+        var dataHiburan = [];
+        var activePage = 'nasional';
         
-        let allNews = []; 
-        let filteredNews = [];
-        let activePeriod = 'today';
-        let activePortal = 'Semua';
-        let activeCategory = 'Semua';
-        let searchQuery = '';
-        let displayLimit = 20;
+        var allNews = []; 
+        var filteredNews = [];
+        var activePeriod = 'today';
+        var activePortal = 'Semua';
+        var activeCategory = 'Semua';
+        var searchQuery = '';
+        var displayLimit = 20;
         
-        let analyticsScope = 'all';
-        let currentView = 'feed'; 
-        let charts = { sentiment: null, category: null, portal: null, timeline: null };
+        var analyticsScope = 'all';
+        var currentView = 'feed'; 
+        var charts = { sentiment: null, category: null, portal: null, timeline: null };
 
-        const portalColors = {
+        var portalColors = {
             'DetikCom': 'text-blue-600 bg-blue-50 border-blue-200',
             'Kompas.com': 'text-orange-600 bg-orange-50 border-orange-200',
             'CNN Indonesia': 'text-red-600 bg-red-50 border-red-200',
@@ -370,7 +393,7 @@
         };
 
         function fetchCSV(url) {
-            return new Promise((resolve) => {
+            return new Promise(function(resolve) {
                 Papa.parse(url, {
                     download: true,
                     header: true,
@@ -384,15 +407,15 @@
         async function initApp() {
             try {
                 document.getElementById('syncStatus').innerText = translations[currentLang].status_sync;
-                const [newsData, infoData, filmData] = await Promise.all([
+                var results = await Promise.all([
                     fetchCSV(URL_NEWS),
                     fetchCSV(URL_INFOTAINMENT),
                     fetchCSV(URL_HIBURAN)
                 ]);
 
-                dataNasional = newsData || [];
-                dataInfotainment = infoData || [];
-                dataHiburan = filmData || [];
+                dataNasional = results[0] || [];
+                dataInfotainment = results[1] || [];
+                dataHiburan = results[2] || [];
 
                 if(dataNasional.length > 0 || dataInfotainment.length > 0 || dataHiburan.length > 0) {
                     document.getElementById('syncStatus').innerText = translations[currentLang].status_updated;
@@ -408,9 +431,9 @@
 
         window.switchCategory = function(cat) {
             activePage = cat;
-            if (cat === 'nasional') allNews = [...dataNasional];
-            else if (cat === 'infotainment') allNews = [...dataInfotainment];
-            else if (cat === 'hiburan') allNews = [...dataHiburan];
+            if (cat === 'nasional') allNews = [].concat(dataNasional);
+            else if (cat === 'infotainment') allNews = [].concat(dataInfotainment);
+            else if (cat === 'hiburan') allNews = [].concat(dataHiburan);
             
             activePortal = 'Semua';
             activeCategory = 'Semua';
@@ -427,8 +450,8 @@
         };
 
         function updateSidebarUI() {
-            ['navNasional', 'navInfo', 'navHiburan', 'navAnalytics'].forEach(id => {
-                const el = document.getElementById(id);
+            ['navNasional', 'navInfo', 'navHiburan', 'navAnalytics'].forEach(function(id) {
+                var el = document.getElementById(id);
                 if (el) {
                     el.classList.replace('text-brandLime', 'text-gray-400');
                     el.classList.replace('bg-gray-800/50', 'hover:bg-gray-800');
@@ -439,7 +462,7 @@
                 document.getElementById('navAnalytics').classList.replace('text-gray-400', 'text-brandLime');
                 document.getElementById('navAnalytics').classList.replace('hover:bg-gray-800', 'bg-gray-800/50');
             } else {
-                let activeId = activePage === 'infotainment' ? 'navInfo' : (activePage === 'hiburan' ? 'navHiburan' : 'navNasional');
+                var activeId = activePage === 'infotainment' ? 'navInfo' : (activePage === 'hiburan' ? 'navHiburan' : 'navNasional');
                 document.getElementById(activeId).classList.replace('text-gray-400', 'text-brandLime');
                 document.getElementById(activeId).classList.replace('hover:bg-gray-800', 'bg-gray-800/50');
             }
@@ -456,24 +479,24 @@
         }
 
         function applyFilters() {
-            filteredNews = [...allNews];
+            filteredNews = [].concat(allNews);
 
             if (searchQuery.trim() !== '') {
-                const q = searchQuery.toLowerCase();
-                filteredNews = filteredNews.filter(d => 
-                    (d['Judul'] || '').toLowerCase().includes(q) ||
-                    (d['Sumber'] || '').toLowerCase().includes(q) ||
-                    (d['Kategori'] || '').toLowerCase().includes(q)
-                );
+                var q = searchQuery.toLowerCase();
+                filteredNews = filteredNews.filter(function(d) {
+                    return (d['Judul'] || '').toLowerCase().includes(q) ||
+                           (d['Sumber'] || '').toLowerCase().includes(q) ||
+                           (d['Kategori'] || '').toLowerCase().includes(q);
+                });
             }
 
-            const now = new Date();
+            var now = new Date();
             if (activePeriod !== 'all') {
-                filteredNews = filteredNews.filter(d => {
+                filteredNews = filteredNews.filter(function(d) {
                     if (!d['Waktu Tarik']) return false;
-                    const itemDate = new Date(d['Waktu Tarik'].replace(' ', 'T'));
+                    var itemDate = new Date(d['Waktu Tarik'].replace(' ', 'T'));
                     if (isNaN(itemDate)) return true;
-                    const diffDays = Math.ceil(Math.abs(now - itemDate) / (1000 * 60 * 60 * 24));
+                    var diffDays = Math.ceil(Math.abs(now - itemDate) / (1000 * 60 * 60 * 24));
                     if (activePeriod === 'today') return diffDays <= 1;
                     if (activePeriod === '7days') return diffDays <= 7;
                     if (activePeriod === '30days') return diffDays <= 30;
@@ -484,15 +507,15 @@
             buildFilterUI();
 
             if (activePortal !== 'Semua') {
-                filteredNews = filteredNews.filter(d => d['Sumber'] === activePortal);
+                filteredNews = filteredNews.filter(function(d) { return d['Sumber'] === activePortal; });
             }
             if (activeCategory !== 'Semua') {
-                filteredNews = filteredNews.filter(d => d['Kategori'] === activeCategory);
+                filteredNews = filteredNews.filter(function(d) { return d['Kategori'] === activeCategory; });
             }
 
-            filteredNews.sort((a, b) => {
-                const dateA = new Date((a['Waktu Tarik']||'').replace(' ', 'T'));
-                const dateB = new Date((b['Waktu Tarik']||'').replace(' ', 'T'));
+            filteredNews.sort(function(a, b) {
+                var dateA = new Date((a['Waktu Tarik']||'').replace(' ', 'T'));
+                var dateB = new Date((b['Waktu Tarik']||'').replace(' ', 'T'));
                 return dateB - dateA;
             });
 
@@ -501,27 +524,37 @@
         }
 
         function buildFilterUI() {
-            let tempFiltered = [...allNews];
-            const portals = ['Semua', ...new Set(tempFiltered.map(d => d['Sumber']).filter(Boolean))];
+            var tempFiltered = [].concat(allNews);
             
-            document.getElementById('portalContainer').innerHTML = portals.map(portal => `
-                <button onclick="setPortal('${portal}')" class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${activePortal === portal ? 'bg-brandDark text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}">${portal}</button>
-            `).join('');
+            var rawPortals = tempFiltered.map(function(d) { return d['Sumber']; }).filter(Boolean);
+            var uniquePortals = [];
+            rawPortals.forEach(function(p) { if(uniquePortals.indexOf(p) === -1) uniquePortals.push(p); });
+            var portals = ['Semua'].concat(uniquePortals);
+            
+            document.getElementById('portalContainer').innerHTML = portals.map(function(portal) {
+                var activeClass = activePortal === portal ? 'bg-brandDark text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
+                return '<button onclick="setPortal(\''+portal+'\')" class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap ' + activeClass + '">' + portal + '</button>';
+            }).join('');
 
-            let catData = activePortal === 'Semua' ? tempFiltered : tempFiltered.filter(d => d['Sumber'] === activePortal);
-            const categories = ['Semua', ...new Set(catData.map(d => d['Kategori']).filter(Boolean))].sort();
-            if (!categories.includes(activeCategory)) activeCategory = 'Semua';
+            var catData = activePortal === 'Semua' ? tempFiltered : tempFiltered.filter(function(d) { return d['Sumber'] === activePortal; });
+            var rawCats = catData.map(function(d) { return d['Kategori']; }).filter(Boolean);
+            var uniqueCats = [];
+            rawCats.forEach(function(c) { if(uniqueCats.indexOf(c) === -1) uniqueCats.push(c); });
+            var categories = ['Semua'].concat(uniqueCats.sort());
+            
+            if (categories.indexOf(activeCategory) === -1) activeCategory = 'Semua';
 
-            document.getElementById('categoryContainer').innerHTML = categories.map(cat => `
-                <button onclick="setCategory('${cat}')" class="px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap ${activeCategory === cat ? 'bg-brandLime text-brandDark shadow-sm font-bold border border-brandLime' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100'}">${cat}</button>
-            `).join('');
+            document.getElementById('categoryContainer').innerHTML = categories.map(function(cat) {
+                var activeClass = activeCategory === cat ? 'bg-brandLime text-brandDark shadow-sm font-bold border border-brandLime' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100';
+                return '<button onclick="setCategory(\''+cat+'\')" class="px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap ' + activeClass + '">' + cat + '</button>';
+            }).join('');
         }
 
         function renderTimeline() {
-            const container = document.getElementById('timelineList');
-            const emptyState = document.getElementById('emptyState');
-            const countLabel = currentLang === 'en' ? 'News Found' : 'Berita Ditemukan';
-            document.getElementById('feedCount').innerText = `${filteredNews.length} ${countLabel}`;
+            var container = document.getElementById('timelineList');
+            var emptyState = document.getElementById('emptyState');
+            var countLabel = currentLang === 'en' ? 'News Found' : 'Berita Ditemukan';
+            document.getElementById('feedCount').innerText = filteredNews.length + " " + countLabel;
 
             if (filteredNews.length === 0) {
                 container.innerHTML = '';
@@ -533,42 +566,53 @@
             emptyState.classList.add('hidden');
             emptyState.classList.remove('flex');
 
-            let html = '';
-            const displayData = filteredNews.slice(0, displayLimit);
-            const t = translations[currentLang];
+            var html = '';
+            var displayData = filteredNews.slice(0, displayLimit);
+            var t = translations[currentLang];
 
-            displayData.forEach(item => {
-                const sumber = item['Sumber'] || 'Unknown';
-                const colorClass = portalColors[sumber] || 'text-gray-600 bg-gray-50 border-gray-200';
-                let timeDisplay = item['Waktu Tarik'] || '';
+            displayData.forEach(function(item) {
+                var sumber = item['Sumber'] || 'Unknown';
+                var colorClass = portalColors[sumber] || 'text-gray-600 bg-gray-50 border-gray-200';
+                var timeDisplay = item['Waktu Tarik'] || '';
                 try {
-                    const d = new Date(timeDisplay.replace(' ', 'T'));
+                    var d = new Date(timeDisplay.replace(' ', 'T'));
                     if(!isNaN(d)) timeDisplay = d.toLocaleTimeString(currentLang === 'en' ? 'en-US' : 'id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
                 } catch(e) {}
 
-                html += `
-                    <div class="relative flex gap-4 ml-6 mb-8 group fade-in">
-                        <div class="absolute -left-[35px] w-4 h-4 bg-gray-300 rounded-full border-4 border-gray-50 group-hover:bg-brandLime group-hover:border-brandLime/30 transition-colors z-10 mt-2"></div>
-                        <a href="${item['URL'] || '#'}" target="_blank" class="block w-full max-w-4xl bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brandLime/50 transition-all">
-                            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${colorClass}">${sumber}</span>
-                                    <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">${t.rubrik} ${item['Kategori'] || 'Umum'}</span>
-                                </div>
-                                <span class="text-xs font-medium text-gray-400">${t.tercatat} ${timeDisplay}</span>
-                            </div>
-                            <h4 class="text-lg lg:text-xl font-bold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">${item['Judul'] || 'Tanpa Judul'}</h4>
-                        </a>
-                    </div>
-                `;
+                // Placeholder image jika kolom 'Gambar' belum ada di CSV
+                var fallbackImg = "https://placehold.co/400x300/f8f9fa/9ca3af?text=" + encodeURIComponent(sumber);
+                var imgUrl = item['Gambar'] || item['Image URL'] || fallbackImg;
+
+                html += '<div class="relative flex gap-4 ml-6 mb-8 group fade-in">';
+                html += '<div class="absolute -left-[35px] w-4 h-4 bg-gray-300 rounded-full border-4 border-gray-50 group-hover:bg-brandLime group-hover:border-brandLime/30 transition-colors z-10 mt-2"></div>';
+                html += '<a href="' + (item['URL'] || '#') + '" target="_blank" class="block w-full max-w-4xl bg-white p-4 lg:p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brandLime/50 transition-all flex flex-col sm:flex-row gap-4 lg:gap-6 items-start">';
+                
+                // Kontainer Gambar (Thumbnail)
+                html += '<div class="w-full sm:w-40 lg:w-48 h-48 sm:h-32 shrink-0 overflow-hidden rounded-xl bg-gray-100 border border-gray-100">';
+                html += '<img src="' + imgUrl + '" alt="Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src=\''+fallbackImg+'\'">';
+                html += '</div>';
+
+                // Kontainer Teks
+                html += '<div class="flex-1 flex flex-col w-full justify-center min-h-[8rem]">';
+                html += '<div class="flex flex-wrap items-center justify-between gap-2 mb-2 lg:mb-3">';
+                html += '<div class="flex items-center gap-2">';
+                html += '<span class="px-2.5 py-1 rounded-md text-[10px] lg:text-xs font-bold border ' + colorClass + '">' + sumber + '</span>';
+                html += '<span class="text-[10px] lg:text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">' + t.rubrik + ' ' + (item['Kategori'] || 'Umum') + '</span>';
+                html += '</div>';
+                html += '<span class="text-[10px] lg:text-xs font-medium text-gray-400">' + t.tercatat + ' ' + timeDisplay + '</span>';
+                html += '</div>';
+                html += '<h4 class="text-base lg:text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-3">' + (item['Judul'] || 'Tanpa Judul') + '</h4>';
+                html += '</div>';
+                
+                html += '</a></div>';
             });
 
             container.innerHTML = html;
         }
 
         function extractTrendingTopicsAndInsights(dataToAnalyze) {
-            const cloudContainer = document.getElementById('trendingTopicsContainer');
-            const insightContainer = document.getElementById('aiInsightText');
+            var cloudContainer = document.getElementById('trendingTopicsContainer');
+            var insightContainer = document.getElementById('aiInsightText');
             
             if (dataToAnalyze.length === 0) {
                 cloudContainer.innerHTML = '<span class="text-sm text-gray-400">No data available.</span>';
@@ -576,37 +620,45 @@
                 return;
             }
 
-            const portals = {};
-            const categories = {};
-            dataToAnalyze.forEach(d => {
-                portals[d['Sumber'] || 'Unknown'] = (portals[d['Sumber'] || 'Unknown'] || 0) + 1;
-                categories[d['Kategori'] || 'Umum'] = (categories[d['Kategori'] || 'Umum'] || 0) + 1;
+            var portals = {};
+            var categories = {};
+            dataToAnalyze.forEach(function(d) {
+                var p = d['Sumber'] || 'Unknown';
+                var c = d['Kategori'] || 'Umum';
+                portals[p] = (portals[p] || 0) + 1;
+                categories[c] = (categories[c] || 0) + 1;
             });
 
-            const topPortal = Object.keys(portals).sort((a, b) => portals[b] - portals[a])[0];
-            const topCategory = Object.keys(categories).sort((a, b) => categories[b] - categories[a])[0];
+            var topPortal = Object.keys(portals).sort(function(a, b) { return portals[b] - portals[a]; })[0];
+            var topCategory = Object.keys(categories).sort(function(a, b) { return categories[b] - categories[a]; })[0];
 
-            const text = dataToAnalyze.slice(0, 100).map(d => d['Judul'] || '').join(' ').toLowerCase();
-            const words = text.replace(/[^a-z0-9\s]/g, '').split(/\s+/);
-            const stopwords = new Set(["di","ke","dari","dan","atau","untuk","dengan","yang","ini","itu","pada","dalam","sebagai","oleh","karena","sehingga","bahwa","jika","ada","adalah","saja","juga","sudah","belum","bisa","akan","telah","saat","setelah","lalu","kemudian","namun","tetapi","tapi","sedang","lagi","baru","satu","dua","hari","tahun","bulan","berita","indonesia","video","foto","nasional","baca","juga","lihat","viral","tiktok","trending"]);
+            var text = dataToAnalyze.slice(0, 100).map(function(d) { return d['Judul'] || ''; }).join(' ').toLowerCase();
+            var words = text.replace(/[^a-z0-9\s]/g, '').split(/\s+/);
+            var stopwords = ["di","ke","dari","dan","atau","untuk","dengan","yang","ini","itu","pada","dalam","sebagai","oleh","karena","sehingga","bahwa","jika","ada","adalah","saja","juga","sudah","belum","bisa","akan","telah","saat","setelah","lalu","kemudian","namun","tetapi","tapi","sedang","lagi","baru","satu","dua","hari","tahun","bulan","berita","indonesia","video","foto","nasional","baca","juga","lihat","viral","tiktok","trending"];
 
-            const wordCounts = {};
-            words.forEach(word => { if (word.length > 3 && !stopwords.has(word)) wordCounts[word] = (wordCounts[word] || 0) + 1; });
-            const sortedWords = Object.keys(wordCounts).sort((a, b) => wordCounts[b] - wordCounts[a]).slice(0, 20);
+            var wordCounts = {};
+            words.forEach(function(word) { 
+                if (word.length > 3 && stopwords.indexOf(word) === -1) {
+                    wordCounts[word] = (wordCounts[word] || 0) + 1;
+                }
+            });
+            var sortedWords = Object.keys(wordCounts).sort(function(a, b) { return wordCounts[b] - wordCounts[a]; }).slice(0, 20);
 
-            cloudContainer.innerHTML = sortedWords.map(word => `<span onclick="setSearch('${word}')" class="cursor-pointer hover:text-brandLime hover:bg-brandDark px-2 py-1 rounded-md text-sm font-bold text-gray-700 transition-all inline-block m-1">${word}</span>`).join('');
+            cloudContainer.innerHTML = sortedWords.map(function(word) {
+                return '<span onclick="setSearch(\''+word+'\')" class="cursor-pointer hover:text-brandLime hover:bg-brandDark px-2 py-1 rounded-md text-sm font-bold text-gray-700 transition-all inline-block m-1">' + word + '</span>';
+            }).join('');
             
             if (currentLang === 'en') {
-                insightContainer.innerHTML = `Based on <b>${dataToAnalyze.length}</b> news articles, information flow is dominated by <b>${topPortal}</b>, centered around the <b>${topCategory}</b> category with a core focus on <b>"${(sortedWords[0] || 'National').toUpperCase()}"</b>.`;
+                insightContainer.innerHTML = 'Based on <b>' + dataToAnalyze.length + '</b> news articles, information flow is dominated by <b>' + topPortal + '</b>, centered around the <b>' + topCategory + '</b> category with a core focus on <b>"' + (sortedWords[0] || 'National').toUpperCase() + '"</b>.';
             } else {
-                insightContainer.innerHTML = `Berdasarkan <b>${dataToAnalyze.length}</b> berita, informasi dikendalikan oleh <b>${topPortal}</b>, terpusat pada rubrik <b>${topCategory}</b> dengan isu utama <b>"${(sortedWords[0] || 'Nasional').toUpperCase()}"</b>.`;
+                insightContainer.innerHTML = 'Berdasarkan <b>' + dataToAnalyze.length + '</b> berita, informasi dikendalikan oleh <b>' + topPortal + '</b>, terpusat pada rubrik <b>' + topCategory + '</b> dengan isu utama <b>"' + (sortedWords[0] || 'Nasional').toUpperCase() + '"</b>.';
             }
         }
 
         window.setAnalyticsScope = function(scope) {
             analyticsScope = scope;
-            ['all', 'nasional', 'infotainment', 'hiburan'].forEach(s => {
-                const btn = document.getElementById('btnScope_' + s);
+            ['all', 'nasional', 'infotainment', 'hiburan'].forEach(function(s) {
+                var btn = document.getElementById('btnScope_' + s);
                 if (btn) btn.className = s === scope ? "px-4 py-2 rounded-lg text-sm font-bold bg-brandDark text-brandLime shadow-md transition-colors" : "px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors";
             });
             renderAnalytics();
@@ -616,19 +668,48 @@
         window.setCategory = function(cat) { activeCategory = cat; applyFilters(); };
         window.setSearch = function(query) { document.getElementById('searchInput').value = query; searchQuery = query; applyFilters(); };
 
-        document.getElementById('periodFilter').addEventListener('change', (e) => { activePeriod = e.target.value; applyFilters(); });
-        document.getElementById('searchInput').addEventListener('input', (e) => { searchQuery = e.target.value; applyFilters(); });
+        document.getElementById('periodFilter').addEventListener('change', function(e) { activePeriod = e.target.value; applyFilters(); });
+        document.getElementById('searchInput').addEventListener('input', function(e) { searchQuery = e.target.value; applyFilters(); });
 
         function showError(msg) {
             document.getElementById('syncStatus').innerText = 'Error';
             document.getElementById('syncStatus').classList.add('text-red-500');
         }
 
+        // ==========================================
+        // FITUR INTERAKTIF: LIPAT SIDEBAR & SCROLL HEADER
+        // ==========================================
+        var isSidebarCollapsed = false;
+        window.toggleSidebar = function() {
+            isSidebarCollapsed = !isSidebarCollapsed;
+            var sidebar = document.getElementById('sidebar');
+            var icon = document.getElementById('collapseIcon');
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed-sidebar');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>';
+            } else {
+                sidebar.classList.remove('collapsed-sidebar');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>';
+            }
+        };
+
+        function handleScroll(e) {
+            var isScrolled = e.target.scrollTop > 20;
+            if (isScrolled) {
+                document.body.classList.add('is-scrolled');
+            } else {
+                document.body.classList.remove('is-scrolled');
+            }
+        }
+        
+        document.getElementById('feedView').addEventListener('scroll', handleScroll);
+        document.getElementById('analyticsView').addEventListener('scroll', handleScroll);
+
         window.switchView = function(view) {
             currentView = view;
-            const feedView = document.getElementById('feedView');
-            const analyticsView = document.getElementById('analyticsView');
-            const feedFiltersView = document.getElementById('feedFiltersView');
+            var feedView = document.getElementById('feedView');
+            var analyticsView = document.getElementById('analyticsView');
+            var feedFiltersView = document.getElementById('feedFiltersView');
 
             if (view === 'feed') {
                 feedView.classList.remove('hidden'); feedView.classList.add('flex');
@@ -645,28 +726,31 @@
 
         function renderAnalytics() {
             if (!window.Chart) return; 
-            let baseData = analyticsScope === 'all' ? [...dataNasional, ...dataInfotainment, ...dataHiburan] : (analyticsScope === 'nasional' ? [...dataNasional] : (analyticsScope === 'infotainment' ? [...dataInfotainment] : [...dataHiburan]));
+            var baseData = analyticsScope === 'all' ? [].concat(dataNasional, dataInfotainment, dataHiburan) : (analyticsScope === 'nasional' ? [].concat(dataNasional) : (analyticsScope === 'infotainment' ? [].concat(dataInfotainment) : [].concat(dataHiburan)));
             
             extractTrendingTopicsAndInsights(baseData);
 
-            let sentimenCount = { 'Positif': 0, 'Negatif': 0, 'Netral': 0, 'Antrean NLP': 0 };
-            let kategoriCount = {};
-            let portalCount = {};
-            let timeSeries = {};
+            var sentimenCount = { 'Positif': 0, 'Negatif': 0, 'Netral': 0, 'Antrean NLP': 0 };
+            var kategoriCount = {};
+            var portalCount = {};
+            var timeSeries = {};
 
-            baseData.forEach(d => {
-                let s = d['Sentimen'] ? d['Sentimen'].trim() : '';
-                if (['Positif', 'Negatif', 'Netral'].includes(s)) sentimenCount[s]++; else sentimenCount['Antrean NLP']++;
+            baseData.forEach(function(d) {
+                var s = d['Sentimen'] ? d['Sentimen'].trim() : '';
+                if (['Positif', 'Negatif', 'Netral'].indexOf(s) !== -1) sentimenCount[s]++; else sentimenCount['Antrean NLP']++;
                 kategoriCount[d['Kategori'] || 'Umum'] = (kategoriCount[d['Kategori'] || 'Umum'] || 0) + 1;
                 portalCount[d['Sumber'] || 'Unknown'] = (portalCount[d['Sumber'] || 'Unknown'] || 0) + 1;
-                if ((d['Waktu Tarik'] || '').length >= 10) timeSeries[d['Waktu Tarik'].substring(0, 10)] = (timeSeries[d['Waktu Tarik'].substring(0, 10)] || 0) + 1;
+                if ((d['Waktu Tarik'] || '').length >= 10) {
+                    var dateKey = d['Waktu Tarik'].substring(0, 10);
+                    timeSeries[dateKey] = (timeSeries[dateKey] || 0) + 1;
+                }
             });
 
-            const sortedCat = Object.keys(kategoriCount).sort((a,b) => kategoriCount[b] - kategoriCount[a]).slice(0, 7);
-            const sortedPortal = Object.keys(portalCount).sort((a,b) => portalCount[b] - portalCount[a]).slice(0, 7);
-            const sortedDates = Object.keys(timeSeries).sort();
+            var sortedCat = Object.keys(kategoriCount).sort(function(a,b){ return kategoriCount[b] - kategoriCount[a]; }).slice(0, 7);
+            var sortedPortal = Object.keys(portalCount).sort(function(a,b){ return portalCount[b] - portalCount[a]; }).slice(0, 7);
+            var sortedDates = Object.keys(timeSeries).sort();
 
-            const destroy = (k) => { if(charts[k]) charts[k].destroy(); };
+            var destroy = function(k) { if(charts[k]) charts[k].destroy(); };
 
             destroy('sentiment');
             charts.sentiment = new Chart(document.getElementById('sentimentChart').getContext('2d'), {
@@ -678,21 +762,21 @@
             destroy('category');
             charts.category = new Chart(document.getElementById('categoryChart').getContext('2d'), {
                 type: 'pie',
-                data: { labels: sortedCat, datasets: [{ data: sortedCat.map(k => kategoriCount[k]), backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#2dd4bf', '#fb923c'], borderWidth: 0 }] },
+                data: { labels: sortedCat, datasets: [{ data: sortedCat.map(function(k){ return kategoriCount[k]; }), backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#2dd4bf', '#fb923c'], borderWidth: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
             });
 
             destroy('portal');
             charts.portal = new Chart(document.getElementById('portalChart').getContext('2d'), {
                 type: 'bar',
-                data: { labels: sortedPortal, datasets: [{ data: sortedPortal.map(p => portalCount[p]), backgroundColor: '#c4f033', borderRadius: 4 }] },
+                data: { labels: sortedPortal, datasets: [{ data: sortedPortal.map(function(p){ return portalCount[p]; }), backgroundColor: '#c4f033', borderRadius: 4 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
 
             destroy('timeline');
             charts.timeline = new Chart(document.getElementById('timelineChart').getContext('2d'), {
                 type: 'line',
-                data: { labels: sortedDates, datasets: [{ data: sortedDates.map(d => timeSeries[d]), borderColor: '#111827', backgroundColor: 'rgba(17, 24, 39, 0.05)', borderWidth: 2, fill: true, tension: 0.3 }] },
+                data: { labels: sortedDates, datasets: [{ data: sortedDates.map(function(d){ return timeSeries[d]; }), borderColor: '#111827', backgroundColor: 'rgba(17, 24, 39, 0.05)', borderWidth: 2, fill: true, tension: 0.3 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
             });
         }
