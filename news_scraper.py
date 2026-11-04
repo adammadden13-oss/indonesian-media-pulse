@@ -50,28 +50,41 @@ def clean_text(text):
     
     return cleaned.strip()
 
+def get_img_url(img):
+    """Fungsi pembantu untuk mengambil URL gambar dari berbagai jenis atribut lazy-loading"""
+    if not img: return ""
+    url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
+    if url.startswith('//'): return 'https:' + url
+    return url
+
 def extract_image(element):
-    """Fungsi super ekstraktor: Mencari gambar hingga ke kontainer terluar artikel."""
-    # 1. Cari di dalam elemen itu sendiri
+    """Fungsi ekstraktor cerdas: Mencegah gambar bocor/diduplikasi ke berita lain."""
+    # 1. Cari di dalam elemen <a> itu sendiri
     img = element.find('img')
+    if img: return get_img_url(img)
     
-    # 2. Jika tidak ada, cari di kontainer induk artikel (naik ke atas)
-    if not img:
-        container = element.find_parent(['article', 'li'])
-        if not container:
-            container = element.parent
-            if container and container.parent:
-                container = container.parent # Naik 2 level
-                
-        if container:
-            img = container.find('img')
+    # 2. Cari di elemen kakak/adik (biasanya link gambar dipisah tepat sebelum link judul)
+    prev = element.find_previous_sibling('a')
+    if prev:
+        img = prev.find('img')
+        if img: return get_img_url(img)
+        
+    # 3. Cari di kontainer induk (Parent) TAPI batasi ruang lingkupnya
+    # Hanya ambil jika parent adalah kotak kecil (card berita), bukan bungkus seluruh halaman
+    parent = element.parent
+    if parent:
+        links = parent.find_all('a')
+        if len(links) <= 3: # Jika ini card tunggal (max 3 link: gambar, judul, kategori), maka aman
+            img = parent.find('img')
+            if img: return get_img_url(img)
             
-    # 3. Ekstrak URL (Tembus Lazy-Loading)
-    if img:
-        url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
-        if url.startswith('//'):
-            url = 'https:' + url
-        return url
+    # 4. Cari di parent 2 tingkat ke atas dengan batasan yang sama
+    if parent and parent.parent:
+        links = parent.parent.find_all('a')
+        if len(links) <= 3:
+            img = parent.parent.find('img')
+            if img: return get_img_url(img)
+            
     return ""
 
 def extract_category(url, tipe):
@@ -81,21 +94,21 @@ def extract_category(url, tipe):
         parts = clean.split('/')
         domain_parts = parts[0].split('.')
         
-        if tipe == 'kompas':
-            if len(domain_parts) >= 3 and domain_parts[0] != 'www':
-                return domain_parts[0].title() # cth: regional.kompas.com -> Regional
-            elif len(parts) > 1:
-                return parts[1].title()
-        elif tipe == 'detik':
+        # Penanganan khusus sub-domain (misal: otomotif.sindonews.com -> Otomotif)
+        if tipe in ['kompas', 'detik', 'sindo']:
             if len(domain_parts) >= 3 and domain_parts[0] != 'www':
                 sub = domain_parts[0].title()
                 if sub.lower() == 'news' and len(parts) > 1: return parts[1].title()
                 return sub
-        else:
-            if len(parts) > 1:
-                cat = parts[1].replace('-', ' ').title()
-                if cat.lower() in ['read', 'news', 'detail'] and len(parts) > 2:
+                
+        if len(parts) > 1:
+            cat = parts[1].replace('-', ' ').title()
+            if cat.lower() in ['read', 'news', 'detail'] and len(parts) > 2:
+                # Hindari mengembalikan angka (ID berita) sebagai kategori
+                if not parts[2].isdigit():
                     return parts[2].title()
+            
+            if not cat.isdigit():
                 return cat
     except: pass
     return "Umum"
