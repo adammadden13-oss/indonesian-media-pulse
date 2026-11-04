@@ -38,15 +38,18 @@ def clean_text(text):
         return ""
     cleaned = " ".join(text.split())
     
-    # 1. Hapus pola tanggal & jam lengkap
+    # 1. Hapus pola tanggal & jam lengkap bawaan Liputan6/Sindo (Contoh: 2026-11-04 11:15:42)
+    cleaned = re.sub(r'\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}', '', cleaned)
+    
+    # 2. Hapus pola tanggal & jam format teks
     cleaned = re.sub(r'\s*\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s*[-–—]?\s*\d{1,2}:\d{2}(?:\s*(?:WIB|WITA|WIT))?)?\s*$', '', cleaned, flags=re.IGNORECASE)
     
-    # 2. Hapus pola waktu relatif 
+    # 3. Hapus pola waktu relatif 
     cleaned = re.sub(r'\s*\d+\s*(?:menit|jam|hari|detik)\s*(?:yang)?\s*lalu\s*$', '', cleaned, flags=re.IGNORECASE)
     
-    # 3. MENGHINDARI BUG CSV GITHUB: Ganti koma dengan spasi/hubung agar kolom tidak pecah
+    # 4. MENGHINDARI BUG CSV GITHUB: Ganti koma dengan spasi/hubung
     cleaned = cleaned.replace(',', ' -')
-    cleaned = cleaned.replace('"', "'") # Ganti kutip ganda jadi tunggal agar lebih aman
+    cleaned = cleaned.replace('"', "'") 
     
     return cleaned.strip()
 
@@ -94,22 +97,24 @@ def extract_category(url, tipe):
         parts = clean.split('/')
         domain_parts = parts[0].split('.')
         
-        # Penanganan khusus sub-domain (misal: otomotif.sindonews.com -> Otomotif)
-        if tipe in ['kompas', 'detik', 'sindo']:
-            if len(domain_parts) >= 3 and domain_parts[0] != 'www':
-                sub = domain_parts[0].title()
-                if sub.lower() == 'news' and len(parts) > 1: return parts[1].title()
-                return sub
+        subdomain = "Umum"
+        if len(domain_parts) >= 3 and domain_parts[0] != 'www':
+            subdomain = domain_parts[0].title()
                 
         if len(parts) > 1:
             cat = parts[1].replace('-', ' ').title()
-            if cat.lower() in ['read', 'news', 'detail'] and len(parts) > 2:
-                # Hindari mengembalikan angka (ID berita) sebagai kategori
-                if not parts[2].isdigit():
-                    return parts[2].title()
             
+            # Jika URL menggunakan kata generik seperti 'read' atau 'news'
+            if cat.lower() in ['read', 'news', 'detail', 'artikel']:
+                if len(parts) > 2 and not parts[2].isdigit():
+                    return parts[2].title()
+                return subdomain if subdomain != "Umum" else "Berita Utama"
+            
+            # Jika ketemu angka (seperti 1767645), jangan jadikan kategori
             if not cat.isdigit():
                 return cat
+                
+        return subdomain if subdomain != "Umum" else "Umum"
     except: pass
     return "Umum"
 
