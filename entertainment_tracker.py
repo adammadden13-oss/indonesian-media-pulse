@@ -1,194 +1,136 @@
 import os
 import re
-import logging
 from datetime import datetime, timezone, timedelta
 import xml.etree.ElementTree as ET
 import requests
-from bs4 import BeautifulSoup
 import pandas as pd
-import urllib3
 
-# Menonaktifkan peringatan SSL untuk web scraping
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-logging.basicConfig(
-    filename="scraper.log",
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
-
-CSV_HIBURAN = "film_dan_hiburan.csv"
 WIB = timezone(timedelta(hours=7))
-
+CSV_HIBURAN = "film_dan_hiburan.csv"
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7"
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7'
 }
 
-def clean_text(text):
-    if not isinstance(text, str) or not text:
-        return ""
-    return " ".join(text.split()).strip()
-
-# 1. FILM TRENDING TMDb (THE MOVIE DATABASE)
 def fetch_tmdb_trending(scraped_time):
-    """Mengambil film terpopuler/trending dari TMDb."""
-    movies = []
-    tmdb_api_key = os.environ.get("TMDB_API_KEY", "")
-    
-    if tmdb_api_key:
-        try:
-            url = f"https://api.themoviedb.org/3/trending/movie/week?api_key={tmdb_api_key}&language=id-ID"
-            resp = requests.get(url, timeout=15)
-            if resp.status_code == 200:
-                results = resp.json().get("results", [])[:8]
-                for m in results:
-                    title = clean_text(m.get("title") or m.get("original_title"))
-                    m_id = m.get("id")
-                    overview = clean_text(m.get("overview", ""))[:120]
-                    desc = f"{title}: {overview}..." if overview else title
-                    movies.append({
-                        "Waktu Tarik": scraped_time,
-                        "Sumber": "TMDb Trending",
-                        "Kategori": "Film Bioskop & Box Office",
-                        "Judul": desc,
-                        "URL": f"https://www.themoviedb.org/movie/{m_id}"
-                    })
-        except Exception as e:
-            logging.error(f"Gagal TMDb API: {e}")
-
-    # Fallback jika API key belum diatur: scraping film trending bioskop publik
-    if not movies:
-        try:
-            url = "https://21cineplex.com/"
-            resp = requests.get(url, headers=HEADERS, timeout=15)
-            soup = BeautifulSoup(resp.text, "html.parser")
-            count = 0
-            for a in soup.find_all("a", href=True):
-                if "/movie/" in a["href"] or "/gui.movie_details" in a["href"]:
-                    title = clean_text(a.get("title") or a.get_text())
-                    if len(title) >= 4 and count < 6:
-                        link = a["href"] if a["href"].startswith("http") else f"https://21cineplex.com{a['href']}"
-                        movies.append({
-                            "Waktu Tarik": scraped_time,
-                            "Sumber": "Cinema XXI / Bioskop",
-                            "Kategori": "Film Bioskop & Box Office",
-                            "Judul": f"Film Populer Bioskop: {title}",
-                            "URL": link
-                        })
-                        count += 1
-        except Exception as e:
-            logging.error(f"Gagal scraping bioskop fallback: {e}")
-
-    return movies
-
-# 4. BIOSKOP SEDANG TAYANG (XXI / CGV)
-def fetch_bioskop_xxi(scraped_time):
-    logging.info("Menarik data Film Sedang Tayang di Bioskop...")
-    url = "https://jadwalnonton.com/now-playing/"
-    data = []
+    tmdb_key = os.environ.get("TMDB_API_KEY", "")
+    if not tmdb_key:
+        print("TMDB_API_KEY tidak ditemukan. Melewati scraping TMDb.")
+        return []
+        
+    url = f"https://api.themoviedb.org/3/trending/movie/day?api_key={tmdb_key}&language=id-ID"
+    results = []
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=15, verify=False)
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        movies = soup.find_all('div', class_='item-poster')
-        count = 1
-        for m in movies:
-            if count > 10: break
-            title_tag = m.find('a', class_='title') or m.find('h2')
-            if title_tag:
-                title = clean_text(title_tag.text)
-                link = title_tag.get('href', url)
-                data.append({
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        resp.raise_for_status()
+        data = resp.json()
+        for item in data.get("results", [])[:10]:
+            judul = item.get("title", item.get("original_title", ""))
+            rilis = item.get("release_date", "")
+            
+            # Ambil poster film beresolusi tinggi dari TMDb
+            poster = item.get("poster_path", "")
+            img_url = f"https://image.tmdb.org/t/p/w500{poster}" if poster else ""
+            
+            if judul:
+                results.append({
                     "Waktu Tarik": scraped_time,
-                    "Sumber": "Cinema XXI / Bioskop",
-                    "Kategori": "Sedang Tayang",
-                    "Judul": f"Now Playing: {title}",
-                    "URL": link
+                    "Sumber": "TMDb Trending",
+                    "Kategori": "Film Bioskop & Box Office",
+                    "Judul": judul,
+                    "URL": f"https://www.themoviedb.org/movie/{item.get('id')}",
+                    "Tanggal_Filter": rilis,
+                    "Gambar": img_url
                 })
-                count += 1
     except Exception as e:
-        logging.error(f"Gagal menarik data Bioskop XXI: {e}")
-    return data
+        print(f"Gagal menarik TMDb: {e}")
+    return results
 
-# 5. STREAMING TOP 10 (NETFLIX & VIU)
-def fetch_streaming_top10(platform_name, url_suffix, scraped_time):
-    logging.info(f"Menarik data Top 10 {platform_name} Indonesia...")
-    url = f"https://flixpatrol.com/top10/{url_suffix}/indonesia/today/"
-    data = []
+def fetch_google_news_entertainment(scraped_time):
+    print("Menarik data hiburan via Google News RSS (Anti-Blokir)...")
+    # Mencari berita yang relevan dengan film, bioskop, atau series Netflix di Indonesia
+    url = 'https://news.google.com/rss/search?q=(film+OR+bioskop+OR+netflix+OR+series)+when:1d&hl=id&gl=ID&ceid=ID:id'
+    results = []
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=20)
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        table = soup.find('table')
-        if table:
-            rows = table.find_all('tr')[1:11]
-            for idx, row in enumerate(rows, 1):
-                cols = row.find_all('td')
-                if len(cols) >= 3:
-                    title_tag = cols[2].find('a') or cols[1].find('a')
-                    if title_tag:
-                        title = clean_text(title_tag.text)
-                        link = title_tag.get('href', '')
-                        full_url = f"https://flixpatrol.com{link}" if link.startswith("/") else link
-                        data.append({
-                            "Waktu Tarik": scraped_time,
-                            "Sumber": f"{platform_name} Indonesia",
-                            "Kategori": "Top 10 Streaming",
-                            "Judul": f"Peringkat #{idx}: {title}",
-                            "URL": full_url
-                        })
+        resp = requests.get(url, headers=HEADERS, timeout=15)
+        root = ET.fromstring(resp.content)
+        count = 0
+        for item in root.findall('./channel/item'):
+            if count >= 15: break
+            raw_title = item.find('title').text if item.find('title') is not None else ''
+            # Hapus nama portal/publisher di akhir judul (misal: " - detikcom")
+            title = re.sub(r'\s*-\s*[^-]+$', '', raw_title).strip() 
+            link = item.find('link').text if item.find('link') is not None else '-'
+            pub_date = item.find('pubDate').text if item.find('pubDate') is not None else '-'
+            
+            # Filter kata-kata berita keras yang salah masuk ke kategori hiburan
+            if any(x in title.lower() for x in ['pembunuhan', 'korupsi', 'gempa', 'banjir', 'polisi', 'kriminal']):
+                continue
+                
+            results.append({
+                "Waktu Tarik": scraped_time,
+                "Sumber": "Google News Hiburan",
+                "Kategori": "Berita Film & Series",
+                "Judul": title,
+                "URL": link,
+                "Tanggal_Filter": pub_date,
+                "Gambar": ""
+            })
+            count += 1
     except Exception as e:
-        logging.error(f"Gagal menarik data {platform_name}: {e}")
-    return data
+        print(f"Gagal menarik Google News Hiburan: {e}")
+    return results
 
 def run_entertainment_tracker():
+    print("=== Memulai penarikan Film & Hiburan ===")
     scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-    logging.info("Memulai tracker Hiburan Murni (TMDb, XXI, Netflix, Viu)...")
     
-    all_data = []
-    # Hanya memanggil fungsi hiburan murni
-    all_data.extend(fetch_tmdb_trending(scraped_time))
-    all_data.extend(fetch_bioskop_xxi(scraped_time))
-    all_data.extend(fetch_streaming_top10('Netflix', 'netflix', scraped_time))
-    all_data.extend(fetch_streaming_top10('Viu', 'viu', scraped_time))
-
+    # 1. Kumpulkan data dari kedua sumber
+    data_tmdb = fetch_tmdb_trending(scraped_time)
+    data_news = fetch_google_news_entertainment(scraped_time)
+    
+    all_data = data_tmdb + data_news
+    
     if not all_data:
-        logging.warning("Semua scraper hiburan gagal menarik data (mungkin diblokir atau API Key kosong).")
-        # Mengganti 'return' dengan memasukkan data dummy agar CSV tetap terupdate dan kita tahu script berjalan.
-        all_data.append({
-            "Waktu Tarik": scraped_time,
-            "Sumber": "System Debug",
-            "Kategori": "Peringatan Sistem",
-            "Judul": "Peringatan: Gagal menarik data Film/Series. Periksa API Key TMDb atau hadangan Cloudflare.",
-            "URL": "-"
-        })
+        print("Tidak ada data film yang berhasil ditarik.")
+        # Buat file darurat jika file sebelumnya belum ada agar dashboard tidak error (Blank)
+        if not os.path.exists(CSV_HIBURAN):
+            df_fallback = pd.DataFrame([{"Waktu Tarik": scraped_time, "Sumber": "Sistem", "Kategori": "Peringatan", "Judul": "Data diblokir (Cloudflare)", "URL": "-"}])
+            df_fallback.to_csv(CSV_HIBURAN, index=False)
+        return
 
-    # Hapus duplikat berdasarkan judul agar laporan tetap rapi
-    df = pd.DataFrame(all_data).drop_duplicates(subset=["Judul"])
-    kolom = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL"]
-    
-    # Validasi struktur kolom untuk mencegah error index
-    for col in kolom:
-        if col not in df.columns:
-            df[col] = "-"
-            
-    df = df[kolom]
-    
-    # PERBAIKAN: Jangan overwrite (timpa) file jika sudah ada data Opini/Google Trends
+    df_new = pd.DataFrame(all_data)
+
+    # 2. Penggabungan dengan data yang sudah ada (Arsip CSV)
     if os.path.exists(CSV_HIBURAN):
         try:
-            df_lama = pd.read_csv(CSV_HIBURAN)
-            # Gabungkan data lama (Opini/Tren) dengan data baru (Film/Series)
-            df_final = pd.concat([df_lama, df], ignore_index=True)
-            # Hapus duplikat secara global berdasarkan Judul agar bersih
-            df_final = df_final.drop_duplicates(subset=["Judul"], keep="last")
-            df_final.to_csv(CSV_HIBURAN, index=False)
-            logging.info(f"Berhasil menggabungkan {len(df)} data hiburan ke {CSV_HIBURAN}.")
+            df_old = pd.read_csv(CSV_HIBURAN)
+            df_combined = pd.concat([df_new, df_old], ignore_index=True)
         except Exception as e:
-            logging.error(f"Gagal menggabungkan CSV: {e}")
-            df.to_csv(CSV_HIBURAN, index=False) # Fallback jika file lama rusak
+            print(f"Gagal membaca file CSV lama: {e}")
+            df_combined = df_new
     else:
-        df.to_csv(CSV_HIBURAN, index=False)
-        logging.info(f"Berhasil membuat file baru dan menyimpan {len(df)} data ke {CSV_HIBURAN}.")
+        df_combined = df_new
+
+    # 3. Hapus duplikat berdasarkan judul (hanya simpan data yang paling baru)
+    df_combined = df_combined.drop_duplicates(subset=["Judul"], keep="first")
+    
+    # 4. URUTKAN MUTLAK BERDASARKAN WAKTU TARIK (YANG TERBARU DI BARIS 1 / PALING ATAS)
+    if "Waktu Tarik" in df_combined.columns:
+        df_combined = df_combined.sort_values(by="Waktu Tarik", ascending=False)
+        
+    # 5. Potong maksimal 50 data teratas agar file CSV tetap ringan
+    df_combined = df_combined.head(50)
+    
+    # 6. Susun urutan kolom yang sesuai untuk dibaca oleh Dashboard HTML
+    kolom_final = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL", "Gambar"]
+    for col in kolom_final:
+        if col not in df_combined.columns:
+            df_combined[col] = "-"
+    
+    df_combined = df_combined[kolom_final]
+    df_combined.to_csv(CSV_HIBURAN, index=False)
+    print(f"[SUCCESS] Tersimpan {len(df_combined)} data hiburan ke {CSV_HIBURAN} (Terurut dari yang paling baru)")
 
 if __name__ == "__main__":
     run_entertainment_tracker()
