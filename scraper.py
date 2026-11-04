@@ -1,43 +1,20 @@
-import os
-import re
-import logging
-from datetime import datetime, timezone, timedelta
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-
-logging.basicConfig(
-    filename="scraper.log",
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
-
-CSV_FILE = "berita_terkini.csv"
-
-# Zona waktu WIB (UTC+7)
-WIB = timezone(timedelta(hours=7))
-
-# Daftar target portal berita
-TARGETS = [
-    {"sumber": "Wolipop", "url": "https://wolipop.detik.com", "tipe": "detik"},
-    {"sumber": "DetikHot Celebs", "url": "https://hot.detik.com/celebs", "tipe": "detik"},
-    {"sumber": "Grid.ID", "url": "https://www.grid.id", "tipe": "grid"},
-    {"sumber": "Okezone Celebrity", "url": "https://celebrity.okezone.com", "tipe": "okezone"},
-    {"sumber": "TribunTrends", "url": "https://trends.tribunnews.com/infotainment", "tipe": "tribun"}
-]
-
-def get_session():
-    session = requests.Session()
-    retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
-    session.mount("https://", HTTPAdapter(max_retries=retries))
-    return session
-
+# ... existing code ...
 def clean_text(text):
     if not text:
         return ""
     return " ".join(text.split())
+
+def extract_image(element):
+    """Fungsi untuk mencari URL thumbnail gambar dari elemen HTML berita."""
+    img = element.find('img')
+    if not img and element.parent:
+        img = element.parent.find('img')
+    if not img and element.parent and element.parent.parent:
+        img = element.parent.parent.find('img')
+        
+    if img:
+        return img.get('src') or img.get('data-src') or img.get('data-original') or ""
+    return ""
 
 def parse_detik(soup, sumber):
     articles = []
@@ -46,6 +23,7 @@ def parse_detik(soup, sumber):
         link = el.get("href", "").strip()
         section = clean_text(el.get("dtr-evt", "")).title()
         article_id = el.get("dtr-id", "").strip()
+        img_url = extract_image(el)
 
         if any(x in section.lower() for x in ["header", "footer", "menu", "logo", "login", "register"]):
             continue
@@ -59,7 +37,8 @@ def parse_detik(soup, sumber):
                 "Sumber": sumber,
                 "Kategori": section or "Berita Utama",
                 "Judul": title,
-                "URL": link
+                "URL": link,
+                "Gambar": img_url
             })
     return articles
 
@@ -69,12 +48,14 @@ def parse_grid(soup):
         link = a["href"].split("?")[0].strip()
         if "grid.id/read/" in link:
             title = clean_text(a.get("title") or a.get_text())
+            img_url = extract_image(a)
             if len(title) >= 20 and "halaman" not in title.lower():
                 articles.append({
                     "Sumber": "Grid.ID",
                     "Kategori": "Celebrity",
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
@@ -84,12 +65,14 @@ def parse_okezone(soup):
         link = a["href"].split("?")[0].strip()
         if "celebrity.okezone.com/read/" in link:
             title = clean_text(a.get("title") or a.get_text())
+            img_url = extract_image(a)
             if len(title) >= 20:
                 articles.append({
                     "Sumber": "Okezone Celebrity",
                     "Kategori": "Celebrity",
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
@@ -99,52 +82,19 @@ def parse_tribun(soup):
         link = a["href"].split("?")[0].strip()
         if "trends.tribunnews.com" in link and re.search(r'/\d{4}/\d{2}/\d{2}/', link):
             title = clean_text(a.get("title") or a.get_text())
+            img_url = extract_image(a)
             if len(title) >= 20 and not any(x in title.lower() for x in ["halaman selanjutnya", "lihat foto", "baca juga"]):
                 articles.append({
                     "Sumber": "TribunTrends",
                     "Kategori": "Infotainment",
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
 def fetch_all():
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-    session = get_session()
-    all_data = []
-    # Mengambil waktu dalam zona WIB (UTC+7)
-    scraped_time = datetime.now(WIB).strftime("%Y-%m-%d %H:%M:%S")
-
-    for target in TARGETS:
-        try:
-            resp = session.get(target["url"], headers=headers, timeout=20)
-            resp.raise_for_status()
-            soup = BeautifulSoup(resp.text, "html.parser")
-
-            if target["tipe"] == "detik":
-                items = parse_detik(soup, target["sumber"])
-            elif target["tipe"] == "grid":
-                items = parse_grid(soup)
-            elif target["tipe"] == "okezone":
-                items = parse_okezone(soup)
-            elif target["tipe"] == "tribun":
-                items = parse_tribun(soup)
-            else:
-                items = []
-
-            for item in items:
-                # Set 'Waktu Tarik' pada setiap item
-                item["Waktu Tarik"] = scraped_time
-
-            all_data.extend(items)
-        except Exception as e:
-            logging.error(f"Error pada {target['sumber']}: {e}")
-            continue
-
-    return all_data
-
+# ... existing code ...
 def run_job():
     data = fetch_all()
     if not data:
@@ -153,8 +103,11 @@ def run_job():
 
     df_new = pd.DataFrame(data).drop_duplicates(subset=["URL"])
 
+    if "Gambar" not in df_new.columns:
+        df_new["Gambar"] = ""
+
     # 1. Pastikan urutan kolom: 'Waktu Tarik' paling kiri
-    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL"]
+    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL", "Gambar"]
     df_new = df_new[kolom_urut]
 
     # 2. Tulis ulang (overwrite) file CSV agar data lama langsung diganti dengan data baru yang bersih
