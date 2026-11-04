@@ -41,6 +41,10 @@
         .is-scrolled #portalContainer button { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; font-size: 0.75rem !important; }
         .is-scrolled #categoryContainer { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; min-height: 36px !important; }
         .is-scrolled #categoryContainer button { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; font-size: 0.65rem !important; }
+        
+        /* Fitur Mouse Drag Scroll */
+        .drag-scroll { cursor: grab; user-select: none; }
+        .drag-scroll.is-dragging { cursor: grabbing; }
     </style>
     
     <script>
@@ -61,7 +65,6 @@
     <!-- Sidebar Navigation -->
     <aside id="sidebar" class="w-20 lg:w-64 bg-brandDark text-white flex flex-col h-full shrink-0 shadow-xl z-20 transition-all duration-300">
         <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-gray-800">
-            <!-- Logo SVG Media Pulse -->
             <svg class="w-8 h-8 shrink-0 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="50" fill="#1b2609"/>
                 <path d="M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z" fill="#c4f033"/>
@@ -101,7 +104,6 @@
                 <span class="text-sm font-medium text-gray-300 hidden lg:block sidebar-text" id="syncStatus" data-i18n="status_sync">Sinkronisasi...</span>
             </div>
         </div>
-        <!-- Tombol Pelipat Sidebar -->
         <div class="p-3 border-t border-gray-800 hidden lg:flex justify-end collapsed-sidebar-center">
             <button onclick="toggleSidebar()" class="text-gray-500 hover:text-white p-1 rounded-md hover:bg-gray-800 transition-all">
                  <svg id="collapseIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
@@ -110,18 +112,20 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-full bg-gray-50 relative">
+    <main class="flex-1 flex flex-col h-full bg-gray-50 relative overflow-hidden">
         
-        <!-- Header: Search & Period Filter -->
-        <header id="mainHeader" class="w-full bg-white border-b border-gray-200 px-4 lg:px-8 py-4 flex flex-col sm:flex-row items-center gap-4 justify-between shrink-0 shadow-sm z-10 transition-all duration-300">
-            <div class="flex-1 w-full max-w-2xl relative">
-                <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Lacak isu, tokoh, atau kata kunci berita..." class="w-full bg-gray-100 border-transparent rounded-full pl-12 pr-4 py-2.5 text-sm font-medium focus:bg-white focus:border-brandLime focus:ring-2 focus:ring-brandLime/50 transition-all shadow-inner">
+        <!-- Header: Search & Period Filter (PERBAIKAN LAYOUT RESPONSIVE) -->
+        <header id="mainHeader" class="w-full bg-white border-b border-gray-200 px-4 lg:px-6 py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0 shadow-sm z-10 transition-all duration-300">
+            <!-- Kotak Pencarian -->
+            <div class="w-full md:max-w-md lg:max-w-2xl relative shrink-0 flex-1">
+                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Lacak isu, tokoh, atau kata kunci berita..." class="w-full bg-gray-100 border-transparent rounded-full pl-10 pr-4 py-2 text-sm font-medium focus:bg-white focus:border-brandLime focus:ring-2 focus:ring-brandLime/50 transition-all shadow-inner outline-none">
             </div>
             
-            <div class="w-full sm:w-auto shrink-0 flex items-center gap-3">
+            <!-- Tombol Bahasa & Periode (Dijamin Tidak Terpotong) -->
+            <div class="w-full md:w-auto flex flex-wrap items-center justify-between md:justify-end gap-3 shrink-0">
                 <!-- Language Switcher -->
-                <div class="relative flex items-center bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+                <div class="relative flex items-center bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer shrink-0">
                     <select id="langSwitch" onchange="switchLanguage(this.value)" class="appearance-none bg-transparent text-gray-800 text-xs font-bold pl-3 pr-7 py-2 outline-none cursor-pointer">
                         <option value="id" selected>ID</option>
                         <option value="en">EN</option>
@@ -129,13 +133,14 @@
                     <svg class="w-3.5 h-3.5 absolute right-2.5 pointer-events-none text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <!-- Filter Periode -->
+                <div class="flex items-center gap-2 shrink-0">
                     <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:block" data-i18n="period_label">Periode:</span>
-                    <select id="periodFilter" class="w-full sm:w-auto bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2 font-medium focus:outline-none focus:border-gray-500 cursor-pointer shadow-sm">
-                        <option value="today" data-i18n="opt_today">Hari Ini (24 Jam Terakhir)</option>
+                    <select id="periodFilter" class="w-auto bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-1.5 font-medium focus:outline-none focus:border-gray-500 cursor-pointer shadow-sm">
+                        <option value="today" data-i18n="opt_today">Hari Ini (24 Jam)</option>
                         <option value="7days" data-i18n="opt_7days">7 Hari Terakhir</option>
                         <option value="30days" data-i18n="opt_30days">30 Hari Terakhir</option>
-                        <option value="all" data-i18n="opt_all">Semua Arsip Berita</option>
+                        <option value="all" data-i18n="opt_all">Semua Arsip</option>
                     </select>
                 </div>
             </div>
@@ -143,25 +148,17 @@
 
         <!-- Filters & Topics Header -->
         <div class="w-full bg-white border-b border-gray-200 shrink-0 shadow-sm z-0 transition-all duration-300" id="feedFiltersView">
-            <!-- Portals Filter -->
-            <div class="px-4 lg:px-8 py-3 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide transition-all duration-300" id="portalContainer">
-                <!-- Diisi oleh JS -->
-            </div>
-            <!-- Categories Filter -->
-            <div class="px-4 lg:px-8 py-2 bg-gray-50 flex items-center gap-2 overflow-x-auto scrollbar-hide min-h-[48px] transition-all duration-300" id="categoryContainer">
-                <!-- Diisi oleh JS -->
-            </div>
+            <div class="px-4 lg:px-8 py-3 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide drag-scroll transition-all duration-300" id="portalContainer"></div>
+            <div class="px-4 lg:px-8 py-2 bg-gray-50 flex items-center gap-2 overflow-x-auto scrollbar-hide drag-scroll min-h-[48px] transition-all duration-300" id="categoryContainer"></div>
         </div>
 
         <!-- Timeline Feed Area -->
         <div class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth flex flex-col" id="feedView">
-            
-            <!-- Feed Stats -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+            <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-bold text-gray-800" data-i18n="timeline_title">Garis Waktu Pemberitaan</h2>
-                <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="flex items-center gap-2 shrink-0">
                     <span id="feedCount" class="text-sm font-medium text-gray-500 bg-gray-200 px-3 py-1 rounded-full whitespace-nowrap">Memuat...</span>
-                    <select id="limitSelect" onchange="changeLimit(this.value)" class="shrink-0 bg-white border border-gray-300 text-gray-700 text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none cursor-pointer shadow-sm">
+                    <select id="limitSelect" onchange="changeLimit(this.value)" class="bg-white border border-gray-300 text-gray-700 text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none cursor-pointer shadow-sm">
                         <option value="20" selected>20 Berita</option>
                         <option value="50">50 Berita</option>
                         <option value="100">100 Berita</option>
@@ -180,14 +177,14 @@
 
             <!-- Empty State -->
             <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
-                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                 <h3 class="text-lg font-bold text-gray-800" data-i18n="empty_title">Tidak ada berita ditemukan</h3>
                 <p class="text-gray-500 text-sm mt-1" data-i18n="empty_desc">Coba sesuaikan kata kunci, periode waktu, atau filter portal Anda.</p>
                 <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-brandDark text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors" data-i18n="btn_reset">Reset Semua Filter</button>
             </div>
         </div>
 
-        <!-- === ANALYTICS VIEW (DASHBOARD GRAFIK) === -->
+        <!-- === ANALYTICS VIEW === -->
         <div id="analyticsView" class="hidden flex-1 flex-col overflow-y-auto p-4 lg:p-8 bg-gray-50 w-full fade-in">
             <div class="mb-8 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
                 <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="analytics_title">Pusat Analisis & Sentimen Media</h2>
@@ -223,23 +220,18 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <!-- Sentimen Chart -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center hover:shadow-md transition-shadow">
                     <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 w-full text-center border-b border-gray-100 pb-2" data-i18n="chart_sentiment">🎭 Peta Sentimen Berita</h3>
                     <div class="w-full h-[220px] relative">
                         <canvas id="sentimentChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Kategori Chart -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center hover:shadow-md transition-shadow">
                     <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 w-full text-center border-b border-gray-100 pb-2" data-i18n="chart_category">🗂️ Top 7 Rubrik Teraktif</h3>
                     <div class="w-full h-[220px] relative">
                         <canvas id="categoryChart"></canvas>
                     </div>
                 </div>
-
-                <!-- Portal Chart -->
                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center hover:shadow-md transition-shadow">
                     <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 w-full text-center border-b border-gray-100 pb-2" data-i18n="chart_portal">📰 Dominasi Portal</h3>
                     <div class="w-full h-[220px] relative">
@@ -248,7 +240,6 @@
                 </div>
             </div>
 
-            <!-- Tren Volume -->
             <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-8 w-full hover:shadow-md transition-shadow">
                 <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2" data-i18n="chart_timeline">📈 Mobilitas Volume Pemberitaan Harian</h3>
                 <div class="w-full h-[300px] relative">
@@ -256,7 +247,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <script>
@@ -273,7 +263,7 @@
                 status_updated: "Data Mutakhir",
                 search_placeholder: "Lacak isu, tokoh, atau kata kunci berita...",
                 period_label: "Periode:",
-                opt_today: "Hari Ini (24 Jam Terakhir)",
+                opt_today: "Hari Ini (24 Jam)",
                 opt_7days: "7 Hari Terakhir",
                 opt_30days: "30 Hari Terakhir",
                 opt_all: "Semua Arsip Berita",
@@ -309,9 +299,9 @@
                 sys_status: "System Status",
                 status_sync: "Synchronizing...",
                 status_updated: "Data up-to-date",
-                search_placeholder: "Track issues, figures, or news keywords...",
+                search_placeholder: "Track issues, figures, or keywords...",
                 period_label: "Period:",
-                opt_today: "Today (Last 24 Hours)",
+                opt_today: "Today (24 Hours)",
                 opt_7days: "Last 7 Days",
                 opt_30days: "Last 30 Days",
                 opt_all: "All News Archives",
@@ -537,7 +527,13 @@
             }).join('');
 
             var catData = activePortal === 'Semua' ? tempFiltered : tempFiltered.filter(function(d) { return d['Sumber'] === activePortal; });
-            var rawCats = catData.map(function(d) { return d['Kategori']; }).filter(Boolean);
+            
+            // FILTER KATEGORI ANGKA (Regex yang ketat)
+            var rawCats = catData.map(function(d) { return d['Kategori']; }).filter(function(c) {
+                // Jangan terima jika string tersebut MURNI hanya berisi angka
+                return c && !/^\d+$/.test(c.trim());
+            });
+            
             var uniqueCats = [];
             rawCats.forEach(function(c) { if(uniqueCats.indexOf(c) === -1) uniqueCats.push(c); });
             var categories = ['Semua'].concat(uniqueCats.sort());
@@ -579,7 +575,6 @@
                     if(!isNaN(d)) timeDisplay = d.toLocaleTimeString(currentLang === 'en' ? 'en-US' : 'id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
                 } catch(e) {}
 
-                // Placeholder image jika kolom 'Gambar' belum ada di CSV
                 var fallbackImg = "https://placehold.co/400x300/f8f9fa/9ca3af?text=" + encodeURIComponent(sumber);
                 var imgUrl = item['Gambar'] || item['Image URL'] || fallbackImg;
 
@@ -676,9 +671,6 @@
             document.getElementById('syncStatus').classList.add('text-red-500');
         }
 
-        // ==========================================
-        // FITUR INTERAKTIF: LIPAT SIDEBAR & SCROLL HEADER
-        // ==========================================
         var isSidebarCollapsed = false;
         window.toggleSidebar = function() {
             isSidebarCollapsed = !isSidebarCollapsed;
@@ -781,7 +773,41 @@
             });
         }
 
-        window.onload = initApp;
+        // Fitur Mouse Drag to Scroll
+        function makeScrollable(slider) {
+            if (!slider) return;
+            var isDown = false;
+            var startX;
+            var scrollLeft;
+
+            slider.addEventListener('mousedown', function(e) {
+                isDown = true;
+                slider.classList.add('is-dragging');
+                startX = e.pageX - slider.offsetLeft;
+                scrollLeft = slider.scrollLeft;
+            });
+            slider.addEventListener('mouseleave', function() {
+                isDown = false;
+                slider.classList.remove('is-dragging');
+            });
+            slider.addEventListener('mouseup', function() {
+                isDown = false;
+                slider.classList.remove('is-dragging');
+            });
+            slider.addEventListener('mousemove', function(e) {
+                if (!isDown) return;
+                e.preventDefault();
+                var x = e.pageX - slider.offsetLeft;
+                var walk = (x - startX) * 2;
+                slider.scrollLeft = scrollLeft - walk;
+            });
+        }
+
+        window.onload = function() {
+            initApp();
+            makeScrollable(document.getElementById('portalContainer'));
+            makeScrollable(document.getElementById('categoryContainer'));
+        };
     </script>
 </body>
 </html>
