@@ -51,7 +51,7 @@ def clean_text(text):
     return cleaned.strip()
 
 def extract_image(element):
-    """Fungsi ajaib untuk mencari URL thumbnail gambar dari elemen HTML berita."""
+    """Fungsi ajaib menembus lazy-loading untuk mencari URL thumbnail gambar."""
     img = element.find('img')
     # Jika gambar tidak ada langsung di dalam tag <a>, cari di elemen bungkusnya (parent)
     if not img and element.parent:
@@ -60,8 +60,11 @@ def extract_image(element):
         img = element.parent.parent.find('img')
         
     if img:
-        # Mengambil atribut gambar (seringkali pakai data-src untuk lazy loading portal berita)
-        return img.get('src') or img.get('data-src') or img.get('data-original') or ""
+        # KUNCI: Prioritaskan atribut lazy-loading sebelum atribut 'src' standar
+        url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
+        if url.startswith('//'):
+            url = 'https:' + url
+        return url
     return ""
 
 def extract_category(url, tipe):
