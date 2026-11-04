@@ -18,13 +18,13 @@ CSV_FILE = "berita_news.csv"
 WIB = timezone(timedelta(hours=7))
 
 TARGETS = [
-    {"sumber": "detikNews", "url": "https://news.detik.com/berita", "tipe": "detik"},
-    {"sumber": "Kompas.com Nasional", "url": "https://nasional.kompas.com", "tipe": "kompas"},
-    {"sumber": "CNN Indonesia", "url": "https://www.cnnindonesia.com/nasional", "tipe": "cnn"},
-    {"sumber": "Tribunnews Nasional", "url": "https://www.tribunnews.com/nasional", "tipe": "tribun"},
-    {"sumber": "SINDOnews Nasional", "url": "https://nasional.sindonews.com", "tipe": "sindo"},
-    {"sumber": "iNews Nasional", "url": "https://www.inews.id/news/nasional", "tipe": "inews"},
-    {"sumber": "Liputan6 News", "url": "https://www.liputan6.com/news", "tipe": "liputan6"}
+    {"sumber": "DetikCom", "url": "https://www.detik.com", "tipe": "detik"},
+    {"sumber": "Kompas.com", "url": "https://www.kompas.com", "tipe": "kompas"},
+    {"sumber": "CNN Indonesia", "url": "https://www.cnnindonesia.com", "tipe": "cnn"},
+    {"sumber": "Tribunnews", "url": "https://www.tribunnews.com", "tipe": "tribun"},
+    {"sumber": "SINDOnews", "url": "https://www.sindonews.com", "tipe": "sindo"},
+    {"sumber": "iNews", "url": "https://www.inews.id", "tipe": "inews"},
+    {"sumber": "Liputan6", "url": "https://www.liputan6.com", "tipe": "liputan6"}
 ]
 
 def get_session():
@@ -34,7 +34,6 @@ def get_session():
     return session
 
 def clean_text(text):
-    """Membersihkan judul dari spasi ganda, tag waktu, tanggal rilis, dan karakter pemecah CSV."""
     if not isinstance(text, str) or not text:
         return ""
     cleaned = " ".join(text.split())
@@ -51,16 +50,56 @@ def clean_text(text):
     
     return cleaned.strip()
 
+def extract_image(element):
+    """Fungsi ajaib untuk mencari URL thumbnail gambar dari elemen HTML berita."""
+    img = element.find('img')
+    # Jika gambar tidak ada langsung di dalam tag <a>, cari di elemen bungkusnya (parent)
+    if not img and element.parent:
+        img = element.parent.find('img')
+    if not img and element.parent and element.parent.parent:
+        img = element.parent.parent.find('img')
+        
+    if img:
+        # Mengambil atribut gambar (seringkali pakai data-src untuk lazy loading portal berita)
+        return img.get('src') or img.get('data-src') or img.get('data-original') or ""
+    return ""
+
+def extract_category(url, tipe):
+    """Fungsi ajaib untuk mengekstrak rubrik/kategori langsung dari URL berita"""
+    try:
+        clean = re.sub(r'^https?://(www\.)?', '', url)
+        parts = clean.split('/')
+        domain_parts = parts[0].split('.')
+        
+        if tipe == 'kompas':
+            if len(domain_parts) >= 3 and domain_parts[0] != 'www':
+                return domain_parts[0].title() # cth: regional.kompas.com -> Regional
+            elif len(parts) > 1:
+                return parts[1].title()
+        elif tipe == 'detik':
+            if len(domain_parts) >= 3 and domain_parts[0] != 'www':
+                sub = domain_parts[0].title()
+                if sub.lower() == 'news' and len(parts) > 1: return parts[1].title()
+                return sub
+        else:
+            if len(parts) > 1:
+                cat = parts[1].replace('-', ' ').title()
+                if cat.lower() in ['read', 'news', 'detail'] and len(parts) > 2:
+                    return parts[2].title()
+                return cat
+    except: pass
+    return "Umum"
+
 # 1. DETIKNEWS
 def parse_detik(soup, sumber):
     articles = []
     for el in soup.find_all("a", attrs={"dtr-ttl": True}):
         title = clean_text(el.get("dtr-ttl", ""))
         link = el.get("href", "").strip()
-        section = clean_text(el.get("dtr-evt", "")).title()
         article_id = el.get("dtr-id", "").strip()
+        img_url = extract_image(el)
 
-        if any(x in section.lower() for x in ["header", "footer", "menu", "logo", "login"]):
+        if any(x in title.lower() for x in ["header", "footer", "menu", "logo", "login"]):
             continue
         if not article_id.isdigit():
             m = re.search(r'/d-(\d+)/', link)
@@ -70,26 +109,29 @@ def parse_detik(soup, sumber):
         if len(title) >= 20 and link.startswith("http"):
             articles.append({
                 "Sumber": sumber,
-                "Kategori": "Berita & Peristiwa",
+                "Kategori": extract_category(link, 'detik'),
                 "Judul": title,
-                "URL": link
+                "URL": link,
+                "Gambar": img_url
             })
     return articles
 
-# 2. KOMPAS NASIONAL
+# 2. KOMPAS
 def parse_kompas(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
-        if "kompas.com/read/" in link:
+        if ".kompas.com/read/" in link or "kompas.com/read/" in link:
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
+            img_url = extract_image(a)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "baca juga", "artikel kompas"]):
                 articles.append({
                     "Sumber": sumber,
-                    "Kategori": "Nasional & Kebijakan",
+                    "Kategori": extract_category(link, 'kompas'),
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
@@ -98,36 +140,41 @@ def parse_cnn(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
-        if "cnnindonesia.com/nasional/" in link:
+        # Ambil semua berita yang memiliki tanggal di URL-nya (format cnn)
+        if "cnnindonesia.com/" in link and re.search(r'/\d{4}\d{2}\d{2}', link):
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
+            img_url = extract_image(a)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "video", "baca juga", "fokus"]):
                 articles.append({
                     "Sumber": sumber,
-                    "Kategori": "Nasional & Politik",
+                    "Kategori": extract_category(link, 'cnn'),
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
-# 4. TRIBUNNEWS NASIONAL
+# 4. TRIBUNNEWS
 def parse_tribun(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
-        if "tribunnews.com/nasional/" in link and re.search(r'/\d{4}/\d{2}/\d{2}/', link):
+        if "tribunnews.com/" in link and re.search(r'/\d{4}/\d{2}/\d{2}/', link):
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
+            img_url = extract_image(a)
             if len(title) >= 25 and not any(x in title.lower() for x in ["halaman selanjutnya", "lihat foto", "arsip"]):
                 articles.append({
                     "Sumber": sumber,
-                    "Kategori": "Peristiwa Nasional",
+                    "Kategori": extract_category(link, 'tribun'),
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
-# 5. SINDONEWS NASIONAL
+# 5. SINDONEWS
 def parse_sindo(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
@@ -135,46 +182,52 @@ def parse_sindo(soup, sumber):
         if "sindonews.com/read/" in link:
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
+            img_url = extract_image(a)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "halaman", "baca juga"]):
                 articles.append({
                     "Sumber": sumber,
-                    "Kategori": "Nasional & Politik",
+                    "Kategori": extract_category(link, 'sindo'),
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
-# 6. INEWS NASIONAL
+# 6. INEWS
 def parse_inews(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
-        if "inews.id/news/" in link:
+        if "inews.id/" in link and re.search(r'/read/\d+', link):
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
+            img_url = extract_image(a)
             if len(title) >= 25 and not any(x in title.lower() for x in ["lihat foto", "video", "baca juga"]):
                 articles.append({
                     "Sumber": sumber,
-                    "Kategori": "Peristiwa & Hukum",
+                    "Kategori": extract_category(link, 'inews'),
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
-# 7. LIPUTAN6 NEWS
+# 7. LIPUTAN6
 def parse_liputan6(soup, sumber):
     articles = []
     for a in soup.find_all("a", href=True):
         link = a["href"].split("?")[0].strip()
-        if "liputan6.com/news/read/" in link:
+        if "liputan6.com/" in link and "/read/" in link:
             raw_title = a.get("title") or a.get_text()
             title = clean_text(raw_title)
+            img_url = extract_image(a)
             if len(title) >= 25:
                 articles.append({
                     "Sumber": sumber,
-                    "Kategori": "Hukum & Politik",
+                    "Kategori": extract_category(link, 'liputan6'),
                     "Judul": title,
-                    "URL": link
+                    "URL": link,
+                    "Gambar": img_url
                 })
     return articles
 
@@ -229,8 +282,10 @@ def run_job():
     # 1. ADD SENTIMENT PLACEHOLDERS SO COLUMNS MATCH
     df_new["Sentimen"] = ""
     df_new["Skor Sentimen"] = ""
+    if "Gambar" not in df_new.columns:
+        df_new["Gambar"] = ""
     
-    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL", "Sentimen", "Skor Sentimen"]
+    kolom_urut = ["Waktu Tarik", "Sumber", "Kategori", "Judul", "URL", "Gambar", "Sentimen", "Skor Sentimen"]
     df_new = df_new[kolom_urut]
 
     if os.path.exists(CSV_FILE):
@@ -239,6 +294,7 @@ def run_job():
             # Ensure existing file has the columns too, to prevent mismatch
             if "Sentimen" not in df_existing.columns: df_existing["Sentimen"] = ""
             if "Skor Sentimen" not in df_existing.columns: df_existing["Skor Sentimen"] = ""
+            if "Gambar" not in df_existing.columns: df_existing["Gambar"] = ""
             
             # Bersihkan judul-judul lama yang sudah tersimpan agar seragam
             df_existing["Judul"] = df_existing["Judul"].apply(clean_text)
