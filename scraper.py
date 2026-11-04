@@ -5,7 +5,7 @@ def clean_text(text):
     return " ".join(text.split())
 
 def extract_image(element):
-    """Fungsi untuk mencari URL thumbnail gambar dari elemen HTML berita."""
+    """Fungsi ajaib menembus lazy-loading untuk mencari URL thumbnail gambar."""
     img = element.find('img')
     if not img and element.parent:
         img = element.parent.find('img')
@@ -13,7 +13,12 @@ def extract_image(element):
         img = element.parent.parent.find('img')
         
     if img:
-        return img.get('src') or img.get('data-src') or img.get('data-original') or ""
+        # KUNCI: Prioritaskan atribut lazy-loading sebelum atribut 'src' standar
+        url = img.get('data-src') or img.get('data-original') or img.get('src') or ""
+        # Bersihkan URL jika formatnya //domain.com
+        if url.startswith('//'):
+            url = 'https:' + url
+        return url
     return ""
 
 def parse_detik(soup, sumber):
