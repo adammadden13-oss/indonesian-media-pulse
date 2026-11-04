@@ -1,64 +1,51 @@
-Waktu Tarik,Sumber,Kategori,Judul,URL
-2026-09-10 09:03:39,System Debug,Peringatan Sistem,Peringatan: Gagal menarik data Film/Series. Periksa API Key TMDb atau hadangan Cloudflare.,-
-2026-09-10 10:41:17,TMDb Trending,Film Bioskop & Box Office,Mutiny,https://www.themoviedb.org/movie/1288445
-2026-09-13 10:16:12,TMDb Trending,Film Bioskop & Box Office,"The Runner: Dalam film triler psikologis The Runner, Maia Marten, seorang pengacara London yang pintar, merasa hidupnya hancur oleh ...",https://www.themoviedb.org/movie/1386315
-2026-09-15 10:29:59,TMDb Trending,Film Bioskop & Box Office,One Night Only,https://www.themoviedb.org/movie/1433367
-2026-09-16 10:25:42,TMDb Trending,Film Bioskop & Box Office,"Mayday: Saat seorang pilot Angkatan Laut AS dalam misi rahasia selama Perang Dingin terjebak di belakang garis musuh, satu-satun...",https://www.themoviedb.org/movie/1137844
-2026-09-22 10:24:35,TMDb Trending,Film Bioskop & Box Office,Moana,https://www.themoviedb.org/movie/1108427
-2026-09-24 15:17:20,TMDb Trending,Film Bioskop & Box Office,Toi+Moi - Seuls contre tous,https://www.themoviedb.org/movie/1641629
-2026-09-25 15:55:07,TMDb Trending,Film Bioskop & Box Office,UNABOMBER,https://www.themoviedb.org/movie/1492640
-2026-09-25 15:55:07,TMDb Trending,Film Bioskop & Box Office,Teenage Sex and Death at Camp Miasma,https://www.themoviedb.org/movie/1240889
-2026-09-26 10:38:10,TMDb Trending,Film Bioskop & Box Office,"The Odyssey: Odysseus, raja legendaris Yunani dari Ithaca, memulai perjalanan panjang dan berbahaya untuk pulang setelah Perang Troya...",https://www.themoviedb.org/movie/1368337
-2026-09-27 10:46:43,TMDb Trending,Film Bioskop & Box Office,The End of Oak Street,https://www.themoviedb.org/movie/1101383
-2026-09-28 10:46:13,TMDb Trending,Film Bioskop & Box Office,"Unabomber: Di drama yang terinspirasi kisah nyata ini, jalan Ted Kaczynski dari seorang genius dan objek percobaan di Harvard sampa...",https://www.themoviedb.org/movie/1492640
-2026-09-28 10:46:13,TMDb Trending,Film Bioskop & Box Office,One Last Shot,https://www.themoviedb.org/movie/1607127
-2026-09-28 10:46:13,TMDb Trending,Film Bioskop & Box Office,Toy Story 5,https://www.themoviedb.org/movie/1084244
-2026-09-29 11:20:58,TMDb Trending,Film Bioskop & Box Office,Heart of the Beast,https://www.themoviedb.org/movie/1263337
-2026-09-30 11:04:42,TMDb Trending,Film Bioskop & Box Office,"Hipotesis Cinta: Berdasarkan novel laris New York Times, Hipotesis Cinta menceritakan Olive, calon Ph.D. yang spontan mencium profesor pa...",https://www.themoviedb.org/movie/1032863
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #1: Sekawan Limo 2: Gunung Klawih,https://flixpatrol.com/title/sekawan-limo-2-gunung-klawih/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #2: UNABOMBER,https://flixpatrol.com/title/unabomber-2026/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #3: I&#39;ll Hold You Always,https://flixpatrol.com/title/ill-hold-you-always/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #4: General Mayhem: The Killing of Brigadier J,https://flixpatrol.com/title/general-mayhem-the-killing-of-brigadier-j/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #5: Tumbal Proyek,https://flixpatrol.com/title/tumbal-proyek/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #6: Ghost in the Cell,https://flixpatrol.com/title/ghost-in-the-cell/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #7: Haunted Universities 4,https://flixpatrol.com/title/haunted-universities-4/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #8: Sengkolo: Petaka Satu Suro,https://flixpatrol.com/title/sengkolo-petaka-satu-suro/
-2026-10-04 11:24:01,Netflix Indonesia,Top 10 Streaming,Peringkat #9: Kung Fu Hustle,https://flixpatrol.com/title/kung-fu-hustle/
-2026-10-05 11:10:28,TMDb Trending,Film Bioskop & Box Office,Coyote vs. Acme,https://www.themoviedb.org/movie/1204680
-2026-10-05 11:10:28,TMDb Trending,Film Bioskop & Box Office,"UNABOMBER: Di drama yang terinspirasi kisah nyata ini, jalan Ted Kaczynski dari seorang genius dan objek percobaan di Harvard sampa...",https://www.themoviedb.org/movie/1492640
-2026-10-06 11:58:39,TMDb Trending,Film Bioskop & Box Office,Runner,https://www.themoviedb.org/movie/1377237
-2026-10-08 11:36:50,TMDb Trending,Film Bioskop & Box Office,The Uprising,https://www.themoviedb.org/movie/977942
-2026-10-12 11:26:03,TMDb Trending,Film Bioskop & Box Office,Onslaught,https://www.themoviedb.org/movie/1284046
-2026-10-14 10:37:21,TMDb Trending,Film Bioskop & Box Office,Digger,https://www.themoviedb.org/movie/1248832
-2026-10-14 10:37:21,TMDb Trending,Film Bioskop & Box Office,Insidious: Out of the Further,https://www.themoviedb.org/movie/1291595
-2026-10-14 10:37:21,TMDb Trending,Film Bioskop & Box Office,Fall 2: Deadpoint,https://www.themoviedb.org/movie/1101412
-2026-10-15 10:17:42,TMDb Trending,Film Bioskop & Box Office,호프,https://www.themoviedb.org/movie/1058424
-2026-10-15 10:17:42,TMDb Trending,Film Bioskop & Box Office,Other Mommy,https://www.themoviedb.org/movie/1400837
-2026-10-17 10:04:28,TMDb Trending,Film Bioskop & Box Office,Buddy,https://www.themoviedb.org/movie/1514026
-2026-10-18 10:07:12,TMDb Trending,Film Bioskop & Box Office,"Matchbox the Movie: Ketika sekelompok mantan teman masa kecil bertemu kembali, reuni mereka menjadi kacau saat tak sengaja menemukan konspir...",https://www.themoviedb.org/movie/1148365
-2026-10-19 10:21:01,TMDb Trending,Film Bioskop & Box Office,"Animals: Saat putra mereka diculik, seorang kandidat wali kota LA dan istrinya kalang kabut mengumpulkan tebusan sambil membuat k...",https://www.themoviedb.org/movie/1236045
-2026-10-20 10:29:38,TMDb Trending,Film Bioskop & Box Office,Practical Magic 2,https://www.themoviedb.org/movie/1302904
-2026-10-21 10:24:07,TMDb Trending,Film Bioskop & Box Office,"Love of Your Life: Disutradarai Rachel Morrison, LOVE OF YOUR LIFE mengikuti Maya, yang pertemuannya dengan Charlie memicu kisah cinta luar...",https://www.themoviedb.org/movie/1381078
-2026-10-23 10:27:56,TMDb Trending,Film Bioskop & Box Office,Whalefall,https://www.themoviedb.org/movie/1255833
-2026-10-25 10:17:37,TMDb Trending,Film Bioskop & Box Office,"Masterplan: Saat seorang pencuri legendaris mengincar Mona Lisa, dia merekrut dua orang asing: Chiara, pakar kejahatan siber asal It...",https://www.themoviedb.org/movie/1561726
-2026-10-26 10:19:08,TMDb Trending,Film Bioskop & Box Office,Street Fighter,https://www.themoviedb.org/movie/1153576
-2026-10-26 10:19:08,TMDb Trending,Film Bioskop & Box Office,"Tenzing: Seorang pria yang gigih memulai misi berisiko tinggi, dan menaklukkan rintangan yang tampak mustahil, demi mewujudkan im...",https://www.themoviedb.org/movie/1288069
-2026-10-26 10:19:08,TMDb Trending,Film Bioskop & Box Office,Bad Apples,https://www.themoviedb.org/movie/1198654
-2026-10-27 10:47:40,TMDb Trending,Film Bioskop & Box Office,La bola negra,https://www.themoviedb.org/movie/1422041
-2026-10-28 11:05:41,TMDb Trending,Film Bioskop & Box Office,Sense and Sensibility,https://www.themoviedb.org/movie/1503762
-2026-10-29 11:28:37,TMDb Trending,Film Bioskop & Box Office,Hope: Sebuah penemuan misterius terjadi di pinggiran kota pelabuhan kecil. Para penduduk mendapati diri mereka dalam kondisi p...,https://www.themoviedb.org/movie/1058424
-2026-10-29 11:28:37,TMDb Trending,Film Bioskop & Box Office,The Cycle,https://www.themoviedb.org/movie/1290418
-2026-10-30 11:28:33,TMDb Trending,Film Bioskop & Box Office,Dune: Part Three: Bagian ketiga dan terakhir dari trilogi Dune karya Villeneuve. Berdasarkan novel Dune Messiah karya Frank Herbert....,https://www.themoviedb.org/movie/1170608
-2026-10-31 11:09:46,TMDb Trending,Film Bioskop & Box Office,"Spider-Man: Brand New Day: Empat tahun setelah peristiwa Spider-Man: No Way Home, Peter Parker sudah tidak ada lagi dan Spider-Man kini berada di p...",https://www.themoviedb.org/movie/969681
-2026-11-02 11:32:12,TMDb Trending,Film Bioskop & Box Office,Colisión,https://www.themoviedb.org/movie/1571955
-2026-11-02 11:32:12,TMDb Trending,Film Bioskop & Box Office,"Obsession: Setelah menghancurkan ""One Wish Willow"" yang misterius untuk memenangkan hati gebetannya, seorang romantis yang putus as...",https://www.themoviedb.org/movie/1339713
-2026-11-03 12:26:21,TMDb Trending,Film Bioskop & Box Office,"Avengers: Doomsday: Tiga semesta bertabrakan. Para pahlawan favorit kini berada di ambang kehancuran, bersiap menghadapi ancaman terbesar ya...",https://www.themoviedb.org/movie/1003596
-2026-11-03 12:26:21,TMDb Trending,Film Bioskop & Box Office,Forgotten Island,https://www.themoviedb.org/movie/1465063
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Resident Evil,https://www.themoviedb.org/movie/1423191
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Primetime,https://www.themoviedb.org/movie/1375441
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Verity,https://www.themoviedb.org/movie/1283515
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,ゴジラ-0.0,https://www.themoviedb.org/movie/1381071
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,The Dog Stars,https://www.themoviedb.org/movie/1384216
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Wildwood,https://www.themoviedb.org/movie/791523
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Apocalipsis Z: Nuevo mundo,https://www.themoviedb.org/movie/1507696
-2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Clayface,https://www.themoviedb.org/movie/1400940
+Waktu Tarik,Sumber,Kategori,Judul,URL,Gambar
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Resident Evil,https://www.themoviedb.org/movie/1423191,https://image.tmdb.org/t/p/w500/gAgWJhUSQWCgtKR8170nMkYlBda.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Primetime,https://www.themoviedb.org/movie/1375441,https://image.tmdb.org/t/p/w500/lmrulvLbmaejTix1YaMxo1oGhH1.jpg
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Kolaborasi Baru Jason Statham dan Guy Ritchie di Netflix,https://news.google.com/rss/articles/CBMimwFBVV95cUxQQlhnbEJhY0dfRE1mREtCWXBqZG9ndFFUSVJKblFfSjlPM0tmRWx0YlZheTRaMXNPeW5Dem1yaEM4OEhXSmFfSjM3d3c5WGhtc0tkanE3NEtQcktzQW5TMXM5YTBseGJyZVJhZ2RfbndYU0FzcDVVYXQ1VTNFZGZLRTJlaVVLSFFpWFNaNGpLRTlFZ2VWMzItQ3lJOA?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"Film Teori Cakrawala Hadir di Vidio, Kisah Guru Keliling di Pelosok Jember",https://news.google.com/rss/articles/CBMiZEFVX3lxTE9ZSzFLbEQ5aFpBbEpBcHhvdjVZYTVQSXNTNHNMZHQyaUItSUV0QTZFRDZ1MUh0M2VZTDdTTnM2aE1UX3RWeEFYaTVYQkpweG5KaDZoaUlPSndYd2pmS01BVmljdk8?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Diana Pungky Comeback Layar Lebar di Film ‘5CM: EVOLUSI HATI’,https://news.google.com/rss/articles/CBMiU0FVX3lxTE1qSEtINHFNa2NBakEzWHpsVUxONHlsSHdvMEloZVpyd2pHYzFkY1M5TFhpOFR5QUR2N19uSU5EM21KTlZKQXRvcnFBWDh4M0RFZTRn?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"Film Horor-Thriller Korea My Home Rilis Poster dan Teaser, Kisah Apartemen Mewah Penuh Teror",https://news.google.com/rss/articles/CBMi2wFBVV95cUxQajNic2JiTFpNdHR1Mk5aTkxSaHN5OGczRUZkRklEcEV1TlduVElLQ1BOUmF1ektITEw0WjdRVEZlR3MxY2VpRFRoVm94SDRnWVZDekVULWYydEtmd2x4NFNoX0RPRUV5Mm9MdEpWYnRFbWpsY0xvVGtFM3FnV3VBcy1FRDBsbmU0LUJXcWlqWVFuZ01xbm9Bbm9xSXFrWktKNlIzODFwdWtCbHFWbkpfWl90SnlGQVJOX1FEbjNKZ1NSYjR0R2N1eXYwdGNDcFEtMGl4Yzhsbkx4ZGPSAeABQVVfeXFMTjBVTDcydTd1Y2M5eEhtT09ueU5VYWpNWGdJNGVFc1NzZVJWc24ydk12cmRBSDV3TFdRakFPaXB6d3RhaXEwbFFtYnJFVHdWTjFoSU93S0pTS3hRY25TU2hWN19KN195VmQxQ0l6TEF3OHdUaUlycmR1V0FBd0J5WVVWRVFEZG0zTHY2UFJ4cnJtVm04Y3ZncjVCUG91WmlIUGdZdURSN0hnYkpXUGlsZjVxeWVnRDFiZDNZUDNGcllRZXRTZVYxUGk3X285TU1GMzJoRHlXTnptMUF0MUNoa08?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Film baru yang dibintangi oleh pemenang Aktor Terbaik Hwang Jung Min dan aktris utama dari 'Squid Game' mengalami kegagalan.,https://news.google.com/rss/articles/CBMingFBVV95cUxOaHB4MkExU3RwMEhsLUhOdEhoNFQzXy11R2FGOG1NaFpLOHg3aVV3ckUyWnNBOWVKdzk3UzFkckJoVFQ0dFl0SVZLcFd1U0RHZXhMYTBkUndWbUE1TWRSaEUwQWxVUHd5eWdILTJrN0gxZndvYTlQM2o1MERrMEVnaE1RWTRnZEpBOXVUMkZfVkY0U0VQZjVJanp6S3cyQQ?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Film Indonesia: Antara Kreativitas dan Rutinitas yang Membosankan,https://news.google.com/rss/articles/CBMiygFBVV95cUxPcmRmeVB6akVlRWgxUms1VElpUC0tMVFmQk9GWGF1bFVKdG5JaVB6MFpVLWxJRi15OGRLUGE1c1pqMXJvMEVQcWhXbGt4ZVc4T2ZvcGFJUW9VTHVyQmNBUUdneHpoTUNpSkxKWUxRRUVleFpXc0ZZTzUyamZJNE5XVHdCdFk3d2dTem9MMWtMalhkS3lEVGRudDF6SzA3OEd5XzhBRXhOZ3ZWb1ZNdEFPUlExcWJWQlhyWDE5WVplYTVwcUM3SVNQOE1n?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Konser BTS di Jakarta bakal tayang 'livestream' di bioskop lebih dari 80 negara,https://news.google.com/rss/articles/CBMikwFBVV95cUxQb1JXUEpzbFAxa041RWlhQnFoS2ZGTFptYTgtU2JFY0VpTFJoTmswb2NJeEY2WVBhVk5LTWpuWEloZ3lTem9wSEpYcmZJUW5XNjZOazBOZFpmaG5TdTZWS25meFRKZV9OWlRsMUxSR3FFamlVenVRQVZadzU5a0xhWU00ZnN0Ylo2UnRzamZLM2dZLTQ?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Riefky: Film Sejarah Jadi Sumber Inspirasi Industri Ekonomi Kreatif,https://news.google.com/rss/articles/CBMisAFBVV95cUxQN0haTnVscHZZY3VSR1FQbFRDekt6c1BHb1EtVURLbHNJaFpUTXlXZ0g4dm5ZQUVmMkI2bzBuQW1HcTlHTVFWNlc4VVFrRDZJR1NkRy1oOGRXR3k5MDd6SmhfY2RmR09JN2lpSlI0SzBkWmk1czZGSHNOWUJFRW1zQUd2VkFyVUxsSlhVYWxjMXZBcnhxUjI4N05WZ21weGlkQ3ROTlA2WFRQUHFkZ1FQTg?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"Segera Tayang di Netflix, Film Animasi Terbaru ""Steps"" Suguhkan Kisah Segar",https://news.google.com/rss/articles/CBMitgFBVV95cUxQVGdtTWNuVzQtYXI2eWdJX2E2NWtmMVNKNzBwUmdla1V0Y2syQzMtRHZ0MlBPV0twRTlYT1JOQTRkbjJpNDJJc1VZdklzNk5XcGFsVjNtUEd6LUJkRzNVZGJnYndoYmtDM1pZY1Z2Q19UZEVIdThXQ0ZaZnlpbDU0YWhfZWx5MW54YU1FUkJmT1IwVnpzV1dLWmI1NmEtaC1FYVBsWVhiM1lHaUxnSk9PU2tmV1dtZw?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"Foto : Aceh Tak Ada Bioskop, Film Pasukan 1000 Janda Siap Gelar Nobar Khusus",https://news.google.com/rss/articles/CBMiwAFBVV95cUxOVjVvcWtIWW54V3pkMU9CQ3RsOURPdlg3eW44b19VYkdjSVdMQ1ZzejVEb01aUDF5THN3UEl4V0hLbi1ocmdjd1NIT1RJOGNTUHJ6eERiNGRLQjBRZXdvellKWGNwYlc5TXBFSXd5ZlhRdlIzSjZhc2RCa3FDMlN6cm9tMEFkSGcza3JFMFZOQ1BMODVscUZRdjBsRnJrRjBUZ3ktdDlQQ1ExdjZsdGtHSjdOdHRHNWx5VGRpLUV6eEE?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"Film Uti Deng Keke Hadir di Vidio, Persahabatan Empat Anak dari Manado ke Gorontalo",https://news.google.com/rss/articles/CBMiYkFVX3lxTE5xMXlUMERXb2lla08yQ0tDVkJ4bHNKTjZaazhCWi1sVkFlZXdrUkNUYXpXY1Q2VzdKdWZ6WDREa0RleHpWbHZxZFpibDlHajZ4d19rcDVOb2hBaTNGcHoyb0Zn?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"Sinopsis Godzilla Minus Zero, Duel Godzilla vs King Ghidorah",https://news.google.com/rss/articles/CBMiwAFBVV95cUxNY3RvVnZOQkF3azFHY3JrNUpXbmZ4Sy04TmtQRi10MjROeWpGdm9aeTlFSTlSLUJKLS0zaW5OMmMwVUdZcWdnMnVuV2dFeDFwbGJhTzRVbmpJV1BQb2FtNzFWdG1HVWJzdlFVb3hiMloyTDFUclpJNW9qUm1fM0xPMWhkQTk3UWYzdm5mZ1I5SnFvenFlOUNydWlLU3BBVm9UVzl0cmkyaUdvOHlBS0pZWGIxeGFpRjZXeGlDOG8wbmnSAcYBQVVfeXFMTTdCUElva2NjVDhCTGRTeDVjSGJNSDBVa1dZN1BGXzJQOVYteGNGa2F6Nk5TUWtnUXB6WDRtcl80ZnJkWGp5ZFJNd3RzM0EwWHd6ZUlscDZ4aFp1M2FtMnhyUXZfN0pIY2QtX1NnQk1CQXFtUWowa3FTODhxdFA0blNmRDZhRnEza0ZPTmc4bWtkMlpGVjcycHlLdkVvUFhPM1VUSUIyaG9raXBTQk1sU0ZoRTZ5WjVJZldnTU5NZnY5VDZSc3Vn?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,5 Serial Netflix Terbaru yang Tayang November,https://news.google.com/rss/articles/CBMijwFBVV95cUxQNEpoTVRfVGFPSU5IbF9BVUF1QWtOV2dFOEY4aHJhMnN2SlZFaGEzdW5IZjlSeC1lZWxXazdMX0N4T1dTVnZHSFVURFF6RnBZdWhmVG9TVi1xVmtSZTVURmNKNHRzd1BBU0RreW1kR2pncWR2NEFNRGNmMTRmdWlSR01xN0FoYUhXT0RjTXp6Y9IBlAFBVV95cUxPWEE0NVdhV1JGTmd2Q1dycHR5UjNVSUtZQk9WbmpCQUZrSkdBczdCT1Z2Z2hRTjlHbVFqdkZONzFkS0JwNDRRVzNXQWxsTWhza3VJLWw5UW05d3VURTkwX3NuMFdXMTRhQnRITS1oWDFWd1VMYmtqRVRRc2xjMnliSHJuODBVcG5UMF8wZWtqUWpFYjVV?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,Film Horor Tumbal Darah Siap Segera Tayang di Netflix,https://news.google.com/rss/articles/CBMilAFBVV95cUxOTlhfZTMwazMwMml2OTVMQ25CRW4xcUhNSHdIWkNzUFRzcDQ4NXhJRVFWVVBiSll5dm9EVG1EcjEzUjhVam9PZjI3U0VoM2lWWGVkWmVSbXVyTUhRTEhxcE96YUpCWS1KNWFQVHdNZGFkUzBhZkdZc1hCSDhBaWxqWEFBdDRxSG1ELW1mZHhBLVdtam4z?oc=5,
+2026-11-04 13:27:47,Google News Hiburan,Berita Film & Series,"50 Link Situs Nonton Film Legal 2026, Alternatif Resmi Pengganti LK21, IndoXXI, dan IDLIX",https://news.google.com/rss/articles/CBMiwwFBVV95cUxQRG45MXR1LUlxRzdyTFFQLXBMOUl3Z05WWVJkbzRHajdSb1dFc3l2bEFWNVY5bW9zTTBieUc0VTh5VWU0UXBINTVRa0hyRFVfQWJpMGs1YmVLUUd1ME85RXZPN3FNQm1ZQTN0ZEo5MThTWVdlaUdlQ0hULTV2eUtkUDRGd2lpOTRfejJNbktVZXp3WmJhX3dMR1YzUlBvc3dLQVhEeHNyNnZBQnBfVzB0dTNucEt6RThZR1FSaFZBNE9Hd1E?oc=5,
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,रामायणम्,https://www.themoviedb.org/movie/656908,https://image.tmdb.org/t/p/w500/gOWnXaBxqT6k2y40hKfYU6c0Ym.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Verity,https://www.themoviedb.org/movie/1283515,https://image.tmdb.org/t/p/w500/rmaNMA1seHqpjtnYKzyynFAr1g8.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Model Citizen,https://www.themoviedb.org/movie/1792170,https://image.tmdb.org/t/p/w500/7SE0LBwgqiqZzkm9gKVbBAbcNQL.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Wildwood,https://www.themoviedb.org/movie/791523,https://image.tmdb.org/t/p/w500/8g7q6o54WfKWRmUQ0Ye8OskevUY.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Minha Melhor Amiga,https://www.themoviedb.org/movie/1257147,https://image.tmdb.org/t/p/w500/wGfTFVeguXDXYrwPQ8QMFsaSK2M.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,A Story of Derry,https://www.themoviedb.org/movie/1813355,https://image.tmdb.org/t/p/w500/4PtzGcegF5Po1NmDAW9IklyvAUh.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,Beware Boiúna,https://www.themoviedb.org/movie/1244523,https://image.tmdb.org/t/p/w500/uW5YMPxJUzT9bkafrCKHXjPTCoQ.jpg
+2026-11-04 13:27:47,TMDb Trending,Film Bioskop & Box Office,ゴジラ-0.0,https://www.themoviedb.org/movie/1381071,https://image.tmdb.org/t/p/w500/zpcoFlZwyLnBt7bb5wmvGDCdg06.jpg
+2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Apocalipsis Z: Nuevo mundo,https://www.themoviedb.org/movie/1507696,
+2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,The Dog Stars,https://www.themoviedb.org/movie/1384216,
+2026-11-04 12:24:32,TMDb Trending,Film Bioskop & Box Office,Clayface,https://www.themoviedb.org/movie/1400940,
+2026-11-03 12:26:21,TMDb Trending,Film Bioskop & Box Office,Forgotten Island,https://www.themoviedb.org/movie/1465063,
+2026-11-03 12:26:21,TMDb Trending,Film Bioskop & Box Office,"Avengers: Doomsday: Tiga semesta bertabrakan. Para pahlawan favorit kini berada di ambang kehancuran, bersiap menghadapi ancaman terbesar ya...",https://www.themoviedb.org/movie/1003596,
+2026-11-02 11:32:12,TMDb Trending,Film Bioskop & Box Office,"Obsession: Setelah menghancurkan ""One Wish Willow"" yang misterius untuk memenangkan hati gebetannya, seorang romantis yang putus as...",https://www.themoviedb.org/movie/1339713,
+2026-11-02 11:32:12,TMDb Trending,Film Bioskop & Box Office,Colisión,https://www.themoviedb.org/movie/1571955,
+2026-10-31 11:09:46,TMDb Trending,Film Bioskop & Box Office,"Spider-Man: Brand New Day: Empat tahun setelah peristiwa Spider-Man: No Way Home, Peter Parker sudah tidak ada lagi dan Spider-Man kini berada di p...",https://www.themoviedb.org/movie/969681,
+2026-10-30 11:28:33,TMDb Trending,Film Bioskop & Box Office,Dune: Part Three: Bagian ketiga dan terakhir dari trilogi Dune karya Villeneuve. Berdasarkan novel Dune Messiah karya Frank Herbert....,https://www.themoviedb.org/movie/1170608,
+2026-10-29 11:28:37,TMDb Trending,Film Bioskop & Box Office,The Cycle,https://www.themoviedb.org/movie/1290418,
+2026-10-29 11:28:37,TMDb Trending,Film Bioskop & Box Office,Hope: Sebuah penemuan misterius terjadi di pinggiran kota pelabuhan kecil. Para penduduk mendapati diri mereka dalam kondisi p...,https://www.themoviedb.org/movie/1058424,
+2026-10-28 11:05:41,TMDb Trending,Film Bioskop & Box Office,Sense and Sensibility,https://www.themoviedb.org/movie/1503762,
+2026-10-27 10:47:40,TMDb Trending,Film Bioskop & Box Office,La bola negra,https://www.themoviedb.org/movie/1422041,
+2026-10-26 10:19:08,TMDb Trending,Film Bioskop & Box Office,"Tenzing: Seorang pria yang gigih memulai misi berisiko tinggi, dan menaklukkan rintangan yang tampak mustahil, demi mewujudkan im...",https://www.themoviedb.org/movie/1288069,
+2026-10-26 10:19:08,TMDb Trending,Film Bioskop & Box Office,Street Fighter,https://www.themoviedb.org/movie/1153576,
+2026-10-26 10:19:08,TMDb Trending,Film Bioskop & Box Office,Bad Apples,https://www.themoviedb.org/movie/1198654,
+2026-10-25 10:17:37,TMDb Trending,Film Bioskop & Box Office,"Masterplan: Saat seorang pencuri legendaris mengincar Mona Lisa, dia merekrut dua orang asing: Chiara, pakar kejahatan siber asal It...",https://www.themoviedb.org/movie/1561726,
+2026-10-23 10:27:56,TMDb Trending,Film Bioskop & Box Office,Whalefall,https://www.themoviedb.org/movie/1255833,
+2026-10-21 10:24:07,TMDb Trending,Film Bioskop & Box Office,"Love of Your Life: Disutradarai Rachel Morrison, LOVE OF YOUR LIFE mengikuti Maya, yang pertemuannya dengan Charlie memicu kisah cinta luar...",https://www.themoviedb.org/movie/1381078,
+2026-10-20 10:29:38,TMDb Trending,Film Bioskop & Box Office,Practical Magic 2,https://www.themoviedb.org/movie/1302904,
+2026-10-19 10:21:01,TMDb Trending,Film Bioskop & Box Office,"Animals: Saat putra mereka diculik, seorang kandidat wali kota LA dan istrinya kalang kabut mengumpulkan tebusan sambil membuat k...",https://www.themoviedb.org/movie/1236045,
+2026-10-18 10:07:12,TMDb Trending,Film Bioskop & Box Office,"Matchbox the Movie: Ketika sekelompok mantan teman masa kecil bertemu kembali, reuni mereka menjadi kacau saat tak sengaja menemukan konspir...",https://www.themoviedb.org/movie/1148365,
+2026-10-17 10:04:28,TMDb Trending,Film Bioskop & Box Office,Buddy,https://www.themoviedb.org/movie/1514026,
+2026-10-15 10:17:42,TMDb Trending,Film Bioskop & Box Office,Other Mommy,https://www.themoviedb.org/movie/1400837,
+2026-10-15 10:17:42,TMDb Trending,Film Bioskop & Box Office,호프,https://www.themoviedb.org/movie/1058424,
