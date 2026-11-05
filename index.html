@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Pulse | Executive Nexus</title>
+    <title>Intelijen Media & Arus Berita</title>
     
-    <!-- Favicon Khas Media Pulse -->
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%231b2609%22/><path fill=%22%23c4f033%22 d=%22M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z%22/></svg>" type="image/svg+xml">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind & Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse untuk membaca CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <!-- Chart.js untuk Grafik Analisis Sentimen & Tren -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -23,142 +20,103 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Sidebar Collapse Transitions */
-        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .collapsed-sidebar { width: 5rem !important; }
-        .collapsed-sidebar .sidebar-text { display: none !important; }
-        .collapsed-sidebar .lg\:justify-start { justify-content: center !important; }
-        .collapsed-sidebar .collapsed-sidebar-center { justify-content: center !important; }
-
-        /* Scroll Shrink Transitions */
-        #mainHeader, #feedFiltersView, #portalContainer, #categoryContainer {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .is-scrolled #mainHeader { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-        .is-scrolled #searchInput { padding-top: 0.375rem !important; padding-bottom: 0.375rem !important; font-size: 0.75rem !important; }
-        .is-scrolled #portalContainer { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
-        .is-scrolled #portalContainer button { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; font-size: 0.75rem !important; }
-        .is-scrolled #categoryContainer { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; min-height: 36px !important; }
-        .is-scrolled #categoryContainer button { padding-top: 0.125rem !important; padding-bottom: 0.125rem !important; font-size: 0.65rem !important; }
-        
-        /* Fitur Mouse Drag Scroll */
-        .drag-scroll { cursor: grab; user-select: none; }
-        .drag-scroll.is-dragging { cursor: grabbing; }
+        /* Kursor khusus untuk area yang bisa di drag */
+        .draggable { cursor: grab; }
+        .draggable:active { cursor: grabbing; }
     </style>
     
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brandLime: '#c4f033',
-                        brandDark: '#111827',
-                    }
-                }
-            }
+            theme: { extend: { colors: { brandLime: '#c4f033', brandDark: '#111827' } } }
         }
     </script>
 </head>
 <body class="text-gray-800 h-screen flex overflow-hidden">
 
     <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="w-20 lg:w-64 bg-brandDark text-white flex flex-col h-full shrink-0 shadow-xl z-20 transition-all duration-300">
+    <aside class="w-20 lg:w-64 bg-brandDark text-white flex flex-col h-full shrink-0 shadow-xl z-20 transition-all duration-300">
         <div class="h-16 flex items-center justify-center lg:justify-start lg:px-6 border-b border-gray-800">
             <svg class="w-8 h-8 shrink-0 drop-shadow-sm" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="50" fill="#1b2609"/>
                 <path d="M46 25 h10 v16 h14 v5 L52 75 h-7 v-16 h-15 v-6 L46 25 z" fill="#c4f033"/>
             </svg>
-            <span class="ml-3 font-bold text-lg hidden lg:block tracking-wide sidebar-text">MediaPulse</span>
+            <span class="ml-3 font-bold text-lg hidden lg:block tracking-wide">MediaPulse</span>
         </div>
-        <nav class="flex-1 py-6 flex flex-col gap-2 px-3 overflow-y-auto scrollbar-hide">
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block sidebar-text" data-i18n="cat_main">Kategori Utama</p>
+        <nav class="flex-1 py-6 flex flex-col gap-2 px-3">
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block" data-i18n="cat_utama">Kategori Utama</p>
             
             <a href="#" onclick="switchCategory('nasional')" id="navNasional" class="flex items-center gap-3 px-3 py-3 bg-gray-800/50 rounded-xl text-brandLime transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_nasional">Berita Nasional</span>
+                <span class="hidden lg:block font-medium" data-i18n="nav_nasional">Berita Nasional</span>
             </a>
             
             <a href="#" onclick="switchCategory('infotainment')" id="navInfo" class="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 rounded-xl text-gray-400 transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_info">Infotainment</span>
+                <span class="hidden lg:block font-medium" data-i18n="nav_infotainment">Infotainment</span>
             </a>
             
             <a href="#" onclick="switchCategory('hiburan')" id="navHiburan" class="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 rounded-xl text-gray-400 transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path></svg>
-                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_hiburan">Film & Hiburan</span>
+                <span class="hidden lg:block font-medium" data-i18n="nav_hiburan">Film & Hiburan</span>
             </a>
 
             <hr class="border-gray-800 my-2 mx-2">
             
-            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block sidebar-text" data-i18n="cat_command">Pusat Komando</p>
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 mb-1 hidden lg:block" data-i18n="cat_pusat">Pusat Komando</p>
             <a href="#" onclick="switchView('analytics')" id="navAnalytics" class="flex items-center gap-3 px-3 py-3 hover:bg-gray-800 rounded-xl text-gray-400 transition-colors">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                <span class="hidden lg:block font-medium sidebar-text" data-i18n="nav_analytics">Analisis Sentimen</span>
+                <span class="hidden lg:block font-medium" data-i18n="nav_analisis">Analisis Sentimen</span>
             </a>
         </nav>
-        <div class="p-4 border-t border-gray-800 text-center lg:text-left flex flex-col justify-center">
-            <p class="text-xs text-gray-500 hidden lg:block sidebar-text" data-i18n="sys_status">System Status</p>
+        <div class="p-4 border-t border-gray-800 text-center lg:text-left">
+            <p class="text-xs text-gray-500 hidden lg:block">System Status</p>
             <div class="flex items-center justify-center lg:justify-start gap-2 mt-1">
-                <div class="w-2 h-2 rounded-full bg-brandLime animate-pulse shrink-0"></div>
-                <span class="text-sm font-medium text-gray-300 hidden lg:block sidebar-text" id="syncStatus" data-i18n="status_sync">Sinkronisasi...</span>
+                <div class="w-2 h-2 rounded-full bg-brandLime animate-pulse"></div>
+                <span class="text-sm font-medium text-gray-300 hidden lg:block" id="syncStatus">Sinkronisasi...</span>
             </div>
-        </div>
-        <div class="p-3 border-t border-gray-800 hidden lg:flex justify-end collapsed-sidebar-center">
-            <button onclick="toggleSidebar()" class="text-gray-500 hover:text-white p-1 rounded-md hover:bg-gray-800 transition-all">
-                 <svg id="collapseIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
         </div>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-full bg-gray-50 relative overflow-hidden">
+    <main class="flex-1 flex flex-col h-full bg-gray-50 relative min-w-0">
         
-        <!-- Header: Search & Period Filter (PERBAIKAN LAYOUT RESPONSIVE) -->
-        <header id="mainHeader" class="w-full bg-white border-b border-gray-200 px-4 lg:px-6 py-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shrink-0 shadow-sm z-10 transition-all duration-300">
+        <!-- Header Utama -->
+        <header class="w-full bg-white border-b border-gray-200 px-4 lg:px-8 py-3 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4 shrink-0 shadow-sm z-10">
             <!-- Kotak Pencarian -->
-            <div class="w-full md:max-w-md lg:max-w-2xl relative shrink-0 flex-1">
-                <svg class="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="searchInput" data-i18n-placeholder="search_placeholder" placeholder="Lacak isu, tokoh, atau kata kunci berita..." class="w-full bg-gray-100 border-transparent rounded-full pl-10 pr-4 py-2 text-sm font-medium focus:bg-white focus:border-brandLime focus:ring-2 focus:ring-brandLime/50 transition-all shadow-inner outline-none">
+            <div class="flex-1 w-full min-w-[200px] max-w-2xl relative">
+                <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="searchInput" placeholder="Lacak isu, tokoh, atau kata kunci berita..." class="w-full bg-gray-100 border-transparent rounded-full pl-12 pr-4 py-2.5 text-sm font-medium focus:bg-white focus:border-brandLime focus:ring-2 focus:ring-brandLime/50 transition-all shadow-inner">
             </div>
             
-            <!-- Tombol Bahasa & Periode (Dijamin Tidak Terpotong) -->
-            <div class="w-full md:w-auto flex flex-wrap items-center justify-between md:justify-end gap-3 shrink-0">
-                <!-- Language Switcher -->
-                <div class="relative flex items-center bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer shrink-0">
-                    <select id="langSwitch" onchange="switchLanguage(this.value)" class="appearance-none bg-transparent text-gray-800 text-xs font-bold pl-3 pr-7 py-2 outline-none cursor-pointer">
-                        <option value="id" selected>ID</option>
-                        <option value="en">EN</option>
-                    </select>
-                    <svg class="w-3.5 h-3.5 absolute right-2.5 pointer-events-none text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
-                </div>
+            <!-- Kontrol Kanan (Bahasa & Periode) -->
+            <div class="flex items-center gap-3 shrink-0 ml-auto">
+                <select id="langSwitch" onchange="switchLanguage(this.value)" class="bg-gray-100 border-transparent text-gray-700 text-sm rounded-lg px-3 py-2.5 font-bold focus:ring-2 focus:ring-brandLime cursor-pointer transition-colors hover:bg-gray-200">
+                    <option value="id">🇮🇩 ID</option>
+                    <option value="en">🇬🇧 EN</option>
+                </select>
 
-                <!-- Filter Periode -->
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:block" data-i18n="period_label">Periode:</span>
-                    <select id="periodFilter" class="w-auto bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-1.5 font-medium focus:outline-none focus:border-gray-500 cursor-pointer shadow-sm">
-                        <option value="today" data-i18n="opt_today">Hari Ini (24 Jam)</option>
-                        <option value="7days" data-i18n="opt_7days">7 Hari Terakhir</option>
-                        <option value="30days" data-i18n="opt_30days">30 Hari Terakhir</option>
-                        <option value="all" data-i18n="opt_all">Semua Arsip</option>
-                    </select>
-                </div>
+                <select id="periodFilter" onchange="changePeriod(this.value)" class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg px-3 py-2.5 font-medium focus:outline-none focus:ring-2 focus:ring-brandLime/50 cursor-pointer shadow-sm hover:border-gray-400">
+                    <option value="today">Hari Ini (48 Jam Terakhir)</option>
+                    <option value="7days">7 Hari Terakhir</option>
+                    <option value="30days">30 Hari Terakhir</option>
+                    <option value="all">Semua Arsip Berita</option>
+                </select>
             </div>
         </header>
 
-        <!-- Filters & Topics Header -->
-        <div class="w-full bg-white border-b border-gray-200 shrink-0 shadow-sm z-0 transition-all duration-300" id="feedFiltersView">
-            <div class="px-4 lg:px-8 py-3 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide drag-scroll transition-all duration-300" id="portalContainer"></div>
-            <div class="px-4 lg:px-8 py-2 bg-gray-50 flex items-center gap-2 overflow-x-auto scrollbar-hide drag-scroll min-h-[48px] transition-all duration-300" id="categoryContainer"></div>
+        <!-- Filters (Portal & Category) -->
+        <div class="w-full bg-white border-b border-gray-200 shrink-0 shadow-sm z-0" id="feedFiltersView">
+            <div class="px-4 lg:px-8 py-3 border-b border-gray-100 flex items-center gap-2 overflow-x-auto scrollbar-hide draggable" id="portalContainer"></div>
+            <div class="px-4 lg:px-8 py-2 bg-gray-50 flex items-center gap-2 overflow-x-auto scrollbar-hide min-h-[48px] draggable" id="categoryContainer"></div>
         </div>
 
-        <!-- Timeline Feed Area -->
+        <!-- Feed List -->
         <div class="flex-1 overflow-y-auto p-4 lg:p-8 scroll-smooth flex flex-col" id="feedView">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-gray-800" data-i18n="timeline_title">Garis Waktu Pemberitaan</h2>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span id="feedCount" class="text-sm font-medium text-gray-500 bg-gray-200 px-3 py-1 rounded-full whitespace-nowrap">Memuat...</span>
-                    <select id="limitSelect" onchange="changeLimit(this.value)" class="bg-white border border-gray-300 text-gray-700 text-xs rounded-lg px-2.5 py-1.5 font-medium focus:outline-none cursor-pointer shadow-sm">
+                <h2 class="text-xl font-bold text-gray-800" data-i18n="judul_timeline">Garis Waktu Pemberitaan</h2>
+                <div class="flex items-center gap-3">
+                    <span id="feedCount" class="text-sm font-medium text-gray-500 bg-gray-200 px-3 py-1 rounded-full">Memuat...</span>
+                    <select id="limitSelect" onchange="changeLimit(this.value)" class="bg-white border border-gray-300 text-gray-700 text-xs rounded-lg px-2.5 py-1.5 font-medium cursor-pointer shadow-sm">
                         <option value="20" selected>20 Berita</option>
                         <option value="50">50 Berita</option>
                         <option value="100">100 Berita</option>
@@ -167,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- Timeline Cards -->
+            <!-- List Area -->
             <div class="relative border-l-2 border-gray-200 ml-3 lg:ml-4 space-y-6 pb-12" id="timelineList">
                 <div class="animate-pulse flex gap-4 ml-6 relative">
                     <div class="absolute -left-[35px] w-4 h-4 bg-gray-300 rounded-full border-4 border-white"></div>
@@ -177,271 +135,148 @@
 
             <!-- Empty State -->
             <div id="emptyState" class="hidden flex-col items-center justify-center py-20 text-center">
-                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
-                <h3 class="text-lg font-bold text-gray-800" data-i18n="empty_title">Tidak ada berita ditemukan</h3>
-                <p class="text-gray-500 text-sm mt-1" data-i18n="empty_desc">Coba sesuaikan kata kunci, periode waktu, atau filter portal Anda.</p>
-                <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-brandDark text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors" data-i18n="btn_reset">Reset Semua Filter</button>
+                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                <h3 class="text-lg font-bold text-gray-800">Tidak ada berita ditemukan</h3>
+                <p class="text-gray-500 text-sm mt-1">Coba sesuaikan kata kunci, periode waktu, atau filter portal Anda.</p>
+                <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-brandDark text-white text-sm font-medium rounded-lg hover:bg-gray-800">Reset Semua Filter</button>
             </div>
         </div>
 
-        <!-- === ANALYTICS VIEW === -->
+        <!-- Analytics Dashboard -->
         <div id="analyticsView" class="hidden flex-1 flex-col overflow-y-auto p-4 lg:p-8 bg-gray-50 w-full fade-in">
             <div class="mb-8 bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2" data-i18n="analytics_title">Pusat Analisis & Sentimen Media</h2>
-                <p class="text-gray-500 text-sm" data-i18n="analytics_desc">Visualisasi data pergerakan opini publik, dominasi isu, dan distribusi portal pemberitaan secara aktual.</p>
-                
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Pusat Analisis & Sentimen Media</h2>
+                <p class="text-gray-500 text-sm">Visualisasi pergerakan opini publik dan distribusi portal berita.</p>
                 <div class="mt-6 flex flex-wrap gap-2 border-t border-gray-100 pt-4" id="analyticsScopeContainer">
-                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider w-full mb-1" data-i18n="scope_label">Pilih Sumber Data Analisis:</span>
-                    <button onclick="setAnalyticsScope('all')" id="btnScope_all" class="px-4 py-2 rounded-lg text-sm font-bold bg-brandDark text-brandLime shadow-md transition-colors" data-i18n="scope_all">Semua Agregat</button>
-                    <button onclick="setAnalyticsScope('nasional')" id="btnScope_nasional" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors" data-i18n="scope_nasional">Berita Nasional</button>
-                    <button onclick="setAnalyticsScope('infotainment')" id="btnScope_infotainment" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors" data-i18n="scope_info">Infotainment</button>
-                    <button onclick="setAnalyticsScope('hiburan')" id="btnScope_hiburan" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors" data-i18n="scope_hiburan">Film & Hiburan</button>
-                </div>
-            </div>
-
-            <!-- AI Insight Panel -->
-            <div class="mb-6 bg-gradient-to-r from-brandDark to-gray-800 rounded-2xl p-5 lg:p-6 shadow-lg text-white border border-gray-700 fade-in relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-brandLime opacity-10 rounded-full blur-2xl"></div>
-                <h3 class="text-xs font-bold text-brandLime uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    <span data-i18n="ai_panel_title">Intelijen AI Cerdas</span>
-                </h3>
-                <p id="aiInsightText" class="text-sm lg:text-base leading-relaxed text-gray-200 font-medium" data-i18n="ai_loading">
-                    Menganalisis pergerakan arus media...
-                </p>
-            </div>
-
-            <!-- Trending Topics Row -->
-            <div class="mb-8 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm text-center">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2" data-i18n="wordcloud_header">☁️ Awan Topik Interaktif (Klik Kata untuk Melacak)</h3>
-                <div class="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 py-2" id="trendingTopicsContainer">
-                    <div class="animate-pulse bg-gray-200 h-6 w-20 rounded-full"></div>
+                    <button onclick="setAnalyticsScope('all')" id="btnScope_all" class="px-4 py-2 rounded-lg text-sm font-bold bg-brandDark text-brandLime shadow-md transition-colors">Semua Agregat</button>
+                    <button onclick="setAnalyticsScope('nasional')" id="btnScope_nasional" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">Berita Nasional</button>
+                    <button onclick="setAnalyticsScope('infotainment')" id="btnScope_infotainment" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">Infotainment</button>
+                    <button onclick="setAnalyticsScope('hiburan')" id="btnScope_hiburan" class="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">Film & Hiburan</button>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center hover:shadow-md transition-shadow">
-                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 w-full text-center border-b border-gray-100 pb-2" data-i18n="chart_sentiment">🎭 Peta Sentimen Berita</h3>
-                    <div class="w-full h-[220px] relative">
-                        <canvas id="sentimentChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center hover:shadow-md transition-shadow">
-                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 w-full text-center border-b border-gray-100 pb-2" data-i18n="chart_category">🗂️ Top 7 Rubrik Teraktif</h3>
-                    <div class="w-full h-[220px] relative">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center hover:shadow-md transition-shadow">
-                    <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 w-full text-center border-b border-gray-100 pb-2" data-i18n="chart_portal">📰 Dominasi Portal</h3>
-                    <div class="w-full h-[220px] relative">
-                        <canvas id="portalChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm mb-8 w-full hover:shadow-md transition-shadow">
-                <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2" data-i18n="chart_timeline">📈 Mobilitas Volume Pemberitaan Harian</h3>
-                <div class="w-full h-[300px] relative">
-                    <canvas id="timelineChart"></canvas>
-                </div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm"><div class="w-full h-[220px] relative"><canvas id="sentimentChart"></canvas></div></div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm"><div class="w-full h-[220px] relative"><canvas id="categoryChart"></canvas></div></div>
+                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm"><div class="w-full h-[220px] relative"><canvas id="portalChart"></canvas></div></div>
             </div>
         </div>
+
     </main>
 
+    <!-- SCRIPTS -->
     <script>
-        var translations = {
-            id: {
-                cat_main: "Kategori Utama",
-                nav_nasional: "Berita Nasional",
-                nav_info: "Infotainment",
-                nav_hiburan: "Film & Hiburan",
-                cat_command: "Pusat Komando",
-                nav_analytics: "Analisis Sentimen",
-                sys_status: "System Status",
-                status_sync: "Sinkronisasi...",
-                status_updated: "Data Mutakhir",
-                search_placeholder: "Lacak isu, tokoh, atau kata kunci berita...",
-                period_label: "Periode:",
-                opt_today: "Hari Ini (24 Jam)",
-                opt_7days: "7 Hari Terakhir",
-                opt_30days: "30 Hari Terakhir",
-                opt_all: "Semua Arsip Berita",
-                timeline_title: "Garis Waktu Pemberitaan",
-                empty_title: "Tidak ada berita ditemukan",
-                empty_desc: "Coba sesuaikan kata kunci, periode waktu, atau filter portal Anda.",
-                btn_reset: "Reset Semua Filter",
-                analytics_title: "Pusat Analisis & Sentimen Media",
-                analytics_desc: "Visualisasi data pergerakan opini publik, dominasi isu, dan distribusi portal pemberitaan secara aktual.",
-                scope_label: "Pilih Sumber Data Analisis:",
-                scope_all: "Semua Agregat",
-                scope_nasional: "Berita Nasional",
-                scope_info: "Infotainment",
-                scope_hiburan: "Film & Hiburan",
-                ai_panel_title: "Intelijen AI Cerdas",
-                ai_loading: "Menganalisis pergerakan arus media...",
-                wordcloud_header: "☁️ Awan Topik Interaktif (Klik Kata untuk Melacak)",
-                chart_sentiment: "🎭 Peta Sentimen Berita",
-                chart_category: "🗂️ Top 7 Rubrik Teraktif",
-                chart_portal: "📰 Dominasi Portal",
-                chart_timeline: "📈 Mobilitas Volume Pemberitaan Harian",
-                read_original: "Baca berita selengkapnya di sumber asli",
-                rubrik: "Rubrik:",
-                tercatat: "Tercatat:"
+        // Setup terjemahan sederhana
+        const translations = {
+            'id': {
+                'cat_utama': 'Kategori Utama', 'nav_nasional': 'Berita Nasional', 'nav_infotainment': 'Infotainment',
+                'nav_hiburan': 'Film & Hiburan', 'cat_pusat': 'Pusat Komando', 'nav_analisis': 'Analisis Sentimen',
+                'judul_timeline': 'Garis Waktu Pemberitaan', 'status_updated': 'Data Mutakhir'
             },
-            en: {
-                cat_main: "Main Categories",
-                nav_nasional: "National News",
-                nav_info: "Infotainment",
-                nav_hiburan: "Film & Entertainment",
-                cat_command: "Command Center",
-                nav_analytics: "Sentiment Analysis",
-                sys_status: "System Status",
-                status_sync: "Synchronizing...",
-                status_updated: "Data up-to-date",
-                search_placeholder: "Track issues, figures, or keywords...",
-                period_label: "Period:",
-                opt_today: "Today (24 Hours)",
-                opt_7days: "Last 7 Days",
-                opt_30days: "Last 30 Days",
-                opt_all: "All News Archives",
-                timeline_title: "News Timeline",
-                empty_title: "No news found",
-                empty_desc: "Try adjusting your keywords, time period, or portal filters.",
-                btn_reset: "Reset All Filters",
-                analytics_title: "Media Analytics & Sentiment Center",
-                analytics_desc: "Real-time visualization of public opinion trends, issue dominance, and news portal distribution.",
-                scope_label: "Select Analytics Data Source:",
-                scope_all: "All Aggregates",
-                scope_nasional: "National News",
-                scope_info: "Infotainment",
-                scope_hiburan: "Film & Entertainment",
-                ai_panel_title: "Smart AI Intelligence",
-                ai_loading: "Analyzing media flow movements...",
-                wordcloud_header: "☁️ Interactive Word Cloud (Click Word to Track)",
-                chart_sentiment: "🎭 News Sentiment Map",
-                chart_category: "🗂️ Top 7 Active Rubrics",
-                chart_portal: "📰 Portal Dominance",
-                chart_timeline: "📈 Daily News Volume Mobility",
-                read_original: "Read full article at original source",
-                rubrik: "Rubric:",
-                tercatat: "Recorded:"
+            'en': {
+                'cat_utama': 'Main Categories', 'nav_nasional': 'National News', 'nav_infotainment': 'Infotainment',
+                'nav_hiburan': 'Film & Ent.', 'cat_pusat': 'Command Center', 'nav_analisis': 'Sentiment Analytics',
+                'judul_timeline': 'News Timeline', 'status_updated': 'System Up-to-Date'
             }
         };
 
-        var currentLang = 'id';
+        const URL_NEWS = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_news.csv';
+        const URL_INFOTAINMENT = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_terkini.csv';
+        const URL_HIBURAN = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/film_dan_hiburan.csv';
+        
+        let dataNasional = [], dataInfotainment = [], dataHiburan = [];
+        let allNews = [], filteredNews = [];
+        
+        // Memori Penyimpanan (Local Storage)
+        let activePage = localStorage.getItem('mp_page') || 'nasional';
+        let activePeriod = localStorage.getItem('mp_period') || 'today';
+        let currentLang = localStorage.getItem('mp_lang') || 'id';
+        let currentView = localStorage.getItem('mp_view') || 'feed'; 
+        
+        let activePortal = 'Semua', activeCategory = 'Semua', searchQuery = '', displayLimit = 20, analyticsScope = 'all';
+        let charts = { sentiment: null, category: null, portal: null, timeline: null };
+
+        const portalColors = {
+            'DetikCom': 'text-blue-600 bg-blue-50 border-blue-200', 'Kompas.com': 'text-orange-600 bg-orange-50 border-orange-200',
+            'CNN Indonesia': 'text-red-600 bg-red-50 border-red-200', 'Tribunnews': 'text-cyan-600 bg-cyan-50 border-cyan-200',
+            'SINDOnews': 'text-sky-600 bg-sky-50 border-sky-200', 'iNews': 'text-indigo-600 bg-indigo-50 border-indigo-200',
+            'Liputan6': 'text-yellow-600 bg-yellow-50 border-yellow-200', 'TMDb Trending': 'text-emerald-600 bg-emerald-50 border-emerald-200'
+        };
 
         function switchLanguage(lang) {
             currentLang = lang;
-            document.querySelectorAll('[data-i18n]').forEach(function(el) {
-                var key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    el.innerText = translations[lang][key];
-                }
+            localStorage.setItem('mp_lang', lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) el.innerText = translations[lang][key];
             });
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
-                var key = el.getAttribute('data-i18n-placeholder');
-                if (translations[lang][key]) {
-                    el.placeholder = translations[lang][key];
-                }
-            });
-            renderTimeline();
-            if (currentView === 'analytics') renderAnalytics();
+            document.getElementById('searchInput').placeholder = lang === 'en' ? "Search news, topics, or figures..." : "Lacak isu, tokoh, atau kata kunci berita...";
+            document.getElementById('langSwitch').value = lang;
         }
 
-        var URL_NEWS = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_news.csv';
-        var URL_INFOTAINMENT = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/berita_terkini.csv';
-        var URL_HIBURAN = 'https://raw.githubusercontent.com/adammadden13-oss/indonesian-media-pulse/main/film_dan_hiburan.csv';
-        
-        var dataNasional = [];
-        var dataInfotainment = [];
-        var dataHiburan = [];
-        var activePage = 'nasional';
-        
-        var allNews = []; 
-        var filteredNews = [];
-        var activePeriod = 'today';
-        var activePortal = 'Semua';
-        var activeCategory = 'Semua';
-        var searchQuery = '';
-        var displayLimit = 20;
-        
-        var analyticsScope = 'all';
-        var currentView = 'feed'; 
-        var charts = { sentiment: null, category: null, portal: null, timeline: null };
-
-        var portalColors = {
-            'DetikCom': 'text-blue-600 bg-blue-50 border-blue-200',
-            'Kompas.com': 'text-orange-600 bg-orange-50 border-orange-200',
-            'CNN Indonesia': 'text-red-600 bg-red-50 border-red-200',
-            'Tribunnews': 'text-cyan-600 bg-cyan-50 border-cyan-200',
-            'SINDOnews': 'text-sky-600 bg-sky-50 border-sky-200',
-            'iNews': 'text-indigo-600 bg-indigo-50 border-indigo-200',
-            'Liputan6': 'text-yellow-600 bg-yellow-50 border-yellow-200',
-            'TMDb Trending': 'text-emerald-600 bg-emerald-50 border-emerald-200',
-            'Google News Hiburan': 'text-pink-600 bg-pink-50 border-pink-200'
-        };
-
         function fetchCSV(url) {
-            return new Promise(function(resolve) {
+            return new Promise((resolve) => {
                 Papa.parse(url, {
-                    download: true,
-                    header: true,
-                    skipEmptyLines: true,
+                    download: true, header: true, skipEmptyLines: true,
                     complete: function(results) { resolve(results.data || []); },
-                    error: function(err) { resolve([]); }
+                    error: function() { resolve([]); }
                 });
             });
         }
 
         async function initApp() {
             try {
-                document.getElementById('syncStatus').innerText = translations[currentLang].status_sync;
-                var results = await Promise.all([
-                    fetchCSV(URL_NEWS),
-                    fetchCSV(URL_INFOTAINMENT),
-                    fetchCSV(URL_HIBURAN)
-                ]);
+                document.getElementById('syncStatus').innerText = 'Mengunduh...';
+                
+                // Set memory states to UI
+                document.getElementById('langSwitch').value = currentLang;
+                document.getElementById('periodFilter').value = activePeriod;
+                switchLanguage(currentLang);
+                setupDragToScroll();
 
-                dataNasional = results[0] || [];
-                dataInfotainment = results[1] || [];
-                dataHiburan = results[2] || [];
+                const [newsData, infoData, filmData] = await Promise.all([ fetchCSV(URL_NEWS), fetchCSV(URL_INFOTAINMENT), fetchCSV(URL_HIBURAN) ]);
+
+                dataNasional = newsData || []; dataInfotainment = infoData || []; dataHiburan = filmData || [];
 
                 if(dataNasional.length > 0 || dataInfotainment.length > 0 || dataHiburan.length > 0) {
                     document.getElementById('syncStatus').innerText = translations[currentLang].status_updated;
                     document.getElementById('syncStatus').classList.replace('text-gray-300', 'text-brandLime');
-                    switchCategory('nasional');
-                } else {
-                    showError("Data arsip kosong.");
+                    
+                    // Lanjutkan dari halaman terakhir yang dibuka
+                    if(currentView === 'analytics') switchView('analytics');
+                    else switchCategory(activePage);
                 }
-            } catch (error) {
-                showError("Gagal merakit data multi-sumber.");
-            }
+            } catch (error) { console.error(error); }
         }
 
         window.switchCategory = function(cat) {
             activePage = cat;
-            if (cat === 'nasional') allNews = [].concat(dataNasional);
-            else if (cat === 'infotainment') allNews = [].concat(dataInfotainment);
-            else if (cat === 'hiburan') allNews = [].concat(dataHiburan);
+            localStorage.setItem('mp_page', cat);
+            if (cat === 'nasional') allNews = [...dataNasional];
+            else if (cat === 'infotainment') allNews = [...dataInfotainment];
+            else if (cat === 'hiburan') allNews = [...dataHiburan];
             
-            activePortal = 'Semua';
-            activeCategory = 'Semua';
-            document.getElementById('searchInput').value = '';
-            searchQuery = '';
+            activePortal = 'Semua'; activeCategory = 'Semua';
+            document.getElementById('searchInput').value = ''; searchQuery = '';
             
             if (currentView !== 'feed') switchView('feed');
             else { updateSidebarUI(); applyFilters(); }
         };
 
-        window.changeLimit = function(val) {
-            displayLimit = parseInt(val);
-            renderTimeline();
+        window.changeLimit = function(val) { displayLimit = parseInt(val); renderTimeline(); };
+        window.changePeriod = function(val) { activePeriod = val; localStorage.setItem('mp_period', val); applyFilters(); };
+        window.setPortal = function(portal) { activePortal = portal; activeCategory = 'Semua'; applyFilters(); };
+        window.setCategory = function(cat) { activeCategory = cat; applyFilters(); };
+        window.resetFilters = function() { 
+            document.getElementById('searchInput').value = ''; document.getElementById('periodFilter').value = 'today';
+            searchQuery = ''; activePeriod = 'today'; activePortal = 'Semua'; activeCategory = 'Semua'; applyFilters(); 
         };
 
+        document.getElementById('searchInput').addEventListener('input', (e) => { searchQuery = e.target.value; applyFilters(); });
+
         function updateSidebarUI() {
-            ['navNasional', 'navInfo', 'navHiburan', 'navAnalytics'].forEach(function(id) {
-                var el = document.getElementById(id);
+            ['navNasional', 'navInfo', 'navHiburan', 'navAnalytics'].forEach(id => {
+                const el = document.getElementById(id);
                 if (el) {
                     el.classList.replace('text-brandLime', 'text-gray-400');
                     el.classList.replace('bg-gray-800/50', 'hover:bg-gray-800');
@@ -452,261 +287,24 @@
                 document.getElementById('navAnalytics').classList.replace('text-gray-400', 'text-brandLime');
                 document.getElementById('navAnalytics').classList.replace('hover:bg-gray-800', 'bg-gray-800/50');
             } else {
-                var activeId = activePage === 'infotainment' ? 'navInfo' : (activePage === 'hiburan' ? 'navHiburan' : 'navNasional');
+                let activeId = activePage === 'infotainment' ? 'navInfo' : (activePage === 'hiburan' ? 'navHiburan' : 'navNasional');
                 document.getElementById(activeId).classList.replace('text-gray-400', 'text-brandLime');
                 document.getElementById(activeId).classList.replace('hover:bg-gray-800', 'bg-gray-800/50');
             }
         }
 
-        window.resetFilters = function() {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('periodFilter').value = 'today';
-            searchQuery = '';
-            activePeriod = 'today';
-            activePortal = 'Semua';
-            activeCategory = 'Semua';
-            applyFilters();
-        }
-
-        function applyFilters() {
-            filteredNews = [].concat(allNews);
-
-            if (searchQuery.trim() !== '') {
-                var q = searchQuery.toLowerCase();
-                filteredNews = filteredNews.filter(function(d) {
-                    return (d['Judul'] || '').toLowerCase().includes(q) ||
-                           (d['Sumber'] || '').toLowerCase().includes(q) ||
-                           (d['Kategori'] || '').toLowerCase().includes(q);
-                });
-            }
-
-            var now = new Date();
-            if (activePeriod !== 'all') {
-                filteredNews = filteredNews.filter(function(d) {
-                    if (!d['Waktu Tarik']) return false;
-                    var itemDate = new Date(d['Waktu Tarik'].replace(' ', 'T'));
-                    if (isNaN(itemDate)) return true;
-                    var diffDays = Math.ceil(Math.abs(now - itemDate) / (1000 * 60 * 60 * 24));
-                    if (activePeriod === 'today') return diffDays <= 1;
-                    if (activePeriod === '7days') return diffDays <= 7;
-                    if (activePeriod === '30days') return diffDays <= 30;
-                    return true;
-                });
-            }
-
-            buildFilterUI();
-
-            if (activePortal !== 'Semua') {
-                filteredNews = filteredNews.filter(function(d) { return d['Sumber'] === activePortal; });
-            }
-            if (activeCategory !== 'Semua') {
-                filteredNews = filteredNews.filter(function(d) { return d['Kategori'] === activeCategory; });
-            }
-
-            filteredNews.sort(function(a, b) {
-                var dateA = new Date((a['Waktu Tarik']||'').replace(' ', 'T'));
-                var dateB = new Date((b['Waktu Tarik']||'').replace(' ', 'T'));
-                return dateB - dateA;
-            });
-
-            renderTimeline();
-            if (currentView === 'analytics') renderAnalytics();
-        }
-
-        function buildFilterUI() {
-            var tempFiltered = [].concat(allNews);
-            
-            var rawPortals = tempFiltered.map(function(d) { return d['Sumber']; }).filter(Boolean);
-            var uniquePortals = [];
-            rawPortals.forEach(function(p) { if(uniquePortals.indexOf(p) === -1) uniquePortals.push(p); });
-            var portals = ['Semua'].concat(uniquePortals);
-            
-            document.getElementById('portalContainer').innerHTML = portals.map(function(portal) {
-                var activeClass = activePortal === portal ? 'bg-brandDark text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50';
-                return '<button onclick="setPortal(\''+portal+'\')" class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap ' + activeClass + '">' + portal + '</button>';
-            }).join('');
-
-            var catData = activePortal === 'Semua' ? tempFiltered : tempFiltered.filter(function(d) { return d['Sumber'] === activePortal; });
-            
-            // FILTER KATEGORI ANGKA (Regex yang ketat)
-            var rawCats = catData.map(function(d) { return d['Kategori']; }).filter(function(c) {
-                // Jangan terima jika string tersebut MURNI hanya berisi angka
-                return c && !/^\d+$/.test(c.trim());
-            });
-            
-            var uniqueCats = [];
-            rawCats.forEach(function(c) { if(uniqueCats.indexOf(c) === -1) uniqueCats.push(c); });
-            var categories = ['Semua'].concat(uniqueCats.sort());
-            
-            if (categories.indexOf(activeCategory) === -1) activeCategory = 'Semua';
-
-            document.getElementById('categoryContainer').innerHTML = categories.map(function(cat) {
-                var activeClass = activeCategory === cat ? 'bg-brandLime text-brandDark shadow-sm font-bold border border-brandLime' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100';
-                return '<button onclick="setCategory(\''+cat+'\')" class="px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap ' + activeClass + '">' + cat + '</button>';
-            }).join('');
-        }
-
-        function renderTimeline() {
-            var container = document.getElementById('timelineList');
-            var emptyState = document.getElementById('emptyState');
-            var countLabel = currentLang === 'en' ? 'News Found' : 'Berita Ditemukan';
-            document.getElementById('feedCount').innerText = filteredNews.length + " " + countLabel;
-
-            if (filteredNews.length === 0) {
-                container.innerHTML = '';
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-                return;
-            }
-
-            emptyState.classList.add('hidden');
-            emptyState.classList.remove('flex');
-
-            var html = '';
-            var displayData = filteredNews.slice(0, displayLimit);
-            var t = translations[currentLang];
-
-            displayData.forEach(function(item) {
-                var sumber = item['Sumber'] || 'Unknown';
-                var colorClass = portalColors[sumber] || 'text-gray-600 bg-gray-50 border-gray-200';
-                var timeDisplay = item['Waktu Tarik'] || '';
-                try {
-                    var d = new Date(timeDisplay.replace(' ', 'T'));
-                    if(!isNaN(d)) timeDisplay = d.toLocaleTimeString(currentLang === 'en' ? 'en-US' : 'id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-                } catch(e) {}
-
-                var fallbackImg = "https://placehold.co/400x300/f8f9fa/9ca3af?text=" + encodeURIComponent(sumber);
-                var imgUrl = item['Gambar'] || item['Image URL'] || fallbackImg;
-
-                html += '<div class="relative flex gap-4 ml-6 mb-8 group fade-in">';
-                html += '<div class="absolute -left-[35px] w-4 h-4 bg-gray-300 rounded-full border-4 border-gray-50 group-hover:bg-brandLime group-hover:border-brandLime/30 transition-colors z-10 mt-2"></div>';
-                html += '<a href="' + (item['URL'] || '#') + '" target="_blank" class="block w-full max-w-4xl bg-white p-4 lg:p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brandLime/50 transition-all flex flex-col sm:flex-row gap-4 lg:gap-6 items-start">';
-                
-                // Kontainer Gambar (Thumbnail)
-                html += '<div class="w-full sm:w-40 lg:w-48 h-48 sm:h-32 shrink-0 overflow-hidden rounded-xl bg-gray-100 border border-gray-100">';
-                html += '<img src="' + imgUrl + '" alt="Thumbnail" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src=\''+fallbackImg+'\'">';
-                html += '</div>';
-
-                // Kontainer Teks
-                html += '<div class="flex-1 flex flex-col w-full justify-center min-h-[8rem]">';
-                html += '<div class="flex flex-wrap items-center justify-between gap-2 mb-2 lg:mb-3">';
-                html += '<div class="flex items-center gap-2">';
-                html += '<span class="px-2.5 py-1 rounded-md text-[10px] lg:text-xs font-bold border ' + colorClass + '">' + sumber + '</span>';
-                html += '<span class="text-[10px] lg:text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">' + t.rubrik + ' ' + (item['Kategori'] || 'Umum') + '</span>';
-                html += '</div>';
-                html += '<span class="text-[10px] lg:text-xs font-medium text-gray-400">' + t.tercatat + ' ' + timeDisplay + '</span>';
-                html += '</div>';
-                html += '<h4 class="text-base lg:text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-3">' + (item['Judul'] || 'Tanpa Judul') + '</h4>';
-                html += '</div>';
-                
-                html += '</a></div>';
-            });
-
-            container.innerHTML = html;
-        }
-
-        function extractTrendingTopicsAndInsights(dataToAnalyze) {
-            var cloudContainer = document.getElementById('trendingTopicsContainer');
-            var insightContainer = document.getElementById('aiInsightText');
-            
-            if (dataToAnalyze.length === 0) {
-                cloudContainer.innerHTML = '<span class="text-sm text-gray-400">No data available.</span>';
-                insightContainer.innerHTML = "No media activity recorded.";
-                return;
-            }
-
-            var portals = {};
-            var categories = {};
-            dataToAnalyze.forEach(function(d) {
-                var p = d['Sumber'] || 'Unknown';
-                var c = d['Kategori'] || 'Umum';
-                portals[p] = (portals[p] || 0) + 1;
-                categories[c] = (categories[c] || 0) + 1;
-            });
-
-            var topPortal = Object.keys(portals).sort(function(a, b) { return portals[b] - portals[a]; })[0];
-            var topCategory = Object.keys(categories).sort(function(a, b) { return categories[b] - categories[a]; })[0];
-
-            var text = dataToAnalyze.slice(0, 100).map(function(d) { return d['Judul'] || ''; }).join(' ').toLowerCase();
-            var words = text.replace(/[^a-z0-9\s]/g, '').split(/\s+/);
-            var stopwords = ["di","ke","dari","dan","atau","untuk","dengan","yang","ini","itu","pada","dalam","sebagai","oleh","karena","sehingga","bahwa","jika","ada","adalah","saja","juga","sudah","belum","bisa","akan","telah","saat","setelah","lalu","kemudian","namun","tetapi","tapi","sedang","lagi","baru","satu","dua","hari","tahun","bulan","berita","indonesia","video","foto","nasional","baca","juga","lihat","viral","tiktok","trending"];
-
-            var wordCounts = {};
-            words.forEach(function(word) { 
-                if (word.length > 3 && stopwords.indexOf(word) === -1) {
-                    wordCounts[word] = (wordCounts[word] || 0) + 1;
-                }
-            });
-            var sortedWords = Object.keys(wordCounts).sort(function(a, b) { return wordCounts[b] - wordCounts[a]; }).slice(0, 20);
-
-            cloudContainer.innerHTML = sortedWords.map(function(word) {
-                return '<span onclick="setSearch(\''+word+'\')" class="cursor-pointer hover:text-brandLime hover:bg-brandDark px-2 py-1 rounded-md text-sm font-bold text-gray-700 transition-all inline-block m-1">' + word + '</span>';
-            }).join('');
-            
-            if (currentLang === 'en') {
-                insightContainer.innerHTML = 'Based on <b>' + dataToAnalyze.length + '</b> news articles, information flow is dominated by <b>' + topPortal + '</b>, centered around the <b>' + topCategory + '</b> category with a core focus on <b>"' + (sortedWords[0] || 'National').toUpperCase() + '"</b>.';
-            } else {
-                insightContainer.innerHTML = 'Berdasarkan <b>' + dataToAnalyze.length + '</b> berita, informasi dikendalikan oleh <b>' + topPortal + '</b>, terpusat pada rubrik <b>' + topCategory + '</b> dengan isu utama <b>"' + (sortedWords[0] || 'Nasional').toUpperCase() + '"</b>.';
-            }
-        }
-
-        window.setAnalyticsScope = function(scope) {
-            analyticsScope = scope;
-            ['all', 'nasional', 'infotainment', 'hiburan'].forEach(function(s) {
-                var btn = document.getElementById('btnScope_' + s);
-                if (btn) btn.className = s === scope ? "px-4 py-2 rounded-lg text-sm font-bold bg-brandDark text-brandLime shadow-md transition-colors" : "px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors";
-            });
-            renderAnalytics();
-        };
-
-        window.setPortal = function(portal) { activePortal = portal; activeCategory = 'Semua'; applyFilters(); };
-        window.setCategory = function(cat) { activeCategory = cat; applyFilters(); };
-        window.setSearch = function(query) { document.getElementById('searchInput').value = query; searchQuery = query; applyFilters(); };
-
-        document.getElementById('periodFilter').addEventListener('change', function(e) { activePeriod = e.target.value; applyFilters(); });
-        document.getElementById('searchInput').addEventListener('input', function(e) { searchQuery = e.target.value; applyFilters(); });
-
-        function showError(msg) {
-            document.getElementById('syncStatus').innerText = 'Error';
-            document.getElementById('syncStatus').classList.add('text-red-500');
-        }
-
-        var isSidebarCollapsed = false;
-        window.toggleSidebar = function() {
-            isSidebarCollapsed = !isSidebarCollapsed;
-            var sidebar = document.getElementById('sidebar');
-            var icon = document.getElementById('collapseIcon');
-            if (isSidebarCollapsed) {
-                sidebar.classList.add('collapsed-sidebar');
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>';
-            } else {
-                sidebar.classList.remove('collapsed-sidebar');
-                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>';
-            }
-        };
-
-        function handleScroll(e) {
-            var isScrolled = e.target.scrollTop > 20;
-            if (isScrolled) {
-                document.body.classList.add('is-scrolled');
-            } else {
-                document.body.classList.remove('is-scrolled');
-            }
-        }
-        
-        document.getElementById('feedView').addEventListener('scroll', handleScroll);
-        document.getElementById('analyticsView').addEventListener('scroll', handleScroll);
-
         window.switchView = function(view) {
             currentView = view;
-            var feedView = document.getElementById('feedView');
-            var analyticsView = document.getElementById('analyticsView');
-            var feedFiltersView = document.getElementById('feedFiltersView');
+            localStorage.setItem('mp_view', view);
+            const feedView = document.getElementById('feedView');
+            const analyticsView = document.getElementById('analyticsView');
+            const feedFiltersView = document.getElementById('feedFiltersView');
 
             if (view === 'feed') {
                 feedView.classList.remove('hidden'); feedView.classList.add('flex');
                 analyticsView.classList.add('hidden'); analyticsView.classList.remove('flex');
                 feedFiltersView.classList.remove('hidden');
+                applyFilters();
             } else {
                 analyticsView.classList.remove('hidden'); analyticsView.classList.add('flex');
                 feedView.classList.add('hidden'); feedView.classList.remove('flex');
@@ -716,98 +314,169 @@
             updateSidebarUI();
         };
 
+        function applyFilters() {
+            filteredNews = [...allNews];
+
+            if (searchQuery.trim() !== '') {
+                const q = searchQuery.toLowerCase();
+                filteredNews = filteredNews.filter(d => 
+                    (d['Judul'] || '').toLowerCase().includes(q) || (d['Sumber'] || '').toLowerCase().includes(q) || (d['Kategori'] || '').toLowerCase().includes(q)
+                );
+            }
+
+            const now = new Date();
+            if (activePeriod !== 'all') {
+                filteredNews = filteredNews.filter(d => {
+                    if (!d['Waktu Tarik']) return false;
+                    let itemDate = new Date(d['Waktu Tarik'].replace(' ', 'T'));
+                    if (isNaN(itemDate)) return true; // Bypass format error
+                    // Toleransi 48 Jam (2 Hari) untuk menghindari layar kosong
+                    const diffDays = Math.ceil(Math.abs(now - itemDate) / (1000 * 60 * 60 * 24));
+                    if (activePeriod === 'today') return diffDays <= 2; 
+                    if (activePeriod === '7days') return diffDays <= 7;
+                    if (activePeriod === '30days') return diffDays <= 30;
+                    return true;
+                });
+            }
+
+            buildFilterUI();
+
+            if (activePortal !== 'Semua') filteredNews = filteredNews.filter(d => d['Sumber'] === activePortal);
+            if (activeCategory !== 'Semua') filteredNews = filteredNews.filter(d => d['Kategori'] === activeCategory);
+
+            filteredNews.sort((a, b) => new Date((b['Waktu Tarik']||'').replace(' ', 'T')) - new Date((a['Waktu Tarik']||'').replace(' ', 'T')));
+            renderTimeline();
+        }
+
+        function buildFilterUI() {
+            let tempFiltered = [...allNews];
+            const portals = ['Semua', ...new Set(tempFiltered.map(d => d['Sumber']).filter(Boolean))];
+            
+            document.getElementById('portalContainer').innerHTML = portals.map(portal => `
+                <button onclick="setPortal('${portal}')" class="px-4 py-1.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${activePortal === portal ? 'bg-brandDark text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}">${portal}</button>
+            `).join('');
+
+            let catData = activePortal === 'Semua' ? tempFiltered : tempFiltered.filter(d => d['Sumber'] === activePortal);
+            // Saring kategori yang berupa angka agar bersih
+            const categories = ['Semua', ...new Set(catData.map(d => d['Kategori']).filter(c => c && isNaN(c)))].sort();
+            if (!categories.includes(activeCategory)) activeCategory = 'Semua';
+
+            document.getElementById('categoryContainer').innerHTML = categories.map(cat => `
+                <button onclick="setCategory('${cat}')" class="px-3 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap ${activeCategory === cat ? 'bg-brandLime text-brandDark shadow-sm font-bold border border-brandLime' : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-100'}">${cat}</button>
+            `).join('');
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timelineList');
+            const emptyState = document.getElementById('emptyState');
+            document.getElementById('feedCount').innerText = `${filteredNews.length} Berita`;
+
+            if (filteredNews.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden'); emptyState.classList.add('flex');
+                return;
+            }
+
+            emptyState.classList.add('hidden'); emptyState.classList.remove('flex');
+            let html = '';
+            
+            filteredNews.slice(0, displayLimit).forEach(item => {
+                const sumber = item['Sumber'] || 'Unknown';
+                const colorClass = portalColors[sumber] || 'text-gray-600 bg-gray-50 border-gray-200';
+                const img = item['Gambar'] && item['Gambar'] !== '-' ? `<img src="${item['Gambar']}" class="w-32 h-24 object-cover rounded-xl shrink-0 border border-gray-100 hidden sm:block" alt="thumb">` : `<div class="w-32 h-24 bg-gray-100 rounded-xl shrink-0 border border-gray-200 hidden sm:flex items-center justify-center text-gray-400 font-bold text-xs">${sumber}</div>`;
+                
+                let timeDisplay = item['Waktu Tarik'] || '';
+                try {
+                    const d = new Date(timeDisplay.replace(' ', 'T'));
+                    if(!isNaN(d)) timeDisplay = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                } catch(e) {}
+
+                html += `
+                    <div class="relative flex gap-4 ml-6 mb-8 group fade-in">
+                        <div class="absolute -left-[35px] w-4 h-4 bg-gray-300 rounded-full border-4 border-gray-50 group-hover:bg-brandLime group-hover:border-brandLime/30 transition-colors z-10 mt-2"></div>
+                        <a href="${item['URL'] || '#'}" target="_blank" class="flex flex-row w-full max-w-4xl bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-brandLime/50 transition-all gap-4">
+                            ${img}
+                            <div class="flex flex-col flex-1">
+                                <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-1 rounded-md text-xs font-bold border ${colorClass}">${sumber}</span>
+                                        <span class="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">Rubrik: ${item['Kategori'] || 'Umum'}</span>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-400">Tercatat: ${timeDisplay}</span>
+                                </div>
+                                <h4 class="text-lg font-bold text-gray-900 leading-snug group-hover:text-blue-600 transition-colors">${item['Judul'] || 'Tanpa Judul'}</h4>
+                            </div>
+                        </a>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        window.setAnalyticsScope = function(scope) {
+            analyticsScope = scope;
+            ['all', 'nasional', 'infotainment', 'hiburan'].forEach(s => {
+                const btn = document.getElementById('btnScope_' + s);
+                if (btn) btn.className = s === scope ? "px-4 py-2 rounded-lg text-sm font-bold bg-brandDark text-brandLime shadow-md" : "px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-500 hover:bg-gray-200";
+            });
+            renderAnalytics();
+        };
+
         function renderAnalytics() {
             if (!window.Chart) return; 
-            var baseData = analyticsScope === 'all' ? [].concat(dataNasional, dataInfotainment, dataHiburan) : (analyticsScope === 'nasional' ? [].concat(dataNasional) : (analyticsScope === 'infotainment' ? [].concat(dataInfotainment) : [].concat(dataHiburan)));
+            let baseData = analyticsScope === 'all' ? [...dataNasional, ...dataInfotainment, ...dataHiburan] : (analyticsScope === 'nasional' ? [...dataNasional] : (analyticsScope === 'infotainment' ? [...dataInfotainment] : [...dataHiburan]));
             
-            extractTrendingTopicsAndInsights(baseData);
-
-            var sentimenCount = { 'Positif': 0, 'Negatif': 0, 'Netral': 0, 'Antrean NLP': 0 };
-            var kategoriCount = {};
-            var portalCount = {};
-            var timeSeries = {};
-
-            baseData.forEach(function(d) {
-                var s = d['Sentimen'] ? d['Sentimen'].trim() : '';
-                if (['Positif', 'Negatif', 'Netral'].indexOf(s) !== -1) sentimenCount[s]++; else sentimenCount['Antrean NLP']++;
+            let sentimenCount = { 'Positif': 0, 'Negatif': 0, 'Netral': 0, 'Antrean NLP': 0 };
+            let kategoriCount = {}, portalCount = {};
+            baseData.forEach(d => {
+                let s = d['Sentimen'] ? d['Sentimen'].trim() : '';
+                if (['Positif', 'Negatif', 'Netral'].includes(s)) sentimenCount[s]++; else sentimenCount['Antrean NLP']++;
                 kategoriCount[d['Kategori'] || 'Umum'] = (kategoriCount[d['Kategori'] || 'Umum'] || 0) + 1;
                 portalCount[d['Sumber'] || 'Unknown'] = (portalCount[d['Sumber'] || 'Unknown'] || 0) + 1;
-                if ((d['Waktu Tarik'] || '').length >= 10) {
-                    var dateKey = d['Waktu Tarik'].substring(0, 10);
-                    timeSeries[dateKey] = (timeSeries[dateKey] || 0) + 1;
-                }
             });
 
-            var sortedCat = Object.keys(kategoriCount).sort(function(a,b){ return kategoriCount[b] - kategoriCount[a]; }).slice(0, 7);
-            var sortedPortal = Object.keys(portalCount).sort(function(a,b){ return portalCount[b] - portalCount[a]; }).slice(0, 7);
-            var sortedDates = Object.keys(timeSeries).sort();
+            const sortedCat = Object.keys(kategoriCount).sort((a,b) => kategoriCount[b] - kategoriCount[a]).slice(0, 7);
+            const sortedPortal = Object.keys(portalCount).sort((a,b) => portalCount[b] - portalCount[a]).slice(0, 7);
 
-            var destroy = function(k) { if(charts[k]) charts[k].destroy(); };
+            const destroy = (k) => { if(charts[k]) charts[k].destroy(); };
 
             destroy('sentiment');
-            charts.sentiment = new Chart(document.getElementById('sentimentChart').getContext('2d'), {
-                type: 'doughnut',
-                data: { labels: ['Positif', 'Negatif', 'Netral', 'Antrean NLP'], datasets: [{ data: [sentimenCount['Positif'], sentimenCount['Negatif'], sentimenCount['Netral'], sentimenCount['Antrean NLP']], backgroundColor: ['#4ade80', '#f87171', '#94a3b8', '#e2e8f0'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-            });
+            charts.sentiment = new Chart(document.getElementById('sentimentChart').getContext('2d'), { type: 'doughnut', data: { labels: ['Positif', 'Negatif', 'Netral', 'Antrean'], datasets: [{ data: [sentimenCount['Positif'], sentimenCount['Negatif'], sentimenCount['Netral'], sentimenCount['Antrean NLP']], backgroundColor: ['#4ade80', '#f87171', '#94a3b8', '#e2e8f0'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
 
             destroy('category');
-            charts.category = new Chart(document.getElementById('categoryChart').getContext('2d'), {
-                type: 'pie',
-                data: { labels: sortedCat, datasets: [{ data: sortedCat.map(function(k){ return kategoriCount[k]; }), backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#2dd4bf', '#fb923c'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-            });
+            charts.category = new Chart(document.getElementById('categoryChart').getContext('2d'), { type: 'pie', data: { labels: sortedCat, datasets: [{ data: sortedCat.map(k => kategoriCount[k]), backgroundColor: ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#2dd4bf', '#fb923c'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false } });
 
             destroy('portal');
-            charts.portal = new Chart(document.getElementById('portalChart').getContext('2d'), {
-                type: 'bar',
-                data: { labels: sortedPortal, datasets: [{ data: sortedPortal.map(function(p){ return portalCount[p]; }), backgroundColor: '#c4f033', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-            });
+            charts.portal = new Chart(document.getElementById('portalChart').getContext('2d'), { type: 'bar', data: { labels: sortedPortal, datasets: [{ data: sortedPortal.map(p => portalCount[p]), backgroundColor: '#c4f033', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        }
 
-            destroy('timeline');
-            charts.timeline = new Chart(document.getElementById('timelineChart').getContext('2d'), {
-                type: 'line',
-                data: { labels: sortedDates, datasets: [{ data: sortedDates.map(function(d){ return timeSeries[d]; }), borderColor: '#111827', backgroundColor: 'rgba(17, 24, 39, 0.05)', borderWidth: 2, fill: true, tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        // Script untuk Mouse Drag to Scroll pada Filter Tab
+        function setupDragToScroll() {
+            document.querySelectorAll('.draggable').forEach(ele => {
+                let pos = { top: 0, left: 0, x: 0, y: 0 };
+                const mouseDownHandler = function (e) {
+                    ele.style.userSelect = 'none';
+                    pos = { left: ele.scrollLeft, top: ele.scrollTop, x: e.clientX, y: e.clientY };
+                    document.addEventListener('mousemove', mouseMoveHandler);
+                    document.addEventListener('mouseup', mouseUpHandler);
+                };
+                const mouseMoveHandler = function (e) {
+                    const dx = e.clientX - pos.x;
+                    const dy = e.clientY - pos.y;
+                    ele.scrollTop = pos.top - dy;
+                    ele.scrollLeft = pos.left - dx;
+                };
+                const mouseUpHandler = function () {
+                    ele.style.userSelect = '';
+                    document.removeEventListener('mousemove', mouseMoveHandler);
+                    document.removeEventListener('mouseup', mouseUpHandler);
+                };
+                ele.addEventListener('mousedown', mouseDownHandler);
             });
         }
 
-        // Fitur Mouse Drag to Scroll
-        function makeScrollable(slider) {
-            if (!slider) return;
-            var isDown = false;
-            var startX;
-            var scrollLeft;
-
-            slider.addEventListener('mousedown', function(e) {
-                isDown = true;
-                slider.classList.add('is-dragging');
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-            });
-            slider.addEventListener('mouseleave', function() {
-                isDown = false;
-                slider.classList.remove('is-dragging');
-            });
-            slider.addEventListener('mouseup', function() {
-                isDown = false;
-                slider.classList.remove('is-dragging');
-            });
-            slider.addEventListener('mousemove', function(e) {
-                if (!isDown) return;
-                e.preventDefault();
-                var x = e.pageX - slider.offsetLeft;
-                var walk = (x - startX) * 2;
-                slider.scrollLeft = scrollLeft - walk;
-            });
-        }
-
-        window.onload = function() {
-            initApp();
-            makeScrollable(document.getElementById('portalContainer'));
-            makeScrollable(document.getElementById('categoryContainer'));
-        };
+        window.onload = initApp;
     </script>
 </body>
 </html>
