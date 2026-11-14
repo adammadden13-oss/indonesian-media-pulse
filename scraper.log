@@ -1372,3 +1372,7 @@
 2026-11-13 05:10:27,435 [INFO] Berhasil memperbarui 845 berita infotainment.
 2026-11-13 05:10:30,084 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
 2026-11-13 05:10:32,327 [INFO] Berhasil membersihkan dan memperbarui 15988 berita.
+2026-11-14 04:59:52,387 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-11-14 04:59:52,409 [INFO] Berhasil memperbarui 928 berita infotainment.
+2026-11-14 04:59:54,782 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
+2026-11-14 04:59:57,199 [INFO] Berhasil membersihkan dan memperbarui 16206 berita.
