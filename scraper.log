@@ -1376,3 +1376,12 @@
 2026-11-14 04:59:52,409 [INFO] Berhasil memperbarui 928 berita infotainment.
 2026-11-14 04:59:54,782 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
 2026-11-14 04:59:57,199 [INFO] Berhasil membersihkan dan memperbarui 16206 berita.
+2026-11-15 04:54:13,963 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='wolipop.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-15 04:54:36,223 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='wolipop.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-15 04:55:00,485 [WARNING] Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='wolipop.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-15 04:55:22,419 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='hot.detik.com', port=443): Read timed out. (read timeout=20)")': /celebs
+2026-11-15 04:55:44,682 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='hot.detik.com', port=443): Read timed out. (read timeout=20)")': /celebs
+2026-11-15 04:55:46,975 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-11-15 04:55:46,991 [INFO] Berhasil memperbarui 995 berita infotainment.
+2026-11-15 04:55:49,599 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
+2026-11-15 04:55:52,229 [INFO] Berhasil membersihkan dan memperbarui 16379 berita.
