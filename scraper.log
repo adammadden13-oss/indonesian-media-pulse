@@ -1396,3 +1396,12 @@
 2026-11-17 06:39:56,430 [WARNING] Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
 2026-11-17 06:39:58,566 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
 2026-11-17 06:40:00,818 [INFO] Berhasil membersihkan dan memperbarui 16850 berita.
+2026-11-18 05:58:13,883 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='hot.detik.com', port=443): Read timed out. (read timeout=20)")': /celebs
+2026-11-18 05:58:16,609 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-11-18 05:58:16,626 [INFO] Berhasil memperbarui 1216 berita infotainment.
+2026-11-18 05:58:37,377 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-18 05:58:59,583 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-18 05:59:23,806 [WARNING] Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-18 05:59:44,022 [ERROR] Gagal mengambil DetikCom: HTTPSConnectionPool(host='www.detik.com', port=443): Max retries exceeded with url: / (Caused by ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)"))
+2026-11-18 05:59:45,005 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
+2026-11-18 05:59:48,210 [INFO] Berhasil membersihkan dan memperbarui 17021 berita.
