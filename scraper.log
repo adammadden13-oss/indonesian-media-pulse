@@ -1412,3 +1412,8 @@
 2026-11-19 05:59:35,642 [INFO] Berhasil memperbarui 1292 berita infotainment.
 2026-11-19 05:59:38,501 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
 2026-11-19 05:59:39,688 [INFO] Berhasil membersihkan dan memperbarui 17260 berita.
+2026-11-20 05:47:53,519 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='wolipop.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-20 05:47:58,174 [ERROR] Error pada TribunTrends: 403 Client Error: Forbidden for url: https://trends.tribunnews.com/infotainment
+2026-11-20 05:47:58,193 [INFO] Berhasil memperbarui 1367 berita infotainment.
+2026-11-20 05:48:00,705 [ERROR] Gagal mengambil Tribunnews: 403 Client Error: Forbidden for url: https://www.tribunnews.com/
+2026-11-20 05:48:02,673 [INFO] Berhasil membersihkan dan memperbarui 17494 berita.
