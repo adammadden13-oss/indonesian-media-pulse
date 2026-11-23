@@ -1426,3 +1426,6 @@
 2026-11-22 05:12:13,330 [INFO] Berhasil memperbarui 1517 berita infotainment.
 2026-11-22 05:12:34,384 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
 2026-11-22 05:12:38,169 [INFO] Berhasil membersihkan dan memperbarui 17894 berita.
+2026-11-23 05:51:34,953 [INFO] Berhasil memperbarui 1592 berita infotainment.
+2026-11-23 05:51:55,907 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-23 05:52:00,726 [INFO] Berhasil membersihkan dan memperbarui 18125 berita.
