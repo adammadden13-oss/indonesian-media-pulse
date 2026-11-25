@@ -1435,3 +1435,9 @@
 2026-11-24 08:30:08,331 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
 2026-11-24 08:30:30,567 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
 2026-11-24 08:30:34,204 [INFO] Berhasil membersihkan dan memperbarui 18386 berita.
+2026-11-25 07:04:33,476 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='hot.detik.com', port=443): Read timed out. (read timeout=20)")': /celebs
+2026-11-25 07:04:35,999 [INFO] Berhasil memperbarui 1771 berita infotainment.
+2026-11-25 07:04:56,963 [WARNING] Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-25 07:05:19,193 [WARNING] Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-25 07:05:43,430 [WARNING] Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='www.detik.com', port=443): Read timed out. (read timeout=20)")': /
+2026-11-25 07:05:48,167 [INFO] Berhasil membersihkan dan memperbarui 18627 berita.
